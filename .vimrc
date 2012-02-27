@@ -24,6 +24,7 @@ Bundle 'ervandew/supertab'
 Bundle 'rodjek/vim-puppet'
 Bundle 'kchmck/vim-coffee-script'
 Bundle 'Command-T'
+Bundle 'scrooloose/nerdtree'
 
 filetype plugin indent on
 
