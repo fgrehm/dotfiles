@@ -86,6 +86,7 @@ au BufRead,BufNew *.html.erb set ft=eruby.html
 au BufRead,BufNew Gemfile set ft=ruby
 au BufRead,BufNew Guardfile set ft=ruby
 au BufRead,BufNew Procfile set ft=ruby
+au BufRead,BufNew *.ru set ft=ruby
 
 au FocusLost * :CommandTFlush
 au BufWrite * :call DeleteTrailingWS()
