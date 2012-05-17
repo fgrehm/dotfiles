@@ -8,6 +8,10 @@ if ! [[ -L $HOME/.vim ]]; then
   ln -s `pwd`/vim $HOME/.vim
 fi
 
+if ! $(git config --get core.excludesfile); then
+  git config --global core.excludesfile `pwd`/gitignore
+fi
+
 if ! [[ -d `pwd`/vim/bundle/vundle/.git  ]]; then
   git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
 fi
