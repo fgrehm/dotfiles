@@ -72,6 +72,10 @@ set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [ASCII=\%03.3b]\ [HEX=\%0
 
 map <C-t> <Esc>:CommandT<CR>
 
+if has("gui_macvim")
+  set guifont=Menlo:h14
+endif
+
 " Fix regexes in search
 nnoremap / /\v
 vnoremap / /\v
