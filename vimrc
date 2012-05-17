@@ -74,6 +74,8 @@ map <C-t> <Esc>:CommandT<CR>
 
 if has("gui_macvim")
   set guifont=Menlo:h14
+else
+  set guifont=Monospace\ 11.5
 endif
 
 " Fix regexes in search

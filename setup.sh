@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
 if ! [[ -L $HOME/.vimrc ]]; then
-  ln -s `pwd`/.vimrc $HOME/.vimrc
+  ln -s `pwd`/vimrc $HOME/.vimrc
 fi
-
 
 if ! [[ -L $HOME/.vim ]]; then
   ln -s `pwd`/vim $HOME/.vim
