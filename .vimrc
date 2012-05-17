@@ -25,6 +25,8 @@ Bundle 'rodjek/vim-puppet'
 Bundle 'kchmck/vim-coffee-script'
 Bundle 'Command-T'
 Bundle 'scrooloose/nerdtree'
+Bundle 'matchit.zip'
+Bundle 'ruby-matchit'
 
 filetype plugin indent on
 
