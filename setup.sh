@@ -8,6 +8,14 @@ if ! [[ -L $HOME/.vim ]]; then
   ln -s `pwd`/vim $HOME/.vim
 fi
 
+if ! $(grep -q "source `pwd`/bashrc" $HOME/.bashrc); then
+  echo "source `pwd`/bashrc" >> $HOME/.bashrc
+fi
+
+if ! [[ -L $HOME/.bash ]]; then
+  ln -s `pwd`/bash $HOME/.bash
+fi
+
 if ! [[ -L $HOME/.gitconfig ]]; then
   folder=$(echo `pwd` | sed -e 's/[\/&]/\\&/g')
   sed -e "s/ROOT/$folder/g" gitconfig-template > gitconfig
