@@ -22,6 +22,10 @@ if ! [[ -L $HOME/.gitconfig ]]; then
   ln -s `pwd`/gitconfig $HOME/.gitconfig
 fi
 
+if ! [[ -L $HOME/.gemrc ]]; then
+  ln -s `pwd`/gemrc $HOME/.gemrc
+fi
+
 if ! [[ -d `pwd`/vim/bundle/vundle/.git  ]]; then
   git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
 fi
