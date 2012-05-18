@@ -8,8 +8,10 @@ if ! [[ -L $HOME/.vim ]]; then
   ln -s `pwd`/vim $HOME/.vim
 fi
 
-if ! $(git config --get core.excludesfile); then
-  git config --global core.excludesfile `pwd`/gitignore
+if ! [[ -L $HOME/.gitconfig ]]; then
+  folder=$(echo `pwd` | sed -e 's/[\/&]/\\&/g')
+  sed -e "s/ROOT/$folder/g" gitconfig-template > gitconfig
+  ln -s `pwd`/gitconfig $HOME/.gitconfig
 fi
 
 if ! [[ -d `pwd`/vim/bundle/vundle/.git  ]]; then

@@ -1,0 +1,17 @@
+[user]
+  name = Fabio Rehm
+  email = fgrehm@gmail.com
+[alias]
+  st = status
+  pr = pull --rebase
+  ci = commit
+  di = diff
+  dic = diff --cached
+  co = checkout
+[color]
+  branch = auto
+  status = auto
+  diff = auto
+  grep = auto
+[core]
+  excludesfile = ROOT/gitignore
