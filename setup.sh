@@ -8,8 +8,14 @@ if ! [[ -L $HOME/.vim ]]; then
   ln -s `pwd`/vim $HOME/.vim
 fi
 
-if ! $(grep -q "source `pwd`/bashrc" $HOME/.bashrc); then
-  echo "source `pwd`/bashrc" >> $HOME/.bashrc
+if [[ $OS_TYPE = "linux-gnu" ]]; then
+  if ! $(grep -q "source `pwd`/bashrc" $HOME/.bashrc); then
+    echo "source `pwd`/bashrc" >> $HOME/.bashrc
+  fi
+else
+  if ! $(grep -q "source `pwd`/bashrc" $HOME/.bash_profile); then
+    echo "source `pwd`/bashrc" >> $HOME/.bash_profile
+  fi
 fi
 
 if ! [[ -L $HOME/.bash ]]; then
