@@ -39,32 +39,16 @@
 #-----------------------------------------------------------------------------------------------
 
 # colors
-case "$TERM" in
-    xterm*|rxvt*|screen*)
-        ESC="\033"
-        RED="\[$ESC[01;31m\]"
-        LIGHT_RED="\[$ESC[1;31m\]"
-        GREEN="\[$ESC[01;32m\]"
-        LIGHT_GREEN="\[$ESC[1;32m\]"
-        GREY="\[$ESC[0;37m\]"
-        CYAN="\[$ESC[01;36m\]"
-        YELLOW="\[$ESC[0;33m\]"
-        LIGHT_VIOLET="\[$ESC[1;35m\]"
-        RESET="\[$ESC[0m\]"
-    ;;
-    *)
-        ESC=""
-        RED=""
-        LIGHT_RED=""
-        GREEN=""
-        LIGHT_GREEN=""
-        GREY=""
-        CYAN=""
-        YELLOW=""
-        LIGHT_VIOLET=""
-        RESET=""
-    ;;
-esac
+ESC="\033"
+RED="\[$ESC[01;31m\]"
+LIGHT_RED="\[$ESC[1;31m\]"
+GREEN="\[$ESC[01;32m\]"
+LIGHT_GREEN="\[$ESC[1;32m\]"
+GREY="\[$ESC[0;37m\]"
+CYAN="\[$ESC[01;36m\]"
+YELLOW="\[$ESC[0;33m\]"
+LIGHT_VIOLET="\[$ESC[1;35m\]"
+RESET="\[$ESC[0m\]"
 
 # prints path to git directory
 __git_dirname() {
@@ -327,6 +311,6 @@ __git_prompt() {
         marker="$RED"
     fi
     marker="${marker}\$${RESET}"
-    PS1="${PS1} → \n\n${marker} "
+    PS1="${PS1} ${marker} "
 }
 PROMPT_COMMAND=__git_prompt

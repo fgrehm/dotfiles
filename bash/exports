@@ -1,3 +1,2 @@
 export EDITOR=vim
-export PS1="\h • \W \$($( cat ~/.bash/git-ps1 ))$ "
 export JRUBY_OPTS="--1.9"
