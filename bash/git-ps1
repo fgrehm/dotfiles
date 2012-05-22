@@ -20,10 +20,10 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 # #
 
-GIT=`which git`
+__GIT_CMD=`which git`
 
-BRANCH=$($GIT symbolic-ref HEAD 2>/dev/null \
-    || $GIT rev-parse HEAD 2>/dev/null | cut -c1-10 \
+BRANCH=$($__GIT_CMD symbolic-ref HEAD 2>/dev/null \
+    || $__GIT_CMD rev-parse HEAD 2>/dev/null | cut -c1-10 \
 )
 
 # if no branch or hash was returned, then we're not in a repository
@@ -38,7 +38,7 @@ mkcolor()
 }
 
 BRANCH=${BRANCH#refs/heads/}
-GIT_STATUS=$( $GIT status 2>/dev/null )
+GIT_STATUS=$( $__GIT_CMD status 2>/dev/null )
 
 # colors can be overridden via the GITPS1_COLOR_* environment variables
 COLOR_DEFAULT=$( mkcolor ${GITPS1_COLOR_DEFAULT:-33} )
@@ -62,7 +62,7 @@ NO_COLOR=$( mkcolor 0 )
 
 # uncommited files
 if [ "$IND_UNSTAGED" != '0' ]; then
-    $GIT diff --no-ext-diff --quiet --exit-code || \
+    $__GIT_CMD diff --no-ext-diff --quiet --exit-code || \
         STATUS="${STATUS}${COLOR_UNSTAGED}${IND_UNSTAGED}"
 fi
 
@@ -80,7 +80,7 @@ fi
 
 # untracked
 if [ "$IND_UNTRACKED" != '0' ]; then
-    if [ -n "$( $GIT ls-files --others --exclude-standard )" ]; then
+    if [ -n "$( $__GIT_CMD ls-files --others --exclude-standard )" ]; then
         STATUS="${STATUS}${COLOR_UNTRACKED}${IND_UNTRACKED}"
     fi
 fi
@@ -118,7 +118,7 @@ function format_unit {
   echo ${UNIT}
 }
 
-SINCE_LAST_COMMIT=$($GIT log --pretty=format:'%ar' -1)
+SINCE_LAST_COMMIT=$($__GIT_CMD log --pretty=format:'%ar' -1)
 SINCE_LAST_COMMIT=(${SINCE_LAST_COMMIT// / })
 
 VALUE=${SINCE_LAST_COMMIT[0]}
