@@ -27,6 +27,7 @@ Bundle 'Command-T'
 Bundle 'scrooloose/nerdtree'
 Bundle 'matchit.zip'
 Bundle 'ruby-matchit'
+Bundle 'VimClojure'
 
 filetype plugin indent on
 
