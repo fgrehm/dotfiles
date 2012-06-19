@@ -7,3 +7,5 @@ fi
 alias git=hub
 alias be='bundle exec'
 alias gs='git status'
+alias pull='git pull'
+alias push='git push'
