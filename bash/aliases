@@ -1,8 +1,9 @@
 if [[ $OS_TYPE = "linux-gnu" ]]; then
   alias ll='ls -alF'
-  alias gvim=mvim
 else
   alias ll='ls -alG'
+  alias gvim=mvim
+  alias mongod-run='mongod run --config /usr/local/etc/mongod.conf'
 fi
 
 alias git=hub
