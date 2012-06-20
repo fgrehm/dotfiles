@@ -1,5 +1,6 @@
 if [[ $OS_TYPE = "linux-gnu" ]]; then
   alias ll='ls -alF'
+  alias gvim=mvim
 else
   alias ll='ls -alG'
 fi
