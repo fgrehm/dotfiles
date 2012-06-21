@@ -6,8 +6,10 @@ else
   alias mongod-run='mongod run --config /usr/local/etc/mongod.conf'
 fi
 
-alias git=hub
 alias be='bundle exec'
+
+alias git=hub
 alias gs='git status'
+alias gl='git lg'
 alias pull='git pull'
 alias push='git push'
