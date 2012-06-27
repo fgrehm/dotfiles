@@ -37,7 +37,6 @@ syntax on
 
 set bg=dark
 colorscheme desert
-set guifont=Monospace\ 12
 
 set hidden
 set tabstop=2
