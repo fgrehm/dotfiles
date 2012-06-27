@@ -1,9 +1,10 @@
-if [[ $OS_TYPE = "linux-gnu" ]]; then
-  alias ll='ls -alF'
-else
+unamestr=`uname`
+if [[ $unamestr = "Darwin" ]]; then
   alias ll='ls -alG'
   alias gvim=mvim
   alias mongod-run='mongod run --config /usr/local/etc/mongod.conf'
+else
+  alias ll='ls -alF'
 fi
 
 alias be='bundle exec'
