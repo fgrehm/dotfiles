@@ -30,6 +30,7 @@ Bundle 'scrooloose/nerdtree'
 Bundle 'matchit.zip'
 Bundle 'ruby-matchit'
 Bundle 'VimClojure'
+Bundle 'SearchComplete'
 
 filetype plugin indent on
 
@@ -86,10 +87,6 @@ if has("gui_macvim")
 else
   set guifont=Monospace\ 11.5
 endif
-
-" Fix regexes in search
-nnoremap / /\v
-vnoremap / /\v
 
 " Delete trailing white space when saving
 func! DeleteTrailingWS()
