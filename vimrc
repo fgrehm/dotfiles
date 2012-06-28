@@ -31,6 +31,8 @@ Bundle 'matchit.zip'
 Bundle 'ruby-matchit'
 Bundle 'VimClojure'
 Bundle 'SearchComplete'
+Bundle 'bufexplorer.zip'
+Bundle 'lunaru/vim-less'
 
 filetype plugin indent on
 
