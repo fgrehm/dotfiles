@@ -2,7 +2,6 @@ alias ll='ls -alF'
 
 alias be='bundle exec'
 
-alias git=hub
 alias gs='git status'
 alias gl='git lg'
 alias pull='git pull'
