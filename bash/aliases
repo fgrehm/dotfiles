@@ -1,11 +1,4 @@
-unamestr=`uname`
-if [[ $unamestr = "Darwin" ]]; then
-  alias ll='ls -alG'
-  alias gvim=mvim
-  alias mongod-run='mongod run --config /usr/local/etc/mongod.conf'
-else
-  alias ll='ls -alF'
-fi
+alias ll='ls -alF'
 
 alias be='bundle exec'
 
