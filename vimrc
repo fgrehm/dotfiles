@@ -33,6 +33,7 @@ Bundle 'VimClojure'
 Bundle 'SearchComplete'
 Bundle 'bufexplorer.zip'
 Bundle 'lunaru/vim-less'
+Bundle 'jeetsukumaran/vim-filesearch'
 
 filetype plugin indent on
 
