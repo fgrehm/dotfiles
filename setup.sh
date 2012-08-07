@@ -30,6 +30,10 @@ if ! [[ -L $HOME/.rdebugrc ]]; then
   ln -s `pwd`/rdebugrc $HOME/.rdebugrc
 fi
 
+if ! [[ -L $HOME/.irbrc ]]; then
+  ln -s `pwd`/irbrc $HOME/.irbrc
+fi
+
 if ! [[ -d `pwd`/vim/bundle/vundle/.git  ]]; then
   git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
 fi
