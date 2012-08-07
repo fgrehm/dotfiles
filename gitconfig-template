@@ -4,7 +4,7 @@
 [alias]
   st = status
   pr = pull --rebase
-  ci = commit
+  ci = commit -v
   di = diff
   dic = diff --cached
   co = checkout
