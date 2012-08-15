@@ -1,42 +1,41 @@
 #!/usr/bin/env bash
 
-if ! [[ -L $HOME/.vimrc ]]; then
-  ln -s `pwd`/vimrc $HOME/.vimrc
-fi
+symlinks=( vimrc vim bash gemrc rdebugrc irbrc )
 
-if ! [[ -L $HOME/.vim ]]; then
-  ln -s `pwd`/vim $HOME/.vim
-fi
+echo "Creating symlinks..."
+for link in ${symlinks[@]}; do
+  target="`pwd`/${link}"
+  link_name="${HOME}/.${link}"
+  if ! [[ -L $link_name ]]; then
+    echo "  LINK - ${link_name}"
+    ln -s $target $link_name
+  else
+    echo "  SKIP - ${link_name}"
+  fi
+done
 
 if ! $(grep -q "source `pwd`/bashrc" $HOME/.bashrc); then
+  echo "Adding source to bashrc"
   echo "source `pwd`/bashrc" >> $HOME/.bashrc
-fi
-
-if ! [[ -L $HOME/.bash ]]; then
-  ln -s `pwd`/bash $HOME/.bash
+else
+  echo "Skipping source for bashrc"
 fi
 
 if ! [[ -L $HOME/.gitconfig ]]; then
+  echo "Creating .gitconfig"
   folder=$(echo `pwd` | sed -e 's/[\/&]/\\&/g')
   sed -e "s/ROOT/$folder/g" gitconfig-template > gitconfig
   ln -s `pwd`/gitconfig $HOME/.gitconfig
-fi
-
-if ! [[ -L $HOME/.gemrc ]]; then
-  ln -s `pwd`/gemrc $HOME/.gemrc
-fi
-
-if ! [[ -L $HOME/.rdebugrc ]]; then
-  ln -s `pwd`/rdebugrc $HOME/.rdebugrc
-fi
-
-if ! [[ -L $HOME/.irbrc ]]; then
-  ln -s `pwd`/irbrc $HOME/.irbrc
+else
+  echo "Skipping .gitconfig"
 fi
 
 if ! [[ -d `pwd`/vim/bundle/vundle/.git  ]]; then
+  echo "Cloning Vundle"
   git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
+else
+  echo "Skipping Vundle clone"
 fi
 
-echo "Open up vim and run :BundleInstall"
+echo -e "\nOpen up vim and run :BundleInstall"
 echo "After that, run \"(cd ~/.vim/bundle/Command-T/ruby/command-t/ && ruby extconf.rb && make)\""
