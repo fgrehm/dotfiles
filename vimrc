@@ -9,31 +9,41 @@ call vundle#rc()
 " required!
 Bundle 'gmarik/vundle'
 
+Bundle 'altercation/vim-colors-solarized'
+
 Bundle 'tpope/vim-fugitive'
-Bundle 'tpope/vim-cucumber'
 Bundle 'tpope/vim-rails'
-Bundle 'tpope/vim-haml'
 Bundle 'tpope/vim-endwise'
-Bundle 'tpope/vim-markdown'
+Bundle 'tpope/vim-surround'
+Bundle 'tpope/vim-repeat'
 Bundle 'rstacruz/sparkup'
-Bundle 'bbommarito/vim-slim'
-Bundle 'tsaleh/vim-align'
 Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
 Bundle 'L9'
-Bundle 'altercation/vim-colors-solarized'
 Bundle 'ervandew/supertab'
-Bundle 'rodjek/vim-puppet'
-Bundle 'kchmck/vim-coffee-script'
+
+Bundle 'tsaleh/vim-align'
 Bundle 'briandoll/change-inside-surroundings.vim'
-Bundle 'Command-T'
+
 Bundle 'scrooloose/nerdtree'
+Bundle 'bufexplorer.zip'
+
+Bundle 'Command-T'
+Bundle 'jeetsukumaran/vim-filesearch'
+Bundle 'SearchComplete'
+
 Bundle 'matchit.zip'
 Bundle 'ruby-matchit'
+
+Bundle 'tpope/vim-cucumber'
+Bundle 'tpope/vim-haml'
+Bundle 'tpope/vim-markdown'
+Bundle 'bbommarito/vim-slim'
+Bundle 'rodjek/vim-puppet'
+Bundle 'kchmck/vim-coffee-script'
 Bundle 'VimClojure'
-Bundle 'SearchComplete'
-Bundle 'bufexplorer.zip'
 Bundle 'lunaru/vim-less'
-Bundle 'jeetsukumaran/vim-filesearch'
+Bundle 'pangloss/vim-javascript'
+Bundle 'briancollins/vim-jst'
 
 filetype plugin indent on
 
