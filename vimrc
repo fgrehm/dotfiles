@@ -23,6 +23,7 @@ Bundle 'ervandew/supertab'
 
 Bundle 'tsaleh/vim-align'
 Bundle 'briandoll/change-inside-surroundings.vim'
+Bundle 'scrooloose/nerdcommenter'
 
 Bundle 'scrooloose/nerdtree'
 Bundle 'bufexplorer.zip'
@@ -94,6 +95,9 @@ set secure
 map <C-t> <Esc>:CommandT<CR>
 map <C-s> <Esc>:w<CR>
 map <C-S> <Esc>:w<CR>
+
+let g:NERDCreateDefaultMappings = 0
+map <leader>C <plug>NERDCommenterComment
 
 if has("gui_macvim")
   set guifont=Menlo:h14
