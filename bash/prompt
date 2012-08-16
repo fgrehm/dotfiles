@@ -1,0 +1,29 @@
+source ~/.bash/git-ps1
+source ~/.bash/rbenv-prompt
+
+__dev_prompt() {
+  local last_exit="$?" # keep here.. so we get the last command
+  local host="${GREY}\h${RESET}"
+  local dir="${GREY}\W${RESET}"
+
+  # setup marker that acts off of last exit code
+  local marker
+  if [ 0 -eq "$last_exit" ]; then
+    marker="$GREEN"
+  else
+    marker="$RED"
+  fi
+  marker="${marker}\$${RESET}"
+
+  local dev_ps1="$(__git_prompt)"
+  if [ -n "$dev_ps1" ]; then
+    local rbenv="$(__rbenv_prompt)"
+    dev_ps1="${dev_ps1} (${rbenv})\n"
+  else
+    dev_ps1=" "
+  fi
+
+  export PS1="[$host • $dir]${dev_ps1}${marker} "
+}
+
+PROMPT_COMMAND=__dev_prompt

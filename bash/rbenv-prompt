@@ -1,0 +1,12 @@
+__rbenv_available=`declare -f -F rbenv > /dev/null && echo $?`
+
+__rbenv_prompt() {
+  if [ $__rbenv_available ]; then
+    version=$(rbenv version-name)
+    if [ $version = 'system' ]; then
+      echo 'system-ruby'
+    else
+      echo $version
+    fi
+  fi
+}

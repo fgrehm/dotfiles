@@ -1,0 +1,26 @@
+case "$TERM" in
+    xterm*|rxvt*|screen*)
+        export ESC="\033"
+        export RED="\[$ESC[01;31m\]"
+        export LIGHT_RED="\[$ESC[1;31m\]"
+        export GREEN="\[$ESC[01;32m\]"
+        export LIGHT_GREEN="\[$ESC[1;32m\]"
+        export GREY="\[$ESC[0;37m\]"
+        export CYAN="\[$ESC[01;36m\]"
+        export YELLOW="\[$ESC[0;33m\]"
+        export LIGHT_VIOLET="\[$ESC[1;35m\]"
+        export RESET="\[$ESC[0m\]"
+    ;;
+    *)
+        export ESC=""
+        export RED=""
+        export LIGHT_RED=""
+        export GREEN=""
+        export LIGHT_GREEN=""
+        export GREY=""
+        export CYAN=""
+        export YELLOW=""
+        export LIGHT_VIOLET=""
+        export RESET=""
+    ;;
+esac

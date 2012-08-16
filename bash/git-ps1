@@ -38,33 +38,6 @@
 #       source ~/.bash_git_ps1.sh
 #-----------------------------------------------------------------------------------------------
 
-# colors
-case "$TERM" in
-    xterm*|rxvt*|screen*)
-        ESC="\033"
-        RED="\[$ESC[01;31m\]"
-        LIGHT_RED="\[$ESC[1;31m\]"
-        GREEN="\[$ESC[01;32m\]"
-        LIGHT_GREEN="\[$ESC[1;32m\]"
-        GREY="\[$ESC[0;37m\]"
-        CYAN="\[$ESC[01;36m\]"
-        YELLOW="\[$ESC[0;33m\]"
-        LIGHT_VIOLET="\[$ESC[1;35m\]"
-        RESET="\[$ESC[0m\]"
-    ;;
-    *)
-        ESC=""
-        RED=""
-        LIGHT_RED=""
-        GREEN=""
-        LIGHT_GREEN=""
-        GREY=""
-        CYAN=""
-        YELLOW=""
-        LIGHT_VIOLET=""
-        RESET=""
-    ;;
-esac
 
 # prints path to git directory
 __git_dirname() {
@@ -272,69 +245,50 @@ __git_timestr_relformat() {
 
 # install git integration into PS1
 __git_prompt() {
-    local last_exit="$?" # keep here.. so we get the last command
-
-    # setup PS1
-    local host="${GREY}\h${RESET}"
-    local dir="${GREY}\W${RESET}"
-    PS1="[$host • $dir]"
-
     # when in git repository
     local gitdir="$(__git_dirname)"
-    if [ -n "$gitdir" ]; then
-        local branch
-        local extras
-
-        local in_gitdir="$(__git_in_gitdir)"
-        case "$in_gitdir" in
-            gitdir|bare)
-                branch="~$(echo $in_gitdir | tr "[:lower:]" "[:upper:]")~"
-                extras=""
-            ;;
-            *)
-                local branch="$(__git_branch_name current ${gitdir})"
-                local br_state="$(__git_branching_state $gitdir)"
-
-                # rebasing..use merge head for branch name
-                case "$br_state" in
-                    rebase-*)
-                        # get the ref head during rebase
-                        branch="$(cat "$gitdir/rebase-merge/head-name")"
-                        branch="${branch##refs/heads/}"
-                        branch="${branch##remotes/}"
-                    ;;
-                esac
-
-                # extras (count strings, working dir symbols)
-                local countstr="$(__git_count_str)"
-                local wd_syms="${YELLOW}$(__git_working_dir_symbols)${RESET}"
-
-                # calc relative time diff of last commit
-                local secs="$(__git_secs_since)"
-                if [ -n "$secs" ]; then
-                    local timestr=" [$(__git_timestr_relformat $secs true)]"
-                    extras="${countstr}${wd_syms}${timestr}"
-                else
-                    extras="${countstr}${wd_syms}"
-                fi
-            ;;
-        esac
-        branch="${YELLOW}${branch}${RESET}"
-
-        # update PS1
-        PS1="${PS1} ${branch}${extras}\n"
-    else
-        PS1="${PS1} "
+    if ! [ -n "$gitdir" ]; then
+      return
     fi
 
-    # setup marker that acts off of last exit code
-    local marker
-    if [ 0 -eq "$last_exit" ]; then
-        marker="$GREEN"
-    else
-        marker="$RED"
-    fi
-    marker="${marker}\$${RESET}"
-    PS1="${PS1}${marker} "
+    local branch
+    local extras
+
+    local in_gitdir="$(__git_in_gitdir)"
+    case "$in_gitdir" in
+        gitdir|bare)
+            branch="~$(echo $in_gitdir | tr "[:lower:]" "[:upper:]")~"
+            extras=""
+        ;;
+        *)
+            local branch="$(__git_branch_name current ${gitdir})"
+            local br_state="$(__git_branching_state $gitdir)"
+
+            # rebasing..use merge head for branch name
+            case "$br_state" in
+                rebase-*)
+                    # get the ref head during rebase
+                    branch="$(cat "$gitdir/rebase-merge/head-name")"
+                    branch="${branch##refs/heads/}"
+                    branch="${branch##remotes/}"
+                ;;
+            esac
+
+            # extras (count strings, working dir symbols)
+            local countstr="$(__git_count_str)"
+            local wd_syms="${YELLOW}$(__git_working_dir_symbols)${RESET}"
+
+            # calc relative time diff of last commit
+            local secs="$(__git_secs_since)"
+            if [ -n "$secs" ]; then
+                local timestr=" [$(__git_timestr_relformat $secs true)]"
+                extras="${countstr}${wd_syms}${timestr}"
+            else
+                extras="${countstr}${wd_syms}"
+            fi
+        ;;
+    esac
+    branch="${YELLOW}${branch}${RESET}"
+
+    echo " ${branch}${extras}"
 }
-PROMPT_COMMAND=__git_prompt
