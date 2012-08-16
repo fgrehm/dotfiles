@@ -118,7 +118,7 @@ __git_working_dir_symbols() {
             git diff-index --cached --quiet HEAD -- || symbols="${symbols} ${added}+"
         fi
         modified=$(git diff --no-ext-diff --name-only | wc -l)
-        git diff --no-ext-diff --quiet --exit-code || symbols="${symbols} ${modified}*"
+        git diff --no-ext-diff --quiet --exit-code || symbols="${symbols} ${modified}∆"
     fi
 
     # stashed
