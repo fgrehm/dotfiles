@@ -7,3 +7,5 @@ alias gl='git lg'
 alias pull='git pull'
 alias push='git push'
 alias commit='git commit'
+
+alias rm-swp='find -iname *.swp -exec rm {} +'
