@@ -96,6 +96,13 @@ map <C-t> <Esc>:CommandT<CR>
 map <C-s> <Esc>:w<CR>
 map <C-S> <Esc>:w<CR>
 
+" set mapping expand the window
+noremap <expr> <silent> <Space><Space> ":vertical res<CR>:res<CR>"
+noremap <Space>= <C-w>=
+noremap <Space>_ <C-w>_
+noremap <Space><Bar> <C-w><Bar>
+noremap <Space>o <C-w>o
+
 let g:NERDCreateDefaultMappings = 0
 map <leader>C <plug>NERDCommenterComment
 
