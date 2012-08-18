@@ -85,6 +85,8 @@ set incsearch
 set showmatch
 set wildignore+=*.o,*.obj,.git,tmp/**,build/**,coverage/**
 
+set tags+=gems.tags
+
 set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [POS=%04l,%04v]\ [LEN=%L]
 
 " enable per-directory .vimrc files
