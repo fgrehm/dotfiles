@@ -1,1 +1,2 @@
 source ~/.bash/completion_scripts/cdp_and_cdpo
+source ~/.bash/completion_scripts/rake
