@@ -10,5 +10,5 @@ alias commit='git commit'
 
 alias rm-swp='find -iname *.swp -exec rm {} +'
 
-alias cdp='cd ~/projetos'
-alias cdpo='cd ~/projetos/oss'
+function cdp()  { cd ~/projetos/$@; }
+function cdpo() { cd ~/projetos/oss/$@; }
