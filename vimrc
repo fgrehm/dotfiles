@@ -98,6 +98,9 @@ map <C-t> <Esc>:CommandT<CR>
 map <C-s> <Esc>:w<CR>
 map <C-S> <Esc>:w<CR>
 
+map! <C-s> <Esc>:w<CR>a
+map! <C-S> <Esc>:w<CR>a
+
 " set mapping expand the window
 noremap <expr> <silent> <Space><Space> ":vertical res<CR>:res<CR>"
 noremap <Space>= <C-w>=
