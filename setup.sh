@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-symlinks=( vimrc vim bash gemrc rdebugrc irbrc )
+symlinks=( bash gemrc rdebugrc irbrc )
 
 echo "Creating symlinks..."
 for link in ${symlinks[@]}; do
@@ -29,13 +29,3 @@ if ! [[ -L $HOME/.gitconfig ]]; then
 else
   echo "Skipping .gitconfig"
 fi
-
-if ! [[ -d `pwd`/vim/bundle/vundle/.git  ]]; then
-  echo "Cloning Vundle"
-  git clone https://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-else
-  echo "Skipping Vundle clone"
-fi
-
-echo -e "\nOpen up vim and run :BundleInstall"
-echo "After that, run \"(cd ~/.vim/bundle/Command-T/ruby/command-t/ && ruby extconf.rb && make)\""
