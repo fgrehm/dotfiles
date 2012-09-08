@@ -8,6 +8,9 @@ alias pull='git pull'
 alias push='git push'
 alias commit='git commit'
 
+alias compress='tar -zcvf $1'
+alias extract='tar -zxvf $1'
+
 alias rm-swp='find -iname *.swp -exec rm {} +'
 
 function cdp()  { cd ~/projetos/$@; }
