@@ -11,7 +11,7 @@ alias commit='git commit'
 alias compress='tar -zcvf $1'
 alias extract='tar -zxvf $1'
 
-alias rm-swp='find -iname *.swp -exec rm {} +'
+alias rm-swp='rm -rf ~/.vim/swap/*.swp'
 
 function cdp()  { cd ~/projetos/$@; }
 function cdpo() { cd ~/projetos/oss/$@; }
