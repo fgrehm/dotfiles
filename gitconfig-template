@@ -16,3 +16,5 @@
   grep = auto
 [core]
   excludesfile = ROOT/gitignore
+[push]
+  default = tracking
