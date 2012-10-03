@@ -13,5 +13,7 @@ alias extract='tar -zxvf $1'
 
 alias rm-swp='rm -rf ~/.vim/swap/*.swp'
 
+alias vundle-install='vim +BundleInstall +qall'
+
 function cdp()  { cd ~/projetos/$@; }
 function cdpo() { cd ~/projetos/oss/$@; }
