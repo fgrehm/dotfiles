@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Based on https://github.com/maxolasersquad/Git-Notifier/blob/master/gitnotify.sh
+
+declare -A GN_LASTSHOW
+
+GN_DURATION=120
+
+for GN_BRANCH in `git branch -a | grep remotes/origin/master | sed 's/ -> .*//' | sed 's/^  //'`; do
+  GN_BRANCH_ARRAY=`echo ${GN_BRANCH} | sed 's/\//_/g'`
+  GN_LASTSHOW[${GN_BRANCH_ARRAY}]=`git log $GN_BRANCH --pretty=$GN_PRETTY -1`
+done
+
+while true; do
+  git fetch
+  # Loop through all of the local branches in the repository
+  for GN_BRANCH in `git branch -a | grep remotes/origin/master | sed 's/ -> .*//' | sed 's/^  //'`; do
+    GN_GITSHOW=`git log $GN_BRANCH --pretty=$GN_PRETTY -1`
+    GN_BRANCH_ARRAY=`echo ${GN_BRANCH} | sed 's/\//_/g'`
+    if [ "${GN_LASTSHOW[${GN_BRANCH_ARRAY}]}" != "$GN_GITSHOW" ]; then
+      notify-send -i gtk-dialog-info -t 10000 -- "Git Update at `pwd`" "$GN_GITSHOW"
+    fi
+    GN_LASTSHOW[${GN_BRANCH_ARRAY}]=$GN_GITSHOW
+  done
+  sleep $GN_DURATION
+done

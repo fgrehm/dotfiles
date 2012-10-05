@@ -1,0 +1,14 @@
+#!/bin/bash
+
+DAEMON_DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [[ $1 = '-d' ]]; then
+  if [ -f `pwd`/.git-notifier.pid ]; then
+    echo 'Git notifier is already running!'
+  else
+    $DAEMON_DIR/_git-notifier-daemon &
+    echo $! > `pwd`/.git-notifier.pid
+  fi
+else
+  $DAEMON_DIR/_git-notifier-daemon
+fi
