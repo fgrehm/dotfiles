@@ -1,3 +1,4 @@
 # Used on "bundle open"
 export EDITOR=vim
 export JRUBY_OPTS="--1.9"
+export PATH="${PATH}:/home/fabio/projetos/oss/dotfiles/bin"
