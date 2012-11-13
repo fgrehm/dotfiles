@@ -21,6 +21,17 @@ else
   echo "Skipping source for bashrc"
 fi
 
+if ! [ -e $HOME/.bash_profile ]; then
+  touch $HOME/.bash_profile
+fi
+
+if ! $(grep -q "source `pwd`/bash_profile" $HOME/.bash_profile); then
+  echo "Adding source to bash_profile"
+  echo "source `pwd`/bash_profile" >> $HOME/.bash_profile
+else
+  echo "Skipping source for bash_profile"
+fi
+
 if ! [[ -L $HOME/.gitconfig ]]; then
   echo "Creating .gitconfig"
   folder=$(echo `pwd` | sed -e 's/[\/&]/\\&/g')
