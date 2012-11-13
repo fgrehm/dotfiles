@@ -17,3 +17,5 @@ alias vundle-install='vim +BundleInstall +qall'
 
 function cdp()  { cd ~/projetos/$@; }
 function cdpo() { cd ~/projetos/oss/$@; }
+
+alias tmux='tmux -2'

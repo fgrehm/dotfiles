@@ -24,12 +24,21 @@ fi
 if ! [ -e $HOME/.bash_profile ]; then
   touch $HOME/.bash_profile
 fi
-
 if ! $(grep -q "source `pwd`/bash_profile" $HOME/.bash_profile); then
   echo "Adding source to bash_profile"
   echo "source `pwd`/bash_profile" >> $HOME/.bash_profile
 else
   echo "Skipping source for bash_profile"
+fi
+
+if ! [ -e $HOME/.tmux.conf ]; then
+  touch $HOME/.tmux.conf
+fi
+if ! $(grep -q "source-file `pwd`/tmux.conf" $HOME/.tmux.conf); then
+  echo "Adding source-file to tmux.conf"
+  echo "source-file `pwd`/tmux.conf " >> $HOME/.tmux.conf
+else
+  echo "Skipping source for tmux.conf"
 fi
 
 if ! [[ -L $HOME/.gitconfig ]]; then
