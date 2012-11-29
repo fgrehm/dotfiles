@@ -6,7 +6,7 @@
   pr = pull --rebase
   ci = commit -v
   di = diff
-  dic = diff --cached
+  dc = diff --cached
   co = checkout
   lg = "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)%Creset' --abbrev-commit"
 [color]
