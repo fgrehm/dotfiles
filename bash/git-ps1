@@ -38,6 +38,7 @@
 #       source ~/.bash_git_ps1.sh
 #-----------------------------------------------------------------------------------------------
 
+GIT=`which git`
 
 # prints path to git directory
 __git_dirname() {
@@ -45,7 +46,7 @@ __git_dirname() {
     if [ -d .git ]; then
         dirname=".git"
     else
-        dirname="$(git rev-parse --git-dir 2>/dev/null)"
+        dirname="$($GIT rev-parse --git-dir 2>/dev/null)"
     fi
     echo "$dirname"
 }
@@ -85,23 +86,23 @@ __git_working_dir_symbols() {
     local symbols
 
     # in working dir
-    if [ true = "$(git rev-parse --is-inside-work-tree 2>/dev/null)" ]; then
-        if git rev-parse --quiet --verify HEAD >/dev/null; then
-            added=$(git diff-index --cached HEAD | wc -l)
-            git diff-index --cached --quiet HEAD -- || symbols="${symbols} ${added}+"
+    if [ true = "$($GIT rev-parse --is-inside-work-tree 2>/dev/null)" ]; then
+        if $GIT rev-parse --quiet --verify HEAD >/dev/null; then
+            added=$($GIT diff-index --cached HEAD | wc -l)
+            $GIT diff-index --cached --quiet HEAD -- || symbols="${symbols} ${added}+"
         fi
-        modified=$(git diff --no-ext-diff --name-only | wc -l)
-        git diff --no-ext-diff --quiet --exit-code || symbols="${symbols} ${modified}∆"
+        modified=$($GIT diff --no-ext-diff --name-only | wc -l)
+        $GIT diff --no-ext-diff --quiet --exit-code || symbols="${symbols} ${modified}∆"
     fi
 
     # stashed
-    if (git rev-parse --verify refs/stash >/dev/null 2>&1); then
-      stashed=$(git stash list 2>&1 | wc -l)
+    if ($GIT rev-parse --verify refs/stash >/dev/null 2>&1); then
+      stashed=$($GIT stash list 2>&1 | wc -l)
       (test $stashed -gt 0) && symbols="${symbols} ${stashed}^"
     fi
 
     # untracked files
-    untracked=$(git ls-files --others --exclude-standard | wc -l)
+    untracked=$($GIT ls-files --others --exclude-standard | wc -l)
     if [ "${untracked}" -gt 0 ]; then
         symbols="${symbols} ${untracked}%"
     fi
@@ -115,8 +116,8 @@ __git_branch_name() {
     # current branch name
     local branch
     local gitdir="$2" || "$(__git_dirname)"
-    branch="$(git symbolic-ref HEAD 2>/dev/null)" || {
-        branch="$(git describe --contains --all HEAD 2>/dev/null)" ||
+    branch="$($GIT symbolic-ref HEAD 2>/dev/null)" || {
+        branch="$($GIT describe --contains --all HEAD 2>/dev/null)" ||
             branch="$(cut -c1-7 "$gitdir/HEAD" 2>/dev/null)..." ||
                 branch="unknown"
 
@@ -128,7 +129,7 @@ __git_branch_name() {
     # parent branch name
     if [ parent = "$1" ]; then
         if [ master = "$branch" ]; then
-            local refs="$(git for-each-ref --format="%(refname:short)")"
+            local refs="$($GIT for-each-ref --format="%(refname:short)")"
             case "$refs" in
                 *git-svn*) # git-svn repo
                     branch='git-svn' ;;
@@ -153,8 +154,8 @@ __git_branch_name() {
 
 # prints if inside git directory or bare git repository
 __git_in_gitdir() {
-    if [ true = "$(git rev-parse --is-inside-git-dir 2>/dev/null)" ]; then
-        if [ true = "$(git rev-parse --is-bare-repository 2>/dev/null)" ]; then
+    if [ true = "$($GIT rev-parse --is-inside-git-dir 2>/dev/null)" ]; then
+        if [ true = "$($GIT rev-parse --is-bare-repository 2>/dev/null)" ]; then
             echo 'bare'
         else
             echo 'gitdir'
@@ -166,7 +167,7 @@ __git_in_gitdir() {
 # arg1: reference A
 # arg2: reference B
 __git_commit_diff_count() {
-    echo "$(git rev-list $1..$2 2>/dev/null | awk 'END {print NR}')"
+    echo "$($GIT rev-list $1..$2 2>/dev/null | awk 'END {print NR}')"
 }
 
 # build combined (+/-) counts for related commits
@@ -192,7 +193,7 @@ __git_count_str() {
 # get the unix timestamp for the lastest commit (seconds)
 __git_secs_since() {
     local now="$(date +%s)"
-    local last_commit="$(git log --format='%at' -1 2>/dev/null)"
+    local last_commit="$($GIT log --format='%at' -1 2>/dev/null)"
     if [ -z "$last_commit" ]; then # probably initial git init, no commits
         return
     fi
