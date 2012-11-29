@@ -21,5 +21,8 @@ alias git=hub
 
 alias migrate='rake db:migrate && RAILS_ENV=test rake db:migrate'
 
+# Tks to http://juanibiapina.herokuapp.com/posts/2
+alias habits='history | sed "s/^[[:space:]]*[0-9]*[[:space:]]*//" | sort | uniq -c | sort -n -r | head -n 10'
+
 function cdp()  { cd ~/projetos/$@; }
 function cdpo() { cd ~/projetos/oss/$@; }
