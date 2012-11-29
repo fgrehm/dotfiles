@@ -19,5 +19,7 @@ alias tmux='tmux -2'
 
 alias git=hub
 
+alias migrate='rake db:migrate && RAILS_ENV=test rake db:migrate'
+
 function cdp()  { cd ~/projetos/$@; }
 function cdpo() { cd ~/projetos/oss/$@; }
