@@ -18,3 +18,5 @@
   excludesfile = ROOT/gitignore
 [push]
   default = tracking
+[web]
+  browser = google-chrome
