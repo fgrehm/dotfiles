@@ -28,5 +28,6 @@ __git_shortcut gca commit --amend
 __git_shortcut gp push
 __git_shortcut ga add
 __git_shortcut gap add -p
+__git_shortcut gr reset
 
 alias gs='git status'
