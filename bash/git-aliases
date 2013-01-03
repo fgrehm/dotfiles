@@ -19,15 +19,16 @@ __git_shortcut () {
     complete -o default -o nospace -F _git_$2_shortcut $1
 }
 
-__git_shortcut gl log
-__git_shortcut gco commit
+__git_shortcut gl lg
+__git_shortcut gco checkout
 __git_shortcut gd diff
 __git_shortcut gdc diff --cached
 __git_shortcut gc commit -m
-__git_shortcut gca commit --amend
+__git_shortcut gca commit '--amend -m'
 __git_shortcut gp push
 __git_shortcut ga add
 __git_shortcut gap add -p
 __git_shortcut gr reset
+__git_shortcut gsw show
 
 alias gs='git status'
