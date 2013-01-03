@@ -1,4 +1,4 @@
-alias ll='ls -alF'
+alias ll='ls -alhF'
 
 alias be='bundle exec'
 
