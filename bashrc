@@ -1,6 +1,6 @@
-source ~/.bash/exports
 source ~/.bash/colors
 source ~/.bash/rbenv
+source ~/.bash/exports
 source ~/.bash/tmuxinator
 source ~/.bash/prompt
 source ~/.bash/aliases
