@@ -12,7 +12,6 @@ alias vundle-install='vim +BundleInstall +qall'
 
 alias tmux='tmux -2'
 
-alias git=hub
 source ~/.bash/git-aliases
 
 alias migrate='rake db:migrate && RAILS_ENV=test rake db:migrate'
