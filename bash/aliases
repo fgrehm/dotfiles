@@ -6,6 +6,7 @@ alias compress='tar -zcvf $1'
 alias extract='tar -zxvf $1'
 
 alias rm-swp='rm -rf ~/.vim/swap/*.swp'
+alias rm-logs='find . -iname *.log -exec rm {} \;'
 
 alias vundle-install='vim +BundleInstall +qall'
 
