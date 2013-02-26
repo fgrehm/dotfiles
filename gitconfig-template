@@ -20,3 +20,6 @@
   default = tracking
 [web]
   browser = google-chrome
+[grep]
+  extendRegexp = true
+  lineNumber = true
