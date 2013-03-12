@@ -95,17 +95,18 @@ __git_working_dir_symbols() {
         $GIT diff --no-ext-diff --quiet --exit-code || symbols="${symbols} ${modified}∆"
     fi
 
-    # stashed
-    if ($GIT rev-parse --verify refs/stash >/dev/null 2>&1); then
-      stashed=$($GIT stash list 2>&1 | wc -l)
-      (test $stashed -gt 0) && symbols="${symbols} ${stashed}^"
-    fi
-
     # untracked files
     untracked=$($GIT ls-files --others --exclude-standard | wc -l)
     if [ "${untracked}" -gt 0 ]; then
         symbols="${symbols} ${untracked}%"
     fi
+
+    # stashed
+    if ($GIT rev-parse --verify refs/stash >/dev/null 2>&1); then
+      stashed=$($GIT stash list 2>&1 | wc -l)
+      (test $stashed -gt 0) && symbols="${symbols} ${RED}${stashed} STASH${RESET}"
+    fi
+
     echo "$symbols"
 }
 
