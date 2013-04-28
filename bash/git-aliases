@@ -1,3 +1,5 @@
+source /usr/share/bash-completion/competions/git
+
 __define_git_completion () {
 eval "
     _git_$2_shortcut () {
