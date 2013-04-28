@@ -1,5 +1,5 @@
 _cd_projects() {
-  local basepath="$HOME/projetos"
+  local basepath="/home/projects"
   if [[ $1 = 'cdpo' ]]; then
     basepath="${basepath}/oss"
   fi
