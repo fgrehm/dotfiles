@@ -13,7 +13,6 @@ alias vundle-install='vim +BundleInstall +qall'
 alias tmux='tmux -2'
 
 source ~/.bash/git-aliases
-alias git-extract='git filter-branch --prune-empty --subdirectory-filter $1 master'
 
 alias migrate='rake db:migrate && RAILS_ENV=test rake db:migrate'
 alias rollback='rake db:rollback && RAILS_ENV=test rake db:rollback'
