@@ -32,6 +32,9 @@ __git_shortcut ga add
 __git_shortcut gap add -p
 __git_shortcut gr reset
 __git_shortcut gsw show
+__git_shortcut gpl pull
+__git_shortcut gplr pull '--rebase origin master'
 
 alias gs='git status'
+alias gl='git lg'
 alias git-extract='git filter-branch --prune-empty --subdirectory-filter $1 master'
