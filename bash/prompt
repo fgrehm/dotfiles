@@ -1,5 +1,4 @@
 source ~/.bash/git-ps1
-source ~/.bash/rbenv-prompt
 
 __dev_prompt() {
   local last_exit="$?" # keep here.. so we get the last command
@@ -17,8 +16,7 @@ __dev_prompt() {
 
   local dev_ps1="$(__git_prompt)"
   if [ -n "$dev_ps1" ]; then
-    local rbenv="$(__rbenv_prompt)"
-    dev_ps1="${dev_ps1} (${rbenv})\n"
+    dev_ps1="${dev_ps1} \n"
   else
     dev_ps1=" "
   fi

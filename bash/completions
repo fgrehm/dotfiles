@@ -1,4 +1,3 @@
 source ~/.bash/completion_scripts/cdp_and_cdpo
 source ~/.bash/completion_scripts/rake
 source ~/.bash/completion_scripts/vagrant
-source ~/.bash/completion_scripts/tmuxinator
