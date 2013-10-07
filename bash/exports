@@ -4,3 +4,4 @@ export JRUBY_OPTS="--1.9"
 export PATH="/opt/vagrant/bin:/home/fabio/projetos/oss/dotfiles/bin:${PATH}"
 
 export VAGRANT_DEFAULT_PROVIDER=lxc
+export SSL_CERT_FILE='/etc/ssl/certs/ca-certificates.crt'
