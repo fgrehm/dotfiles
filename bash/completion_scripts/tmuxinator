@@ -1,3 +1,0 @@
-completion_script=/home/fabio/.rbenv/versions/1.9.3-p327/lib/ruby/gems/1.9.1/gems/tmuxinator-0.5.0/bin/tmuxinator_completion
-[[ -s $completion_script ]] && source $completion_script
-
