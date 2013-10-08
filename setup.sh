@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-symlinks=( bash gemrc rdebugrc irbrc )
+symlinks=( bash gemrc rdebugrc )
 
 echo "Creating symlinks..."
 for link in ${symlinks[@]}; do
