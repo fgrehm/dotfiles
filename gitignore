@@ -4,4 +4,5 @@
 .*.swp
 .*.swo
 .rake_t_cache
+/.vagrant/
 /vendor/bundle
