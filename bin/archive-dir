@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+real = 0.0
+compressed = 0.0
+
+errors = []
+
+skip = [
+  'REVISAR',
+  'topicos-em-engenharia-de-soft'
+]
+
+console_output = $stdout
+
+Dir['*/'].sort.each do |dir|
+  file = dir[0..-2]
+
+  next if skip.any? {|s| file == s }
+
+  puts "7zr a -mx9 #{file}.7z #{dir}"
+
+  `7zr a -mx9 #{file}.7z #{dir}`
+
+  if (`7zr t #{file}.7z` =~ /Everything is Ok(?:.|\s)*Size:\s*(\d+)\s*Compressed:\s*(\d+)/)
+    real += $1.to_f
+    compressed += $2.to_f
+
+    puts "   Folder ratio: %.2f%%" % (($2.to_f / $1.to_f) * 100)
+  else
+    errors << dir
+  end
+end
+
+puts "Errors: #{errors}"
+puts
+
+puts "Real:       #{real}"
+puts "Compressed: #{compressed}"
+puts "Ratio:      %.2f%%" % ((compressed / real) * 100)
