@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if $(docker ps | grep -q gunsub-daemon); then
+  echo 'gunsub-daemon container is running!'
+elif $(docker ps -a | grep -q gunsub-daemon); then
+  echo 'gunsub-daemon container has been created already, starting it!'
+  docker start gunsub-daemon
+else
+  user=$1
+  password=$2
+
+  if [ -z $user ] || [ -z $password ]; then
+    echo 'Usage: start-gunsub USERNAME PASSWORD'
+    exit 1
+  fi
+
+  echo 'starting gunsub-daemon'
+  # -e DEBUG=1
+  docker run -d \
+             -name gunsub-daemon \
+             -e GITHUB_USER=$user \
+             -e GITHUB_PASSWORD=$password \
+             -e GITHUB_POLL_INTERVAL=300 \
+             jpetazzo/gunsub # image
+fi
