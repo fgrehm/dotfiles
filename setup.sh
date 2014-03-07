@@ -30,6 +30,13 @@ else
   echo "Skipping source for bashrc"
 fi
 
+if ! [ -d $HOME/bin ]; then
+  echo "Creating \`${HOME}/bin\` directory"
+  mkdir -p $HOME/bin
+else
+  echo "Skipping \`${HOME}/bin\` creation"
+fi
+
 if ! [ -e $HOME/.bash_profile ]; then
   touch $HOME/.bash_profile
 fi
