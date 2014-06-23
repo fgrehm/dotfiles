@@ -17,7 +17,7 @@ else
   echo 'starting gunsub-daemon'
   # -e DEBUG=1
   docker run -d \
-             -name gunsub-daemon \
+             --name gunsub-daemon \
              -e GITHUB_USER=$user \
              -e GITHUB_PASSWORD=$password \
              -e GITHUB_POLL_INTERVAL=300 \
