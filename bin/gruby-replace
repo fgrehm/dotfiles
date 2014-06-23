@@ -4,4 +4,4 @@ pattern=$1
 path=$2
 code=$3
 
-git grep --name-only $pattern $path | xargs -n1 -Ifile ruby -p -i -e "${code}" file
+git grep --name-only "${pattern}" "${path}" | xargs -n1 -Ifile ruby -p -i -e "${code}" file
