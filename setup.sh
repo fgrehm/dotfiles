@@ -23,6 +23,15 @@ else
   echo "  SKIP - ${link_name}"
 fi
 
+target="`pwd`/devstep.yml"
+link_name="${HOME}/devstep.yml"
+if ! [[ -L $link_name ]]; then
+  echo "  LINK - ${link_name}"
+  sudo ln -s $target $link_name
+else
+  echo "  SKIP - ${link_name}"
+fi
+
 if ! $(grep -q "source `pwd`/bashrc" $HOME/.bashrc); then
   echo "Adding source to bashrc"
   echo "source `pwd`/bashrc" >> $HOME/.bashrc
