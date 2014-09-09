@@ -6,3 +6,4 @@
 .rake_t_cache
 /.vagrant/
 /vendor/bundle
+.devstep/

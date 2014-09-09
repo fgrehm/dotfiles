@@ -2,6 +2,7 @@
 export EDITOR=vim
 export JRUBY_OPTS="--1.9"
 export PATH="${HOME}/projects/oss/dotfiles/bin:${PATH}"
+export PATH=".devstep/bin:${PATH}"
 
 if [ -d $HOME/bin ]; then
   if ! $(echo $PATH | grep -q "${HOME}/bin"); then
