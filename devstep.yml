@@ -1,10 +1,10 @@
 cache_dir: '{{env "HOME"}}/devstep/cache'
-hack:
-  volumes:
-    - '{{env "HOME"}}/.netrc:/.devstep/.netrc'
-    - '{{env "HOME"}}/.gem/credentials:/.devstep/.gem/credentials'
-    - '{{env "HOME"}}/.gitconfig:/.devstep/.gitconfig'
-    - '{{env "HOME"}}/.ssh:/.devstep/.ssh'
-    - '{{env "SSH_AUTH_SOCK"}}:/tmp/ssh-auth-sock'
-  environment:
-    SSH_AUTH_SOCK: "/tmp/ssh-auth-sock"
+volumes:
+  - '{{env "HOME"}}/.netrc:/.devstep/.netrc'
+  - '{{env "HOME"}}/.gem/credentials:/.devstep/.gem/credentials'
+  - '{{env "HOME"}}/.gitconfig:/.devstep/.gitconfig'
+  - '{{env "HOME"}}/.ssh:/.devstep/.ssh'
+  - '{{env "SSH_AUTH_SOCK"}}:/tmp/ssh-auth-sock'
+  - '{{env "HOME"}}/devstep/cache/jdk8-installer:/var/cache/oracle-jdk8-installer'
+environment:
+  SSH_AUTH_SOCK: "/tmp/ssh-auth-sock"

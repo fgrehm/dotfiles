@@ -5,10 +5,7 @@ compressed = 0.0
 
 errors = []
 
-skip = [
-  'REVISAR',
-  'topicos-em-engenharia-de-soft'
-]
+skip = [ 'REVISAR' ]
 
 console_output = $stdout
 

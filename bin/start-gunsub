@@ -21,5 +21,6 @@ else
              -e GITHUB_USER=$user \
              -e GITHUB_PASSWORD=$password \
              -e GITHUB_POLL_INTERVAL=300 \
+             --restart="always" \
              jpetazzo/gunsub # image
 fi

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# http://eyeofmidas.wordpress.com/2014/06/03/how-to-record-desktop-images-into-gif-format-on-ubuntu-14-04/
+
+# TODO: Show some progress
+# TODO: Stop for "editing"
+
+input=$1
+output=$2
+
+if ! [ -f $input ]; then
+  echo "Invalid file ${input}"
+  exit 1
+fi
+
+if [ -z $output ]; then
+  echo "Output not provided"
+  exit 1
+fi
+
+echo $input
+echo $output
+
+mkdir -p temp
+
+echo '-----> [1/5] Extracting pngs'
+# avconv -i ${input} -vsync 1 -an -y -qscale 1 ./temp/out_%04d.png
+
+echo '-----> [2/5] Resizing pngs'
+# for i in ./temp/*.png ; do convert "$i" -resize 50% "$i" ; done
+
+echo '-----> [3/5] Creating gifs'
+# for i in ./temp/*.png ; do convert "$i" "${i%.*}.gif" ; done
+
+echo '-----> [4/5] Creating animated gif'
+# gifsicle -V --colors 256 --delay=3 --loop ./temp/*.gif > ${output}_raw.gif
+
+echo '-----> [5/5] Optimizing gif'
+convert ${output}_raw.gif -fuzz 20% -layers Optimize ${output}.gif
