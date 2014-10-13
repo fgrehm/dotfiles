@@ -23,6 +23,16 @@ else
   echo "  SKIP - ${link_name}"
 fi
 
+target="`pwd`/Vagrantfile"
+link_name="${HOME}/.vagrant.d/Vagrantfile"
+if ! [[ -L $link_name ]]; then
+  echo "  LINK - ${link_name}"
+  ln -s $target $link_name
+else
+  echo "  SKIP - ${link_name}"
+fi
+
+
 if ! $(grep -q "source `pwd`/bashrc" $HOME/.bashrc); then
   echo "Adding source to bashrc"
   echo "source `pwd`/bashrc" >> $HOME/.bashrc
