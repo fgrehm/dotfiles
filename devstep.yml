@@ -4,7 +4,9 @@ volumes:
   - '{{env "HOME"}}/.gem/credentials:/.devstep/.gem/credentials'
   - '{{env "HOME"}}/.gitconfig:/.devstep/.gitconfig'
   - '{{env "HOME"}}/.ssh:/.devstep/.ssh'
-  - '{{env "SSH_AUTH_SOCK"}}:/tmp/ssh-auth-sock'
   - '{{env "HOME"}}/devstep/cache/jdk8-installer:/var/cache/oracle-jdk8-installer'
+  - '{{env "SSH_AUTH_SOCK"}}:/tmp/ssh-auth-sock'
+  - '{{env "HOME"}}/projects/oss/notify-send-http/client:/.devstep/bin/notify-send'
 environment:
   SSH_AUTH_SOCK: "/tmp/ssh-auth-sock"
+  NOTIFY_SEND_URL: "http://172.17.42.1:12345"
