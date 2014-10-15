@@ -33,7 +33,7 @@ __git_shortcut gap add -p
 __git_shortcut gr reset
 __git_shortcut gsw show
 __git_shortcut gpl pull
-__git_shortcut gplr pull '--rebase origin master'
+__git_shortcut gplr pull '--rebase'
 
 alias gs='git status'
 alias gl='git lg'
