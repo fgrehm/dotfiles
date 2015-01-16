@@ -10,5 +10,5 @@ if [ -d $HOME/bin ]; then
   fi
 fi
 
-export VAGRANT_DEFAULT_PROVIDER=lxc
+# export VAGRANT_DEFAULT_PROVIDER=lxc
 export SSL_CERT_FILE='/etc/ssl/certs/ca-certificates.crt'
