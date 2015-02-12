@@ -5,7 +5,7 @@ compressed = 0.0
 
 errors = []
 
-skip = [ 'REVISAR' ]
+skip = [ 'Arquivo' ]
 
 console_output = $stdout
 
