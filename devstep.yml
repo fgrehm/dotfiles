@@ -6,7 +6,7 @@ volumes:
   - '{{env "HOME"}}/.ssh:/home/devstep/.ssh'
   #- '{{env "HOME"}}/devstep/cache/jdk8-installer:/var/cache/oracle-jdk8-installer'
   - '{{env "SSH_AUTH_SOCK"}}:/tmp/ssh-auth-sock'
-  - '{{env "HOME"}}/projects/oss/notify-send-http/client:/home/devstep/bin/notify-send'
+  - '{{env "HOME"}}/projects/oss/notify-send-http/build/client-linux_amd64:/home/devstep/bin/notify-send'
   - '{{env "HOME"}}/projects/oss/lmk/lmk:/home/devstep/bin/lmk'
 environment:
   SSH_AUTH_SOCK: "/tmp/ssh-auth-sock"
