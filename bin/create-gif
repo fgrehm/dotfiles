@@ -26,8 +26,8 @@ mkdir -p temp
 echo '-----> [1/5] Extracting pngs'
 avconv -i ${input} -vsync 1 -an -y -qscale 1 ./temp/out_%04d.png
 
-#echo '-----> [2/5] Resizing pngs'
-#for i in ./temp/*.png ; do convert "$i" -resize 50% "$i" ; done
+echo '-----> [2/5] Resizing pngs'
+for i in ./temp/*.png ; do convert "$i" -resize 50% "$i" ; done
 
 echo '-----> [3/5] Creating gifs'
 for i in ./temp/*.png ; do convert "$i" "${i%.*}.gif" ; done
