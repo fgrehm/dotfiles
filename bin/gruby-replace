@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "${1}" = "" ]; then
+  echo "gruby-replace PATTERN PATH CODE"
+  exit 1
+fi
+
 pattern=$1
 path=$2
 code=$3
