@@ -23,3 +23,7 @@
 [grep]
   extendRegexp = true
   lineNumber = true
+[status]
+  relativePaths = true
+  short = true
+  branch = true
