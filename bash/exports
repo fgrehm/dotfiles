@@ -1,6 +1,6 @@
 # Used on "bundle open"
 export EDITOR=vim
-export JRUBY_OPTS="--1.9"
+# export JRUBY_OPTS="--1.9"
 export PATH="${HOME}/projects/oss/dotfiles/bin:${PATH}"
 export PATH=".devstep/bin:${PATH}"
 
@@ -11,4 +11,6 @@ if [ -d $HOME/bin ]; then
 fi
 
 # export VAGRANT_DEFAULT_PROVIDER=lxc
-export SSL_CERT_FILE='/etc/ssl/certs/ca-certificates.crt'
+# export SSL_CERT_FILE='/etc/ssl/certs/ca-certificates.crt'
+
+export JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64"
