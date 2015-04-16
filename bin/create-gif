@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # http://eyeofmidas.wordpress.com/2014/06/03/how-to-record-desktop-images-into-gif-format-on-ubuntu-14-04/
 
 # TODO: Show some progress
