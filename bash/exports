@@ -15,3 +15,4 @@ fi
 
 export JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64"
 export ANDROID_HOME=/home/fabio/android-sdk-linux
+export PATH="${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools"
