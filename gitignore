@@ -7,3 +7,4 @@
 /.vagrant/
 /vendor/bundle
 .devstep/
+.bundle/
