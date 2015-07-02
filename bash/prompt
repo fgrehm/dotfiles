@@ -15,6 +15,11 @@ __dev_prompt() {
   marker="${marker}\$${RESET}"
 
   local dev_ps1="$(__git_prompt)"
+
+  if [[ -n "${DOCKER_HOST}" ]]; then
+   dev_ps1="${dev_ps1} [${RED}DOCKER_HOST=${DOCKER_HOST}${RESET}]"
+  fi
+
   if [ -n "$dev_ps1" ]; then
     dev_ps1="${dev_ps1} \n"
   else
