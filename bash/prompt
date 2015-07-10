@@ -16,7 +16,7 @@ __dev_prompt() {
 
   local dev_ps1="$(__git_prompt)"
 
-  if [[ -n "${DOCKER_HOST}" ]]; then
+  if [[ -n "${DOCKER_HOST}" ]] && ! [[ "${DOCKER_HOST}" =~ 'docker.sock' ]]; then
    dev_ps1="${dev_ps1} [${RED}DOCKER_HOST=${DOCKER_HOST}${RESET}]"
   fi
 
