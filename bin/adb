@@ -1,0 +1,4 @@
+#!/bin/bash
+
+set -x
+exec docker run --rm -ti sorccu/adb adb -H 172.17.42.1 -P 5037 $*
