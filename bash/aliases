@@ -14,9 +14,6 @@ alias tmux='tmux -2'
 
 source ~/.bash/git-aliases
 
-alias migrate='rake db:migrate && RAILS_ENV=test rake db:migrate'
-alias rollback='rake db:rollback && RAILS_ENV=test rake db:rollback'
-
 alias compose='docker-compose'
 
 # Tks to http://juanibiapina.herokuapp.com/posts/2
