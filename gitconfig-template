@@ -7,6 +7,7 @@
   ci = commit -v
   di = diff
   dc = diff --cached
+  dw = diff --word-diff
   co = checkout
   lg = "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)%Creset' --abbrev-commit"
 [color]

@@ -24,6 +24,7 @@ __git_shortcut () {
 __git_shortcut gco checkout
 __git_shortcut gd diff
 __git_shortcut gdc diff --cached
+__git_shortcut gdcw diff --cached --word-diff
 __git_shortcut gc commit -m
 __git_shortcut gca commit '--amend -C HEAD'
 __git_shortcut gcA commit '--amend -m'
@@ -34,6 +35,7 @@ __git_shortcut gr reset
 __git_shortcut gsw show
 __git_shortcut gpl pull
 __git_shortcut gplr pull '--rebase'
+__git_shortcut gdw diff '--word-diff'
 
 alias gs='git status'
 alias gl='git lg'
