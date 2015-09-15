@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+LINK=
+if $(docker ps -q --filter 'name=mongo' | grep -q mongo); then
+  LINK='--link mongo'
+fi
+
+set -x
+
+docker run -ti --rm mongo mongo $*
