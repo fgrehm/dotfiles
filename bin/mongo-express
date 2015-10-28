@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run -it --rm --name mongo-express --link mongo:mongo -p 8081:8081 knickers/mongo-express
