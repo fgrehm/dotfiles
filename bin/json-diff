@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+docker run -ti \
+           --rm \
+           -v `pwd`:`pwd` \
+           -w `pwd` \
+           fgrehm/json-diff \
+           $*
