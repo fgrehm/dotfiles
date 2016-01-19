@@ -1,4 +1,8 @@
-alias ll='ls -alhF --color'
+if [ "$(uname)" == "Darwin" ]; then
+  alias ll='ls -laGhF'
+else
+  alias ll='ls -alhF --color'
+fi
 
 alias be='bundle exec'
 
