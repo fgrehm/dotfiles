@@ -53,22 +53,22 @@ __git_working_dir_symbols() {
     # in working dir
     if [ true = "$($GIT rev-parse --is-inside-work-tree 2>/dev/null)" ]; then
         if $GIT rev-parse --quiet --verify HEAD >/dev/null; then
-            added=$($GIT diff-index --cached HEAD | wc -l)
+            added=$($GIT diff-index --cached HEAD | wc -l | tr -d '[[:space:]]')
             $GIT diff-index --cached --quiet HEAD -- || symbols="${symbols} ${added}+"
         fi
-        modified=$($GIT diff --no-ext-diff --name-only | wc -l)
+        modified=$($GIT diff --no-ext-diff --name-only | wc -l | tr -d '[[:space:]]')
         $GIT diff --no-ext-diff --quiet --exit-code || symbols="${symbols} ${modified}∆"
     fi
 
     # untracked files
-    untracked=$($GIT ls-files --others --exclude-standard | wc -l)
+    untracked=$($GIT ls-files --others --exclude-standard | wc -l | tr -d '[[:space:]]')
     if [ "${untracked}" -gt 0 ]; then
         symbols="${symbols} ${untracked}%"
     fi
 
     # stashed
     if ($GIT rev-parse --verify refs/stash >/dev/null 2>&1); then
-      stashed=$($GIT stash list 2>&1 | wc -l)
+      stashed=$($GIT stash list 2>&1 | wc -l | tr -d '[[:space:]]')
       (test $stashed -gt 0) && symbols="${symbols} ${RED}${stashed} STASH${RESET}"
     fi
 
