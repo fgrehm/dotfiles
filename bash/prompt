@@ -20,6 +20,10 @@ __dev_prompt() {
    dev_ps1="${dev_ps1} [${RED}DOCKER_HOST=${DOCKER_HOST}${RESET}]"
   fi
 
+  if [[ -n "${DESK_ENV}" ]]; then
+   dev_ps1="${dev_ps1} [${RED}DESK=${DESK_NAME}${RESET}]"
+  fi
+
   if [ -n "$dev_ps1" ]; then
     dev_ps1="${dev_ps1} \n"
   else

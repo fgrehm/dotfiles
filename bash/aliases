@@ -16,12 +16,14 @@ alias vundle-install='vim +BundleInstall +qall'
 
 alias tmux='tmux -2'
 
-source ~/.bash/git-aliases
-
 alias compose='docker-compose'
+alias cat='ccat'
+alias less='function __cless() { ccat --color=always $* | less }; __cless'
 
-# Tks to http://juanibiapina.herokuapp.com/posts/2
-alias habits='history | sed "s/^[[:space:]]*[0-9]*[[:space:]]*//" | sort | uniq -c | sort -n -r | head -n 10'
+source ~/.bash/git-aliases
 
 function cdp()  { cd $HOME/projects/$@; }
 function cdpo() { cd $HOME/projects/oss/$@; }
+
+# Tks to http://juanibiapina.herokuapp.com/posts/2
+alias habits='history | sed "s/^[[:space:]]*[0-9]*[[:space:]]*//" | sort | uniq -c | sort -n -r | head -n 10'

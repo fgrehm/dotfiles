@@ -1,3 +1,4 @@
+# set -x
 source ~/.bash/aliases
 source ~/.bash/colors
 source ~/.bash/completions

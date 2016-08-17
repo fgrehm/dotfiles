@@ -1,4 +1,0 @@
-#!/bin/bash
-
-set -x
-exec docker run -ti --rm postgres psql $*
