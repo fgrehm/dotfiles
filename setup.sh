@@ -26,6 +26,7 @@ fi
 target="`pwd`/Vagrantfile"
 link_name="${HOME}/.vagrant.d/Vagrantfile"
 if ! [[ -L $link_name ]]; then
+  mkdir -p $HOME/.vagrant.d
   echo "  LINK - ${link_name}"
   ln -s $target $link_name
 else
