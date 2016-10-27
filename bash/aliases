@@ -6,19 +6,13 @@ fi
 
 alias be='bundle exec'
 
-alias compress='tar -zcvf $1'
-alias extract='tar -zxvf $1'
-
 alias rm-swp='rm -rf ~/.vim/swap/*.swp'
-alias rm-logs='find . -iname *.log -exec rm {} \;'
-
-alias vundle-install='vim +BundleInstall +qall'
 
 alias tmux='tmux -2'
 
-alias compose='docker-compose'
 alias cat='ccat'
 alias less='function __cless() { ccat --color=always $* | less }; __cless'
+alias d.='desk .'
 
 source ~/.bash/git-aliases
 
