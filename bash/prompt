@@ -1,3 +1,5 @@
+# vi: ft=sh
+
 source ~/.bash/git-ps1
 
 __dev_prompt() {
@@ -28,6 +30,10 @@ __dev_prompt() {
     dev_ps1="${dev_ps1} \n"
   else
     dev_ps1=" "
+  fi
+  # https://github.com/jonmosco/kube-ps1
+  if [[ -n "${KUBE_PS1_BINARY}" ]]; then
+    dev_ps1="${dev_ps1}\$(kube_ps1) "
   fi
 
   export PS1="[$host • $dir]${dev_ps1}${marker} "
