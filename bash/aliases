@@ -10,8 +10,10 @@ alias rm-swp='rm -rf ~/.vim/swap/*.swp'
 
 alias tmux='tmux -2'
 
-alias cat='ccat'
-alias less='function __cless() { ccat --color=always $* | less }; __cless'
+if $(which ccat &>/dev/null); then
+  alias cat='ccat'
+  alias less='function __cless() { ccat --color=always $* | less }; __cless'
+fi
 alias d.='desk .'
 
 source ~/.bash/git-aliases
