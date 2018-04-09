@@ -76,11 +76,3 @@ if ! [[ -L $HOME/.gitconfig ]]; then
 else
   echo "Skipping .gitconfig"
 fi
-
-
-
-#libnss
-#devstep + plugins
-#easy-lb
-#docker images
-#zeal
