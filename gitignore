@@ -9,3 +9,4 @@
 .devstep/
 .bundle/
 .docker-dev/
+telepresence.log
