@@ -2,6 +2,8 @@ if [ "$(uname)" == "Darwin" ]; then
   alias ll='ls -laGhF'
 else
   alias ll='ls -alhF --color'
+  alias pbcopy='xclip -selection clipboard'
+  alias pbpaste='xclip -selection clipboard -o'
 fi
 
 alias be='bundle exec'
