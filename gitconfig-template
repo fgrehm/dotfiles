@@ -38,3 +38,10 @@
   process = git-lfs filter-process
   required = true
   clean = git-lfs clean -- %f
+[gpg]
+  program = gpg
+[diff]
+  colorMoved = zebra
+  algorithm = histogram
+[url "git@github.com:"]
+  insteadOf = https://github.com/
