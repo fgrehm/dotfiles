@@ -48,16 +48,6 @@ else
   echo "Skipping \`${HOME}/bin\` creation"
 fi
 
-if ! [ -e $HOME/.bash_profile ]; then
-  touch $HOME/.bash_profile
-fi
-if ! $(grep -q "source `pwd`/bash_profile" $HOME/.bash_profile); then
-  echo "Adding source to bash_profile"
-  echo "source `pwd`/bash_profile" >> $HOME/.bash_profile
-else
-  echo "Skipping source for bash_profile"
-fi
-
 if ! [ -e $HOME/.tmux.conf ]; then
   touch $HOME/.tmux.conf
 fi

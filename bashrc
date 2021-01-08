@@ -10,8 +10,4 @@ stty stop ''
 
 test -e "${HOME}/.iterm2_shell_integration.bash" && source "${HOME}/.iterm2_shell_integration.bash"
 
-export GOPATH="$HOME/gocode"
-export PATH="$PATH:/usr/local/opt/go/libexec/bin"
-export PATH="$PATH:$GOPATH/bin"
-
 [ -n "$DESK_ENV" ] && source "$DESK_ENV" || true

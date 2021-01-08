@@ -1,24 +1,20 @@
 # Used on "bundle open"
 export EDITOR=vim
-# export JRUBY_OPTS="--1.9"
 export PATH="${HOME}/projects/oss/dotfiles/bin:${PATH}"
-export PATH=".devstep/bin:${PATH}"
 
 if [ -d $HOME/bin ]; then
   if ! $(echo $PATH | grep -q "${HOME}/bin"); then
-    export PATH="${HOME}/bin:${PATH}"
+    export PATH="${PATH}:${HOME}/bin"
   fi
 fi
 
-# export VAGRANT_DEFAULT_PROVIDER=lxc
-# export SSL_CERT_FILE='/etc/ssl/certs/ca-certificates.crt'
+export GOPATH="$HOME/gocode"
+export PATH="$PATH:$GOPATH/bin"
 
-export JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64"
-if [ -d "$HOME/android-sdk-linux" ]; then
-  export ANDROID_HOME="$HOME/home/fabio/android-sdk-linux"
-elif [ -d /usr/local/opt/android-sdk ]; then
-  export ANDROID_HOME=/usr/local/opt/android-sdk
+if [ -d "${HOME}/.rvm" ]; then
+  source ~/.rvm/scripts/rvm
+  # Add RVM to PATH for scripting. Make sure this is the last PATH variable change.
+  export PATH="$PATH:$HOME/.rvm/bin"
 fi
-export PATH="${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools"
 
 export GPG_TTY=$(tty)
