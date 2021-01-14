@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+# Fix issue with natural scrolling and caps as ctrl on restart
+# https://askubuntu.com/questions/1282097/20-04-natural-scrolling-not-persisting-between-sessions
+
+gsettings set org.gnome.desktop.input-sources xkb-options "@as []"
+gsettings set org.gnome.desktop.input-sources xkb-options "['ctrl:nocaps']"
+
+gsettings set org.gnome.desktop.peripherals.mouse natural-scroll false
+gsettings set org.gnome.desktop.peripherals.mouse natural-scroll true
