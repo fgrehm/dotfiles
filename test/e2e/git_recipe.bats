@@ -23,7 +23,7 @@ teardown() {
 
 @test "git: overlay includes all recipe files in compiled-home" {
   [ -f "$DOTFILES/compiled-home/private_dot_config/git/config.tmpl" ]
-  [ -f "$DOTFILES/compiled-home/dot_gitignore" ]
+  [ -f "$DOTFILES/compiled-home/private_dot_config/git/ignore" ]
   [ -f "$DOTFILES/compiled-home/dot_shellrc.d/git.sh" ]
   [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-git.sh.tmpl" ]
 }
@@ -51,12 +51,12 @@ teardown() {
   [[ "$output" == *"prune = true"* ]]
 }
 
-@test "git: deploys global gitignore" {
+@test "git: deploys global gitignore to XDG location" {
   chezmoi_apply_files
 
-  [ -f "$HOME/.gitignore" ]
+  [ -f "$HOME/.config/git/ignore" ]
 
-  run cat "$HOME/.gitignore"
+  run cat "$HOME/.config/git/ignore"
   [[ "$output" == *".DS_Store"* ]]
   [[ "$output" == *".swp"* ]]
 }

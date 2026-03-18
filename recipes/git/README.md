@@ -5,7 +5,7 @@ Git configuration, global gitignore, and shell aliases.
 ## What it does
 
 - Deploys `~/.config/git/config` (XDG location, templated for user identity and SSH signing)
-- Deploys `~/.gitignore` (global ignores for editor swap files, OS cruft, AI tooling)
+- Deploys `~/.config/git/ignore` (global ignores for editor swap files, OS cruft, AI tooling)
 - Adds shell aliases and zsh completions via `~/.shellrc.d/git.sh`
 
 ## Config highlights
