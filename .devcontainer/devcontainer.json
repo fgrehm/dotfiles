@@ -1,0 +1,26 @@
+{
+  "name": "dotfiles-dev",
+  "image": "mcr.microsoft.com/devcontainers/base:debian-13",
+  "features": {
+    "ghcr.io/devcontainers-extra/features/mise:1": {}
+  },
+  "mounts": [
+    "source=${localEnv:HOME}/projects/oss/chezmoi-recipes/bin/chezmoi-recipes,target=/usr/local/bin/chezmoi-recipes,type=bind,readonly"
+  ],
+  "remoteUser": "vscode",
+  "workspaceFolder": "/workspace",
+  "remoteEnv": {
+    "PATH": "/home/vscode/.local/bin:/home/vscode/.local/share/mise/shims:${PATH}",
+    "XDG_CONFIG_HOME": "/home/vscode/.config",
+    "XDG_DATA_HOME": "/home/vscode/.local/share"
+  },
+  "postCreateCommand": "bash /workspace/.devcontainer/init.sh",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "foxundermoon.shell-format",
+        "timonwong.shellcheck"
+      ]
+    }
+  }
+}

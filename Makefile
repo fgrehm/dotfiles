@@ -2,7 +2,7 @@ SHELL_FILES := $(shell find recipes \( -name "*.sh" -o -name "*.sh.tmpl" -o -nam
 
 .DEFAULT_GOAL := help
 
-.PHONY: help shell-fmt shell-fmt-check shell-lint check
+.PHONY: help test shell-fmt shell-fmt-check shell-lint check
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
@@ -17,3 +17,6 @@ shell-lint: ## Lint shell scripts (shellcheck)
 	shellcheck $(SHELL_FILES)
 
 check: shell-fmt-check shell-lint ## Run shell formatting check and shellcheck
+
+test: ## Run e2e tests with bats (requires container or DOTFILES_E2E=1)
+	bats test/e2e/
