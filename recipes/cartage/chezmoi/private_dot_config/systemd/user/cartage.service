@@ -1,0 +1,13 @@
+[Unit]
+Description=Container-to-host bridge daemon
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/cartage serve
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=graphical-session.target

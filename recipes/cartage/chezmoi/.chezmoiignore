@@ -1,0 +1,9 @@
+{{ if .isContainer }}
+.config/systemd/user/cartage.service
+{{ else }}
+.local/bin/pbcopy
+.local/bin/pbpaste
+.local/bin/notify-send
+.local/bin/yad
+.local/bin/xdg-open
+{{ end }}
