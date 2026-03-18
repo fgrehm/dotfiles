@@ -36,10 +36,11 @@ directory, then chezmoi applies as normal.
 ```
 home/                         shared chezmoi source files
 recipes/
-  podman/
-    README.md
-    chezmoi/                  chezmoi source fragment for podman
+  <recipe-name>/
+    README.md                 recipe documentation
+    chezmoi/                  chezmoi source fragment for this recipe
       .chezmoiscripts/
+      dot_*/
       private_dot_config/
 compiled-home/                generated (gitignored), fed to chezmoi
 ```
@@ -48,7 +49,10 @@ compiled-home/                generated (gitignored), fed to chezmoi
 
 | Recipe | What it manages |
 |--------|----------------|
-| (coming soon) | |
+| **shell** | bash, zsh (Oh My Zsh), modular `~/.shellrc.d/` loader for other recipes |
+| **git** | XDG git config (user identity, SSH signing), global gitignore, aliases + zsh completions |
+| podman | (coming soon) |
+| cartage | (coming soon) |
 
 ## Development
 
