@@ -6,9 +6,11 @@
 {{-   $hasNvidiaGPU = output "lspci" | lower | contains "nvidia" -}}
 {{- end -}}
 
+sourceDir = "{{ .chezmoi.workingTree }}"
+
 [hooks.read-source-state.pre]
     command = "chezmoi-recipes"
-    args = ["overlay", "--quiet", "--recipes-dir", "{{ .chezmoi.workingTree }}/recipes"]
+    args = ["overlay", "--recipes-dir", "{{ .chezmoi.workingTree }}/recipes"]
 
 [hooks.add.pre]
     command = "sh"
@@ -41,6 +43,11 @@
 [hooks.destroy.pre]
     command = "sh"
     args = ["-c", "echo 'Error: use home/ or recipes/ instead of chezmoi destroy (compiled-home/ is generated)' >&2; exit 1"]
+
+# Prevent chezmoi from paging diffs through $PAGER (e.g. less), which causes
+# script content diffs to get mingled with script execution output in -v mode.
+[diff]
+  pager = "cat"
 
 [data]
     recipesDir = "{{ .chezmoi.workingTree }}/recipes"
