@@ -13,7 +13,6 @@ Git configuration, global gitignore, and shell aliases.
 - SSH commit signing (auto-detected: only enabled if `~/.ssh/id_ed25519-sign.pub` exists)
 - SSH URLs for GitHub (`git@github.com:` instead of `https://`)
 - Histogram diff algorithm, colorMoved, fetch prune
-- diffnav as default pager for `diff` and `show` (requires diffnav to be installed)
 - Git LFS filter configured
 
 ## Requirements
