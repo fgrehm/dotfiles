@@ -1,0 +1,31 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if command -v nvim &>/dev/null; then
+  log_skip "Neovim already installed"
+  exit 0
+fi
+
+# {{ if ne .chezmoi.username "root" }}
+SUDO="sudo"
+# {{ else }}
+SUDO=""
+# {{ end }}
+
+_install() {
+  set -e
+  log_info "Installing Neovim..."
+  # https://github.com/neovim/neovim/releases
+  run_quiet wget -qO /tmp/nvim-linux-x86_64.tar.gz \
+    https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
+  run_quiet "$SUDO" tar -C /opt -xzf /tmp/nvim-linux-x86_64.tar.gz
+  "$SUDO" ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/nvim
+  rm -f /tmp/nvim-linux-x86_64.tar.gz
+}
+
+if ! _install; then
+  log_error "Failed to install Neovim (network unavailable?)"
+  log_info "Run 'chezmoi apply' again after fixing the issue."
+fi
