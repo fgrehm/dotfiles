@@ -1,0 +1,54 @@
+# vim: ft=zsh
+# Path to your Oh My Zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="robbyrussell"
+
+plugins=()
+
+# User completions directory (standard zsh pattern).
+[ ! -d "$HOME/.zsh/completions" ] && mkdir -p "$HOME/.zsh/completions"
+fpath=("$HOME/.zsh/completions" $fpath)
+
+source $ZSH/oh-my-zsh.sh
+
+# --- History: save on exit, don't share across sessions ---
+unsetopt SHARE_HISTORY
+unsetopt INC_APPEND_HISTORY
+setopt APPEND_HISTORY
+setopt HIST_IGNORE_SPACE
+setopt HIST_IGNORE_DUPS
+
+# --- Git prompt extensions (ahead/behind + stash count) ---
+function git_ahead_behind() {
+    local ahead behind output
+    ahead=$(command git rev-list --count @{upstream}..HEAD 2>/dev/null) || return
+    behind=$(command git rev-list --count HEAD..@{upstream} 2>/dev/null) || return
+    output=""
+    (( ahead > 0 )) && output+="%{$fg[green]%}⬆ ${ahead}%{$reset_color%} "
+    (( behind > 0 )) && output+="%{$fg[red]%}⬇ ${behind}%{$reset_color%} "
+    [[ -n "$output" ]] && echo "$output"
+}
+
+function git_dirty_count() {
+    local count
+    count=$(command git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+    (( count > 0 )) && echo "%{$fg[yellow]%}✏️ ${count}%{$reset_color%} "
+}
+
+function git_stash_count() {
+    local count
+    count=$(command git stash list 2>/dev/null | wc -l | tr -d ' ')
+    (( count > 0 )) && echo "%{$fg[yellow]%}📦 ${count}%{$reset_color%} "
+}
+
+ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[blue]%})"
+ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[blue]%})"
+
+PROMPT="{{ if .isContainer }}🐳 {{ end }}%(?:%{$fg_bold[green]%}%1{➜%} :%{$fg_bold[red]%}%1{➜%} ) %{$fg[cyan]%}%c%{$reset_color%}"
+PROMPT+=' $(git_prompt_info)$(git_dirty_count)$(git_ahead_behind)$(git_stash_count)'
+
+# Source shared shell configuration (env vars, aliases, PATH)
+if [ -f ~/.shellrc ]; then
+    . ~/.shellrc
+fi

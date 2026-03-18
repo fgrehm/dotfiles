@@ -1,0 +1,4 @@
+# vim: ft=sh
+# ~/.shellrc.local: machine-specific shell config (not managed by chezmoi).
+# This file is sourced by ~/.shellrc after all ~/.shellrc.d/*.sh modules.
+# Add environment variables, aliases, or overrides specific to this machine.

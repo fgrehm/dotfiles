@@ -8,7 +8,7 @@
 
 [hooks.read-source-state.pre]
     command = "chezmoi-recipes"
-    args = ["overlay", "--quiet", "--recipes-dir", "/home/fabio/projects/oss/dotfiles-new/recipes"]
+    args = ["overlay", "--quiet", "--recipes-dir", "{{ .chezmoi.workingTree }}/recipes"]
 
 [hooks.add.pre]
     command = "sh"
@@ -43,7 +43,7 @@
     args = ["-c", "echo 'Error: use home/ or recipes/ instead of chezmoi destroy (compiled-home/ is generated)' >&2; exit 1"]
 
 [data]
-    recipesDir = "/home/fabio/projects/oss/dotfiles-new/recipes"
+    recipesDir = "{{ .chezmoi.workingTree }}/recipes"
     name = {{ promptStringOnce . "name" "Full name" | quote }}
     email = {{ promptStringOnce . "email" "Email" | quote }}
     isContainer = {{ $isContainer }}

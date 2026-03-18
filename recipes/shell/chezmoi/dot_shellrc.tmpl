@@ -1,0 +1,21 @@
+# vim: ft=sh
+# ~/.shellrc: shared configuration sourced by both bash and zsh.
+# Modules live in ~/.shellrc.d/*.sh and are sourced in alphabetical order.
+# For machine-local overrides, use ~/.shellrc.local (not managed by chezmoi).
+
+{{ if or (eq .email "TODO@example.com") (eq .name "TODO: Your Name") -}}
+printf '\033[33m[chezmoi] Name and email are still placeholders. Run: chezmoi init\033[0m\n'
+{{ end -}}
+
+# Source drop-in modules
+if [ -d "$HOME/.shellrc.d" ]; then
+    for _shellrc_f in "$HOME"/.shellrc.d/*.sh; do
+        [ -f "$_shellrc_f" ] && . "$_shellrc_f"
+    done
+    unset _shellrc_f
+fi
+
+# Source machine-local overrides (not managed by chezmoi)
+if [ -f "$HOME/.shellrc.local" ]; then
+    . "$HOME/.shellrc.local"
+fi

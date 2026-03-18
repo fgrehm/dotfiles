@@ -41,13 +41,31 @@ setup_dotfiles_repo() {
 }
 
 # Write a minimal .chezmoi.toml.tmpl with no hooks and no prompts.
-# Use this when testing chezmoi behavior without chezmoi-recipes.
+# Includes all standard template variables so recipe templates render correctly.
 write_minimal_config_template() {
   cat >"$DOTFILES/home/.chezmoi.toml.tmpl" <<'TMPL'
 [data]
     name = "Test User"
     email = "test@example.com"
+    isContainer = true
+    isDebian = true
+    hasNvidiaGPU = false
 TMPL
+}
+
+# Copy a recipe from the real repo into the test repo.
+# Usage: copy_recipe <name>
+copy_recipe() {
+  local name="$1"
+  local real_root
+  real_root="$(project_root)"
+  cp -a "$real_root/recipes/$name" "$DOTFILES/recipes/$name"
+}
+
+# Run chezmoi apply, skipping script execution.
+# Use this to test file deployment without triggering install scripts.
+chezmoi_apply_files() {
+  chezmoi apply --no-tty --exclude=scripts --source "$DOTFILES"
 }
 
 # Add a recipe with a single chezmoi source file.
