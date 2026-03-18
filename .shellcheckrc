@@ -1,0 +1,5 @@
+# SC1091: can't follow sourced files (ui.bash lives in compiled-home at runtime)
+# SC1128: shebang not on first line (chezmoi template directive comes first in .sh.tmpl)
+# SC2050: constant expression in [[ ]] (chezmoi templates render to constants)
+# SC2317: unreachable code (chezmoi template conditionals look unreachable to shellcheck)
+disable=SC1091,SC1128,SC2050,SC2317

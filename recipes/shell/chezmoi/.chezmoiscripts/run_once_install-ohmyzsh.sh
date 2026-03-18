@@ -9,5 +9,6 @@ if [ -d "$HOME/.oh-my-zsh" ]; then
 fi
 
 log_info "Installing Oh My Zsh..."
+# Prevent the installer from replacing our chezmoi-managed .zshrc
 export KEEP_ZSHRC=yes
 sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
