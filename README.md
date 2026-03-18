@@ -47,12 +47,7 @@ compiled-home/                generated (gitignored), fed to chezmoi
 
 ## Recipes
 
-| Recipe | What it manages |
-|--------|----------------|
-| **shell** | bash, zsh (Oh My Zsh), modular `~/.shellrc.d/` loader for other recipes |
-| **git** | XDG git config (user identity, SSH signing), global gitignore, aliases + zsh completions |
-| podman | (coming soon) |
-| cartage | (coming soon) |
+See [`recipes/`](recipes/) for the full list. Each recipe has its own README.
 
 ## Development
 
