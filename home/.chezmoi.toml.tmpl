@@ -1,0 +1,51 @@
+{{- /* Auto-detect environment */ -}}
+{{- $isContainer := or (stat "/.dockerenv") (stat "/run/.containerenv") (stat "/var/devcontainer") (env "CODESPACES") (env "REMOTE_CONTAINERS") (env "container") | not | not -}}
+{{- $isDebian := eq .chezmoi.osRelease.id "debian" -}}
+{{- $hasNvidiaGPU := false -}}
+{{- if and (not $isContainer) (lookPath "lspci") -}}
+{{-   $hasNvidiaGPU = output "lspci" | lower | contains "nvidia" -}}
+{{- end -}}
+
+[hooks.read-source-state.pre]
+    command = "chezmoi-recipes"
+    args = ["overlay", "--quiet", "--recipes-dir", "/home/fabio/projects/oss/dotfiles-new/recipes"]
+
+[hooks.add.pre]
+    command = "sh"
+    args = ["-c", "echo 'Error: use home/ or recipes/ instead of chezmoi add (compiled-home/ is generated)' >&2; exit 1"]
+
+[hooks.edit.pre]
+    command = "sh"
+    args = ["-c", "echo 'Error: use home/ or recipes/ instead of chezmoi edit (compiled-home/ is generated)' >&2; exit 1"]
+
+[hooks.re-add.pre]
+    command = "sh"
+    args = ["-c", "echo 'Error: use home/ or recipes/ instead of chezmoi re-add (compiled-home/ is generated)' >&2; exit 1"]
+
+[hooks.merge.pre]
+    command = "sh"
+    args = ["-c", "echo 'Error: use home/ or recipes/ instead of chezmoi merge (compiled-home/ is generated)' >&2; exit 1"]
+
+[hooks.chattr.pre]
+    command = "sh"
+    args = ["-c", "echo 'Error: use home/ or recipes/ instead of chezmoi chattr (compiled-home/ is generated)' >&2; exit 1"]
+
+[hooks.import.pre]
+    command = "sh"
+    args = ["-c", "echo 'Error: use home/ or recipes/ instead of chezmoi import (compiled-home/ is generated)' >&2; exit 1"]
+
+[hooks.forget.pre]
+    command = "sh"
+    args = ["-c", "echo 'Error: use home/ or recipes/ instead of chezmoi forget (compiled-home/ is generated)' >&2; exit 1"]
+
+[hooks.destroy.pre]
+    command = "sh"
+    args = ["-c", "echo 'Error: use home/ or recipes/ instead of chezmoi destroy (compiled-home/ is generated)' >&2; exit 1"]
+
+[data]
+    recipesDir = "/home/fabio/projects/oss/dotfiles-new/recipes"
+    name = {{ promptStringOnce . "name" "Full name" | quote }}
+    email = {{ promptStringOnce . "email" "Email" | quote }}
+    isContainer = {{ $isContainer }}
+    isDebian = {{ $isDebian }}
+    hasNvidiaGPU = {{ $hasNvidiaGPU }}
