@@ -1,0 +1,14 @@
+layout {
+    default_tab_template {
+        pane size=1 borderless=true {
+            plugin location="https://github.com/ishefi/zellaude/releases/latest/download/zellaude.wasm"
+        }
+        children
+    }
+    tab name="workspace" focus=true {
+        pane split_direction="vertical" {
+            pane
+            pane
+        }
+    }
+}
