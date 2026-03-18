@@ -1,0 +1,52 @@
+# vim: ft=gitconfig.gotmpl
+{{ if or (ne .name "TODO: Your Name") (ne .email "TODO@example.com") -}}
+[user]
+{{- if ne .email "TODO@example.com" }}
+	email = {{ .email }}
+{{- end }}
+{{- if ne .name "TODO: Your Name" }}
+	name = {{ .name }}
+{{- end }}
+{{- if stat (joinPath .chezmoi.homeDir ".ssh/id_ed25519-sign.pub") }}
+	signingKey = ~/.ssh/id_ed25519-sign.pub
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
+{{- end }}
+{{ end -}}
+[color]
+	branch = auto
+	status = auto
+	diff = auto
+	grep = auto
+[core]
+	excludesfile = ~/.gitignore
+[push]
+	default = tracking
+[grep]
+	extendRegexp = true
+	lineNumber = true
+[status]
+	relativePaths = true
+	short = true
+	branch = true
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[diff]
+	colorMoved = zebra
+	algorithm = histogram
+[pull]
+	rebase = false
+[fetch]
+	prune = true
+[init]
+	defaultBranch = main
+[pager]
+	diff = diffnav
+	show = diffnav

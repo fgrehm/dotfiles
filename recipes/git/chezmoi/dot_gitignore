@@ -1,0 +1,14 @@
+*~
+.*.swo
+.*.swp
+.DS_Store
+.ai/
+.bundle/
+.claude/clotilde
+.claude/settings.local.json
+.svn
+.vagrant/
+.worktrees/
+vendor/bundle
+MEMORY.local.md
+CLAUDE.local.md

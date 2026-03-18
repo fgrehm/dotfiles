@@ -1,0 +1,27 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if command -v git &>/dev/null; then
+  log_skip "git already installed"
+  exit 0
+fi
+
+# {{ if ne .chezmoi.username "root" }}
+SUDO="sudo"
+# {{ else }}
+SUDO=""
+# {{ end }}
+
+_install() {
+  set -e
+  log_info "Installing git..."
+  run_quiet "$SUDO" apt-get update -qq
+  run_quiet "$SUDO" apt-get install -y git
+}
+
+if ! _install; then
+  log_error "Failed to install git"
+  log_info "Run 'chezmoi apply' again after fixing the issue."
+fi
