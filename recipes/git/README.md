@@ -4,6 +4,7 @@ Git configuration, global gitignore, and shell aliases.
 
 ## What it does
 
+- Installs git via apt (graceful failure, idempotent)
 - Deploys `~/.config/git/config` (XDG location, templated for user identity and SSH signing)
 - Deploys `~/.config/git/ignore` (global ignores for editor swap files, OS cruft, AI tooling)
 - Adds shell aliases and zsh completions via `~/.shellrc.d/git.sh`
@@ -18,7 +19,6 @@ Git configuration, global gitignore, and shell aliases.
 ## Requirements
 
 - Debian 13 (Trixie)
-- git (installed via apt, not managed by this recipe)
 
 ## Template variables
 
