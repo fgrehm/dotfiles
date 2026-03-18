@@ -1,2 +1,3 @@
+# Keep versions in sync with .devcontainer/Dockerfile
 bats 1.11.1
 chezmoi 2.70.0
