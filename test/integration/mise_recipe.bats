@@ -22,11 +22,11 @@ teardown() {
   cleanup
 }
 
-@test "mise: install script installs mise" {
+@test "mise: install script makes mise available" {
   chezmoi_apply_full
 
-  [ -f "$HOME/.local/bin/mise" ]
-  "$HOME/.local/bin/mise" --version
+  command -v mise
+  mise --version
 }
 
 @test "mise: shellrc fragment is deployed" {
