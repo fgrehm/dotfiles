@@ -120,11 +120,13 @@ isolate_home() {
 }
 
 # Run chezmoi init non-interactively with test identity values.
+# Pre-seeds the config so promptStringOnce finds name/email already cached.
 chezmoi_init() {
   local source_dir="${1:-$DOTFILES}"
-  chezmoi init --no-tty --source "$source_dir" \
-    --promptString name="Test User" \
-    --promptString email="test@example.com"
+  mkdir -p "$HOME/.config/chezmoi"
+  printf '[data]\n    name = "Test User"\n    email = "test@example.com"\n' \
+    >"$HOME/.config/chezmoi/chezmoi.toml"
+  chezmoi init --no-tty --source "$source_dir"
 }
 
 # Run chezmoi apply including scripts (full integration apply).

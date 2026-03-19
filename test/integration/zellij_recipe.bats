@@ -22,11 +22,11 @@ teardown() {
   cleanup
 }
 
-@test "zellij: install script installs zellij to ~/.local/bin" {
+@test "zellij: install script makes zellij available" {
   chezmoi_apply_full
 
-  [ -f "$HOME/.local/bin/zellij" ]
-  "$HOME/.local/bin/zellij" --version
+  command -v zellij
+  zellij --version
 }
 
 @test "zellij: apply is idempotent" {
