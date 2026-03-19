@@ -88,7 +88,7 @@ add_home_file() {
 
 # Run chezmoi-recipes overlay against the temp repo.
 run_overlay() {
-  chezmoi-recipes overlay --quiet --recipes-dir "$DOTFILES/recipes"
+  chezmoi-recipes overlay --recipes-dir "$DOTFILES/recipes"
 }
 
 # Run the overlay manually without chezmoi-recipes binary.
@@ -119,10 +119,26 @@ isolate_home() {
   git config --global user.name "Test User"
 }
 
-# Run chezmoi init with test defaults (non-interactive).
+# Run chezmoi init non-interactively with test identity values.
 chezmoi_init() {
   local source_dir="${1:-$DOTFILES}"
-  chezmoi init --no-tty --source "$source_dir"
+  chezmoi init --no-tty --source "$source_dir" \
+    --promptString name="Test User" \
+    --promptString email="test@example.com"
+}
+
+# Run chezmoi apply including scripts (full integration apply).
+# Requires a container environment; use chezmoi_apply_files for unit tests.
+chezmoi_apply_full() {
+  chezmoi apply -v --source "$DOTFILES"
+}
+
+# Skip if DOTFILES_INTEGRATION=1 is not set.
+# Integration tests install real tools and require a container.
+skip_if_no_integration() {
+  if [ -z "${DOTFILES_INTEGRATION:-}" ]; then
+    skip "integration test: set DOTFILES_INTEGRATION=1 to run (requires container)"
+  fi
 }
 
 # Clean up temp dirs.

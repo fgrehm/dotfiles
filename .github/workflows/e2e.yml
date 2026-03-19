@@ -1,0 +1,38 @@
+name: e2e
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:trixie
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: apt-get update -qq && apt-get install -y -qq wget git sudo ca-certificates
+
+      - name: Install mise
+        run: wget -qO- https://mise.jdx.dev/install.sh | sh
+
+      - name: Install tools (bats, chezmoi)
+        run: |
+          "$HOME/.local/bin/mise" install
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/share/mise/shims" >> "$GITHUB_PATH"
+
+      - name: Install chezmoi-recipes
+        run: |
+          wget -qO- "https://github.com/fgrehm/chezmoi-recipes/releases/latest/download/chezmoi-recipes_linux_amd64.tar.gz" \
+            | tar -xz -C /usr/local/bin chezmoi-recipes
+
+      - name: Unit tests (file deployment)
+        run: make test
+
+      - name: Integration tests (tool installation)
+        run: make test-integration
