@@ -21,6 +21,12 @@ jobs:
       - name: Install mise
         run: wget -qO- https://mise.jdx.dev/install.sh | sh
 
+      - name: Cache mise tools
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/mise
+          key: mise-${{ hashFiles('.tool-versions') }}
+
       - name: Install tools (bats, chezmoi)
         run: |
           "$HOME/.local/bin/mise" install
