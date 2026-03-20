@@ -11,7 +11,6 @@ setup() {
   skip_if_no_integration
   isolate_home
   setup_dotfiles_repo
-  copy_recipe "shell"
   copy_recipe "mise"
   cd "$DOTFILES"
   run_overlay
