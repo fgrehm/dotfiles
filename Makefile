@@ -32,7 +32,7 @@ shell-lint: ## Lint shell scripts (shellcheck)
 check: shell-fmt-check shell-lint ## Run shell formatting check and shellcheck
 
 test: ## Run e2e tests with bats (requires container or DOTFILES_E2E=1)
-	bats test/e2e/
+	bats --print-output-on-failure test/e2e/
 
 test-integration: ## Run integration tests - installs real tools (requires container)
-	DOTFILES_INTEGRATION=1 bats test/integration/
+	DOTFILES_INTEGRATION=1 bats --print-output-on-failure test/integration/

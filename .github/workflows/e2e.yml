@@ -12,6 +12,9 @@ jobs:
     container:
       image: debian:trixie
 
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     steps:
       - uses: actions/checkout@v4
 

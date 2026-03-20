@@ -113,7 +113,8 @@ isolate_home() {
   export HOME="$TEST_HOME"
   export XDG_CONFIG_HOME="$TEST_HOME/.config"
   export XDG_DATA_HOME="$TEST_HOME/.local/share"
-  mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME"
+  mkdir -p "$XDG_CONFIG_HOME" "$XDG_DATA_HOME" "$TEST_HOME/.local/bin"
+  export PATH="$TEST_HOME/.local/bin:$PATH"
 
   git config --global user.email "test@example.com"
   git config --global user.name "Test User"
