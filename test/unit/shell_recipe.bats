@@ -4,7 +4,7 @@
 # Run: bats test/e2e/shell_recipe.bats
 #   or: make test
 
-load test_helper
+load ../test_helper
 
 setup() {
   skip_if_not_container

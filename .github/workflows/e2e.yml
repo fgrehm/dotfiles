@@ -50,5 +50,5 @@ jobs:
       - name: Unit tests (file deployment)
         run: make test
 
-      - name: Integration tests (tool installation)
-        run: make test-integration
+      - name: E2E tests (tool installation)
+        run: make test-e2e

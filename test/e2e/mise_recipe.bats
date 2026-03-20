@@ -1,17 +1,16 @@
 #!/usr/bin/env bats
-# Tests for the mise recipe.
+# Integration test: mise recipe installs mise and deploys shellrc fragment.
 #
-# Run: bats test/e2e/mise_recipe.bats
-#   or: make test
+# Runs chezmoi apply including scripts.
+# Run: make test-integration
 
-load test_helper
+load ../test_helper
 
 setup() {
   skip_if_not_container
+  skip_if_no_integration
   isolate_home
   setup_dotfiles_repo
-  write_minimal_config_template
-  copy_recipe "shell"
   copy_recipe "mise"
   cd "$DOTFILES"
   run_overlay
@@ -22,19 +21,22 @@ teardown() {
   cleanup
 }
 
-@test "mise: overlay includes install script and shellrc fragment" {
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-mise.sh" ]
-  [ -f "$DOTFILES/compiled-home/dot_shellrc.d/mise.sh" ]
+@test "mise: install script makes mise available" {
+  chezmoi_apply_full
+
+  command -v mise
+  mise --version
 }
 
-@test "mise: deploys shellrc.d fragment" {
-  chezmoi_apply_files
+@test "mise: shellrc fragment is deployed" {
+  chezmoi_apply_full
 
   [ -f "$HOME/.shellrc.d/mise.sh" ]
 }
 
-@test "mise: shellrc fragment activates mise when available" {
-  chezmoi_apply_files
+@test "mise: apply is idempotent" {
+  chezmoi_apply_full
 
-  grep -q "mise activate" "$HOME/.shellrc.d/mise.sh"
+  run chezmoi_apply_full
+  [ "$status" -eq 0 ]
 }

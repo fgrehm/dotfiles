@@ -4,7 +4,7 @@
 # Run: bats test/e2e/cartage_recipe_laptop.bats
 #   or: make test
 
-load test_helper
+load ../test_helper
 
 # Write a minimal config template for a non-container (laptop) environment.
 write_laptop_config_template() {

@@ -21,7 +21,8 @@ recipes/              modular recipe directories
     README.md         required (discovery marker)
     chezmoi/          chezmoi source fragment (dot_*, .chezmoiscripts/, etc.)
 compiled-home/        generated, gitignored
-test/e2e/             bats e2e tests
+test/unit/            bats unit tests (file deployment)
+test/e2e/             bats e2e tests (full apply with installs)
 .devcontainer/        devcontainer config (Debian 13 + mise)
 ```
 
@@ -107,11 +108,12 @@ failure (don't block the rest of `chezmoi apply`).
 Tests run inside the devcontainer (or with `DOTFILES_E2E=1`).
 
 ```bash
-make test       # bats e2e tests
+make test       # unit tests (file deployment)
+make test-e2e   # e2e tests (full apply with installs)
 make check      # shfmt + shellcheck
 ```
 
-Test helper (`test/e2e/test_helper.bash`) provides:
+Test helper (`test/test_helper.bash`) provides:
 - `setup_dotfiles_repo` - creates temp repo with chezmoi-recipes layout
 - `write_minimal_config_template` - non-interactive config (no prompts)
 - `add_recipe`, `add_home_file` - populate test fixtures
