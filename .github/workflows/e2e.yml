@@ -15,6 +15,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Cache apt packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-${{ hashFiles('.github/workflows/e2e.yml') }}
+
       - name: Install system dependencies
         run: apt-get update -qq && apt-get install -y -qq wget git sudo ca-certificates make
 
