@@ -16,7 +16,7 @@ skip_if_not_container() {
 
 # Absolute path to the real dotfiles-new repo root.
 project_root() {
-  cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd
+  cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd
 }
 
 # Create a temporary dotfiles repo seeded from the real repo's home/ and recipes/.
