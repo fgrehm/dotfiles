@@ -1,12 +1,16 @@
 # git
 
-Git configuration, global gitignore, and shell aliases.
+Git configuration, global gitignore, shell aliases, and TUI tooling.
 
 ## What it does
 
 - Installs git via apt (graceful failure, idempotent)
+- Installs [diffnav](https://github.com/dlvhdr/diffnav) — TUI diff pager (configured as default pager)
+- Installs [worktrunk](https://worktrunk.dev) — git worktree manager (`wt` CLI)
 - Deploys `~/.config/git/config` (XDG location, templated for user identity and SSH signing)
 - Deploys `~/.config/git/ignore` (global ignores for editor swap files, OS cruft, AI tooling)
+- Deploys `~/.config/diffnav/config.yml` (commented-out defaults)
+- Deploys `~/.config/worktrunk/config.toml` (commented-out defaults)
 - Adds shell aliases and zsh completions via `~/.shellrc.d/git.sh`
 
 ## Config highlights

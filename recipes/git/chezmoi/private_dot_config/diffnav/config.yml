@@ -1,0 +1,13 @@
+# diffnav configuration — https://github.com/dlvhdr/diffnav
+# All options shown with their default values.
+#
+# ui:
+#   hideHeader: false
+#   hideFooter: false
+#   showFileTree: true
+#   fileTreeWidth: 26
+#   searchTreeWidth: 50
+#   icons: nerd-fonts-status  # nerd-fonts-status | nerd-fonts-color | ascii | emoji | unicode
+#   colorFileNames: true
+#   showDiffStats: true
+#   sideBySide: true
