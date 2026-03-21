@@ -14,18 +14,21 @@ _install() {
   local arch
   arch="$(uname -m)"
   case "$arch" in
-    x86_64) arch="x86_64" ;;
-    aarch64 | arm64) arch="arm64" ;;
-    *) echo "Unsupported architecture: $arch" >&2; return 1 ;;
+  x86_64) arch="x86_64" ;;
+  aarch64 | arm64) arch="arm64" ;;
+  *)
+    echo "Unsupported architecture: $arch" >&2
+    return 1
+    ;;
   esac
   local version
-  version=$(wget -qO- "https://api.github.com/repos/charmbracelet/vhs/releases/latest" \
-    | grep '"tag_name"' | cut -d'"' -f4 | tr -d 'v')
+  version=$(wget -qO- "https://api.github.com/repos/charmbracelet/vhs/releases/latest" |
+    grep '"tag_name"' | cut -d'"' -f4 | tr -d 'v')
   mkdir -p "$HOME/.local/bin"
   local tmp
   tmp="$(mktemp -d)"
-  wget -qO- "https://github.com/charmbracelet/vhs/releases/download/v${version}/vhs_${version}_Linux_${arch}.tar.gz" \
-    | tar xz -C "$tmp" --strip-components=1
+  wget -qO- "https://github.com/charmbracelet/vhs/releases/download/v${version}/vhs_${version}_Linux_${arch}.tar.gz" |
+    tar xz -C "$tmp" --strip-components=1
   mv "$tmp/vhs" "$HOME/.local/bin/vhs"
   rm -rf "$tmp"
 }

@@ -14,9 +14,12 @@ _install() {
   local arch
   arch="$(uname -m)"
   case "$arch" in
-    x86_64) arch="x86_64" ;;
-    aarch64 | arm64) arch="aarch64" ;;
-    *) echo "Unsupported architecture: $arch" >&2; return 1 ;;
+  x86_64) arch="x86_64" ;;
+  aarch64 | arm64) arch="aarch64" ;;
+  *)
+    echo "Unsupported architecture: $arch" >&2
+    return 1
+    ;;
   esac
   mkdir -p "$HOME/.local/bin"
   wget -qO "$HOME/.local/bin/ttyd" \

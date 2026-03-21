@@ -14,13 +14,16 @@ _install() {
   local arch
   arch="$(uname -m)"
   case "$arch" in
-    x86_64) arch="amd64" ;;
-    aarch64 | arm64) arch="arm64" ;;
-    *) echo "Unsupported architecture: $arch" >&2; return 1 ;;
+  x86_64) arch="amd64" ;;
+  aarch64 | arm64) arch="arm64" ;;
+  *)
+    echo "Unsupported architecture: $arch" >&2
+    return 1
+    ;;
   esac
   mkdir -p "$HOME/.local/bin"
-  wget -qO- "https://github.com/fgrehm/clotilde/releases/latest/download/clotilde_linux_${arch}.tar.gz" \
-    | tar xz -C "$HOME/.local/bin" clotilde
+  wget -qO- "https://github.com/fgrehm/clotilde/releases/latest/download/clotilde_linux_${arch}.tar.gz" |
+    tar xz -C "$HOME/.local/bin" clotilde
 }
 
 if ! _install; then

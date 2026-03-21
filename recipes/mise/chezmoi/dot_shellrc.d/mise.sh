@@ -11,7 +11,7 @@
 if command -v mise >/dev/null 2>&1; then
   MISE_SHIMS_DIR="$(mise shims-dir 2>/dev/null || echo "$HOME/.local/share/mise/shims")"
   case ":$PATH:" in
-    *":$MISE_SHIMS_DIR:"*) ;;
-    *) export PATH="$PATH:$MISE_SHIMS_DIR" ;;
+  *":$MISE_SHIMS_DIR:"*) ;;
+  *) export PATH="$PATH:$MISE_SHIMS_DIR" ;;
   esac
 fi

@@ -15,15 +15,18 @@ _install() {
   local arch
   arch="$(uname -m)"
   case "$arch" in
-    x86_64) arch="x86_64" ;;
-    aarch64 | arm64) arch="aarch64" ;;
-    *) echo "Unsupported architecture: $arch" >&2; return 1 ;;
+  x86_64) arch="x86_64" ;;
+  aarch64 | arm64) arch="aarch64" ;;
+  *)
+    echo "Unsupported architecture: $arch" >&2
+    return 1
+    ;;
   esac
   mkdir -p "$HOME/.local/bin"
   local tmp
   tmp="$(mktemp -d)"
-  wget -qO- "https://github.com/max-sixty/worktrunk/releases/latest/download/worktrunk-${arch}-unknown-linux-musl.tar.xz" \
-    | tar xJ -C "$tmp" --strip-components=1
+  wget -qO- "https://github.com/max-sixty/worktrunk/releases/latest/download/worktrunk-${arch}-unknown-linux-musl.tar.xz" |
+    tar xJ -C "$tmp" --strip-components=1
   mv "$tmp/wt" "$HOME/.local/bin/wt"
   mv "$tmp/git-wt" "$HOME/.local/bin/git-wt"
   rm -rf "$tmp"

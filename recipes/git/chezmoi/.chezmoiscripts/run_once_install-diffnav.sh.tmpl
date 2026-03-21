@@ -15,13 +15,16 @@ _install() {
   local arch
   arch="$(uname -m)"
   case "$arch" in
-    x86_64) arch="x86_64" ;;
-    aarch64 | arm64) arch="arm64" ;;
-    *) echo "Unsupported architecture: $arch" >&2; return 1 ;;
+  x86_64) arch="x86_64" ;;
+  aarch64 | arm64) arch="arm64" ;;
+  *)
+    echo "Unsupported architecture: $arch" >&2
+    return 1
+    ;;
   esac
   mkdir -p "$HOME/.local/bin"
-  wget -qO- "https://github.com/dlvhdr/diffnav/releases/latest/download/diffnav_Linux_${arch}.tar.gz" \
-    | tar xz -C "$HOME/.local/bin" diffnav
+  wget -qO- "https://github.com/dlvhdr/diffnav/releases/latest/download/diffnav_Linux_${arch}.tar.gz" |
+    tar xz -C "$HOME/.local/bin" diffnav
 }
 
 if ! _install; then
