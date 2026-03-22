@@ -130,6 +130,18 @@ make test-e2e   # e2e tests (full apply with installs)
 make check      # shfmt + shellcheck
 ```
 
+**Every new recipe needs tests:**
+
+- `test/unit/<recipe>.bats` — verifies files land in the right destinations
+  using `chezmoi_apply_files` (`--exclude=scripts`, no installs run). Required
+  for any recipe that deploys config files.
+- `test/e2e/<recipe>.bats` — runs `chezmoi_apply_full` (scripts included),
+  checks the binary is on `$PATH`, and verifies idempotency. Required for any
+  recipe with install scripts that download binaries.
+
+Look at existing tests in `test/unit/` and `test/e2e/` for examples before
+writing new ones.
+
 Test helper (`test/test_helper.bash`) provides:
 - `setup_dotfiles_repo` - creates temp repo with chezmoi-recipes layout
 - `write_minimal_config_template` - non-interactive config (no prompts)
