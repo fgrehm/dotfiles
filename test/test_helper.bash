@@ -62,6 +62,31 @@ copy_recipe() {
   cp -a "$real_root/recipes/$name" "$DOTFILES/recipes/$name"
 }
 
+# Copy .recipeignore from the real repo into the test repo.
+# Required for tests that exercise conditional recipe exclusion.
+copy_recipeignore() {
+  local real_root
+  real_root="$(project_root)"
+  cp "$real_root/recipes/.recipeignore" "$DOTFILES/recipes/.recipeignore"
+}
+
+# Pre-seed a rendered chezmoi config so .recipeignore can read it at overlay time.
+# chezmoi_init runs after run_overlay, so recipeignore won't see the config unless
+# it is seeded here first.
+# Usage: seed_chezmoi_config [true|false]  (isContainer value, defaults to true)
+seed_chezmoi_config() {
+  local is_container="${1:-true}"
+  mkdir -p "$HOME/.config/chezmoi"
+  cat >"$HOME/.config/chezmoi/chezmoi.toml" <<TOML
+[data]
+    name = "Test User"
+    email = "test@example.com"
+    isContainer = ${is_container}
+    isDebian = true
+    hasNvidiaGPU = false
+TOML
+}
+
 # Run chezmoi apply, skipping script execution.
 # Use this to test file deployment without triggering install scripts.
 chezmoi_apply_files() {

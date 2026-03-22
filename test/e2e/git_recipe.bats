@@ -28,6 +28,20 @@ teardown() {
   git --version
 }
 
+@test "git: install script makes diffnav available" {
+  chezmoi_apply_full
+
+  command -v diffnav
+  diffnav --version
+}
+
+@test "git: install script makes wt (worktrunk) available" {
+  chezmoi_apply_full
+
+  command -v wt
+  wt --version
+}
+
 @test "git: config and ignore are deployed" {
   chezmoi_apply_full
 

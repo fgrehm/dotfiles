@@ -26,6 +26,10 @@ teardown() {
   [ -f "$DOTFILES/compiled-home/private_dot_config/git/ignore" ]
   [ -f "$DOTFILES/compiled-home/dot_shellrc.d/git.sh" ]
   [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-git.sh.tmpl" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-diffnav.sh.tmpl" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-worktrunk.sh.tmpl" ]
+  [ -f "$DOTFILES/compiled-home/private_dot_config/diffnav/config.yml" ]
+  [ -f "$DOTFILES/compiled-home/private_dot_config/worktrunk/config.toml" ]
 }
 
 @test "git: deploys git config to XDG location" {
@@ -49,6 +53,25 @@ teardown() {
   [[ "$output" == *"defaultBranch = main"* ]]
   [[ "$output" == *"algorithm = histogram"* ]]
   [[ "$output" == *"prune = true"* ]]
+}
+
+@test "git: config sets diffnav as pager" {
+  chezmoi_apply_files
+
+  run cat "$HOME/.config/git/config"
+  [[ "$output" == *"pager = diffnav"* ]]
+}
+
+@test "git: deploys diffnav config" {
+  chezmoi_apply_files
+
+  [ -f "$HOME/.config/diffnav/config.yml" ]
+}
+
+@test "git: deploys worktrunk config" {
+  chezmoi_apply_files
+
+  [ -f "$HOME/.config/worktrunk/config.toml" ]
 }
 
 @test "git: deploys global gitignore to XDG location" {
