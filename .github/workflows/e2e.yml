@@ -25,7 +25,7 @@ jobs:
           key: apt-${{ hashFiles('.github/workflows/e2e.yml') }}
 
       - name: Install system dependencies
-        run: apt-get update -qq && apt-get install -y -qq wget git sudo ca-certificates make
+        run: apt-get update -qq && apt-get install -y -qq wget git sudo ca-certificates make xz-utils
 
       - name: Install mise
         run: wget -qO- https://mise.jdx.dev/install.sh | sh
