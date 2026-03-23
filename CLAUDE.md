@@ -120,6 +120,38 @@ fi
 Key points: guard with `command -v`, `set -e` inside function only, graceful
 failure (don't block the rest of `chezmoi apply`).
 
+## Script Ordering
+
+chezmoi runs scripts in two phases, sorted lexicographically within each:
+
+1. **Before file deployment**: `run_once_`, `run_onchange_`, `run_once_before_`,
+   `run_onchange_before_` scripts
+2. **After file deployment**: `run_once_after_`, `run_onchange_after_` scripts
+
+Use `run_once_after_` or `run_onchange_after_` when a script depends on files
+deployed by chezmoi (e.g., a tool installed via a config file that lands during
+file deployment).
+
+## Conditional File Skipping
+
+Two mechanisms for environment-conditional deployment:
+
+- **`.chezmoiignore`** in a recipe's `chezmoi/` dir: skip target files by
+  environment. Patterns match target paths (e.g., `.config/mise/config.toml`).
+  Uses chezmoi template syntax (`{{ if .isContainer }}`).
+- **Template guards** inside scripts: early `exit 0` based on template
+  conditionals. Use for `run_onchange_` scripts that can't be skipped via
+  `.chezmoiignore`.
+
+## Config-Triggered Re-runs
+
+`run_onchange_` scripts re-run when their rendered content changes. To re-trigger
+when a deployed config file changes, embed its hash in a comment:
+
+```bash
+# config hash: # {{ include "dot_config/mise/config.toml" | sha256sum }}
+```
+
 ## Testing
 
 Tests run inside the devcontainer (or with `DOTFILES_E2E=1`).
