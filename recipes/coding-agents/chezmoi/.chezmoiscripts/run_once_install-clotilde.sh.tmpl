@@ -9,7 +9,7 @@ if command -v clotilde &>/dev/null; then
 fi
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing Clotilde..."
   local arch
   arch="$(uname -m)"

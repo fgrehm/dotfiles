@@ -9,7 +9,7 @@ if command -v mise &>/dev/null; then
 fi
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing mise..."
   mkdir -p "$HOME/.local/bin"
   wget -qO- https://mise.run | sh

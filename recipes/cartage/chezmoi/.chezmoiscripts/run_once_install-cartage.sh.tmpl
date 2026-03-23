@@ -9,7 +9,7 @@ if command -v cartage &>/dev/null; then
 fi
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing Cartage..."
   local arch
   arch="$(uname -m)"

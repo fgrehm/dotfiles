@@ -2,7 +2,7 @@
 # Integration test: mise recipe installs mise and deploys shellrc fragment.
 #
 # Runs chezmoi apply including scripts.
-# Run: make test-integration
+# Run: make test-e2e
 
 load ../test_helper
 

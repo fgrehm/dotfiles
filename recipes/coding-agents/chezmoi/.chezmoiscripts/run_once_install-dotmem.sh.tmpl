@@ -9,7 +9,7 @@ if command -v dotmem &>/dev/null; then
 fi
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing dotmem..."
   local arch
   arch="$(uname -m)"

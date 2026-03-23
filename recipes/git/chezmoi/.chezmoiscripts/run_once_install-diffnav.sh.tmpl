@@ -9,7 +9,7 @@ if command -v diffnav &>/dev/null; then
 fi
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing diffnav..."
   # https://github.com/dlvhdr/diffnav/releases
   local arch

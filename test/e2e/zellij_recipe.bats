@@ -2,7 +2,7 @@
 # Integration test: zellij recipe downloads and installs zellij.
 #
 # Requires network access and a container.
-# Run: make test-integration
+# Run: make test-e2e
 
 load ../test_helper
 

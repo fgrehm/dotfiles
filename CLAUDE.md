@@ -105,7 +105,7 @@ SUDO=""
 # {{ end }}
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing <tool>..."
   "$SUDO" apt-get update -qq
   "$SUDO" apt-get install -y <tool>
@@ -117,8 +117,8 @@ if ! _install; then
 fi
 ```
 
-Key points: guard with `command -v`, `set -e` inside function only, graceful
-failure (don't block the rest of `chezmoi apply`).
+Key points: guard with `command -v`, `set -eo pipefail` inside function only,
+graceful failure (don't block the rest of `chezmoi apply`).
 
 ## Script Ordering
 
