@@ -20,6 +20,7 @@ _log() { printf '\033[1;34m==> %s\033[0m\n' "$*"; }
 _die() { printf '\033[1;31merror: %s\033[0m\n' "$*" >&2; exit 1; }
 
 [ "$(uname -s)" = "Linux" ] || _die "only Linux is supported"
+command -v git >/dev/null 2>&1 || _die "git is required but not installed (apt-get install git)"
 
 case "$(uname -m)" in
   x86_64)        ARCH=amd64 ;;
