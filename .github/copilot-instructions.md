@@ -1,7 +1,13 @@
 # Copilot Instructions
 
-This is a chezmoi dotfiles repo. See [CLAUDE.md](../CLAUDE.md) for full project
-context, conventions, and patterns. Key points for reviews:
+This is a chezmoi dotfiles repo using
+[chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes) for modular
+organization. `chezmoi-recipes overlay` merges `home/` and `recipes/*/chezmoi/`
+into `compiled-home/` (the chezmoi source state). Each file belongs to exactly
+one recipe or `home/`, never both. See [CLAUDE.md](../CLAUDE.md) for full
+project context.
+
+Key points for reviews:
 
 ## Structure
 
@@ -16,7 +22,7 @@ context, conventions, and patterns. Key points for reviews:
   `# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"`.
 - `.sh.tmpl` files must have a vim modeline: `# vim: ft=bash.gotmpl`.
 - Plain `.sh` files (no template directives) must have: `# vim: ft=bash`.
-- Install scripts guard with `command -v`, use `set -e` inside `_install()`
+- Install scripts guard with `command -v`, use `set -eo pipefail` inside `_install()`
   only, and fail gracefully (don't block `chezmoi apply`).
 - Use `wget` instead of `curl` (curl not guaranteed on Debian).
 
