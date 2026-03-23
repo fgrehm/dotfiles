@@ -3,10 +3,10 @@
 # repo, builds the overlay, initializes chezmoi, and applies.
 #
 # Usage:
-#   sh -c "$(curl -fsSL <raw-url-to-this-file>)"
+#   sh -c "$(wget -qO- <raw-url-to-this-file>)"
 #
 #   # Non-interactive (provide prompt values)
-#   sh -c "$(curl -fsSL <raw-url-to-this-file>)" -- \
+#   sh -c "$(wget -qO- <raw-url-to-this-file>)" -- \
 #     --promptString "Full name=Your Name" \
 #     --promptString "Email=you@example.com"
 #
@@ -33,13 +33,13 @@ export PATH="$BIN_DIR:$PATH"
 # Install chezmoi
 if ! command -v chezmoi >/dev/null 2>&1; then
   _log "Installing chezmoi"
-  sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$BIN_DIR"
+  sh -c "$(wget -qO- get.chezmoi.io)" -- -b "$BIN_DIR"
 fi
 
 # Install chezmoi-recipes
 if ! command -v chezmoi-recipes >/dev/null 2>&1; then
   _log "Installing chezmoi-recipes"
-  curl -fsSL "https://github.com/fgrehm/chezmoi-recipes/releases/latest/download/chezmoi-recipes_linux_${ARCH}.tar.gz" \
+  wget -qO- "https://github.com/fgrehm/chezmoi-recipes/releases/latest/download/chezmoi-recipes_linux_${ARCH}.tar.gz" \
     | tar xz -C "$BIN_DIR"
 fi
 
