@@ -7,15 +7,20 @@ if command -v pi &>/dev/null; then
   exit 0
 fi
 
-if ! command -v npm &>/dev/null; then
+NPM_CMD=""
+if command -v mise &>/dev/null && mise which npm &>/dev/null; then
+  NPM_CMD="mise exec node -- npm"
+elif command -v npm &>/dev/null; then
+  NPM_CMD="npm"
+else
   log_skip "npm not found, skipping Pi coding agent"
   exit 0
 fi
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing Pi coding agent..."
-  npm install -g @mariozechner/pi-coding-agent
+  $NPM_CMD install -g @mariozechner/pi-coding-agent
 }
 
 if ! _install; then
