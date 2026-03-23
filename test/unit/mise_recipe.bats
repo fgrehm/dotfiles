@@ -37,6 +37,12 @@ teardown() {
   [ -f "$HOME/.shellrc.d/mise.sh" ]
 }
 
+@test "mise: shellrc fragment sets up mise shims on PATH" {
+  chezmoi_apply_files
+
+  grep -q "mise shims-dir\|MISE_SHIMS_DIR" "$HOME/.shellrc.d/mise.sh"
+}
+
 @test "mise: skips config.toml in container" {
   chezmoi_apply_files
 

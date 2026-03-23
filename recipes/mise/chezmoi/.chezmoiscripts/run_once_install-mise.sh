@@ -1,6 +1,5 @@
 #!/bin/env bash
 # vim: ft=bash
-set -eo pipefail
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 if command -v mise &>/dev/null; then
