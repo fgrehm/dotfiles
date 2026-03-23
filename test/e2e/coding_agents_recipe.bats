@@ -2,7 +2,7 @@
 # Integration test: coding-agents recipe installs agent tools.
 #
 # Runs chezmoi apply including scripts. Requires a container with network.
-# Run: make test-integration
+# Run: make test-e2e
 
 load ../test_helper
 

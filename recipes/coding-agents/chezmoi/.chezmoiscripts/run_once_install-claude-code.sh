@@ -8,7 +8,7 @@ if command -v claude &>/dev/null; then
 fi
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing Claude Code..."
   wget -qO- https://claude.ai/install.sh | bash
 }
