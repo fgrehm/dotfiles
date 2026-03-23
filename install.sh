@@ -35,9 +35,11 @@ export PATH="$BIN_DIR:$PATH"
 if ! command -v chezmoi >/dev/null 2>&1; then
   _log "Installing chezmoi"
   tmp=$(mktemp) || _die "failed to create temp file"
-  wget -qO "$tmp" get.chezmoi.io || _die "failed to download chezmoi installer"
+  trap 'rm -f "$tmp"' EXIT
+  wget -qO "$tmp" "https://get.chezmoi.io" || _die "failed to download chezmoi installer"
   sh "$tmp" -- -b "$BIN_DIR"
   rm -f "$tmp"
+  trap - EXIT
 fi
 
 # Install chezmoi-recipes
