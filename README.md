@@ -15,7 +15,7 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and
 
 ```bash
 # Install chezmoi and chezmoi-recipes
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/fgrehm/chezmoi-recipes/main/install.sh)" -- <GITHUB_USERNAME>
+sh -c "$(wget -q -O - https://raw.githubusercontent.com/fgrehm/chezmoi-recipes/main/install.sh)" -- <GITHUB_USERNAME>
 ```
 
 **Already have both tools:**
