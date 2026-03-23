@@ -8,7 +8,7 @@ if command -v vhs &>/dev/null; then
 fi
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing vhs..."
   # https://github.com/charmbracelet/vhs/releases
   local arch

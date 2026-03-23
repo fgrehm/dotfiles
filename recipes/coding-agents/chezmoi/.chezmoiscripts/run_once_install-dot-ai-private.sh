@@ -15,4 +15,5 @@ fi
 log_info "Configuring dot-ai-private..."
 if ! "$INSTALL_DIR/install.sh"; then
   log_error "dot-ai-private install.sh failed"
+  log_info "Run 'chezmoi apply' again after fixing the issue."
 fi

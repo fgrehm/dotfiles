@@ -2,7 +2,7 @@
 # Integration test: git recipe installs git and deploys config.
 #
 # Runs chezmoi apply including scripts. Requires a container with sudo.
-# Run: make test-integration
+# Run: make test-e2e
 
 load ../test_helper
 

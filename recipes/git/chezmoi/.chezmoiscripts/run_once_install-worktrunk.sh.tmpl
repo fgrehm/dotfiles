@@ -9,7 +9,7 @@ if command -v wt &>/dev/null; then
 fi
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing worktrunk..."
   # https://github.com/max-sixty/worktrunk/releases
   local arch

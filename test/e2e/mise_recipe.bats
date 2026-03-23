@@ -2,7 +2,7 @@
 # Integration test: mise recipe installs mise and deploys shellrc fragment.
 #
 # Runs chezmoi apply including scripts.
-# Run: make test-integration
+# Run: make test-e2e
 
 load ../test_helper
 
@@ -32,6 +32,12 @@ teardown() {
   chezmoi_apply_full
 
   [ -f "$HOME/.shellrc.d/mise.sh" ]
+}
+
+@test "mise: config.toml is skipped in container" {
+  chezmoi_apply_full
+
+  [ ! -f "$HOME/.config/mise/config.toml" ]
 }
 
 @test "mise: apply is idempotent" {
