@@ -34,7 +34,10 @@ export PATH="$BIN_DIR:$PATH"
 # Install chezmoi
 if ! command -v chezmoi >/dev/null 2>&1; then
   _log "Installing chezmoi"
-  sh -c "$(wget -qO- get.chezmoi.io)" -- -b "$BIN_DIR"
+  tmp=$(mktemp) || _die "failed to create temp file"
+  wget -qO "$tmp" get.chezmoi.io || _die "failed to download chezmoi installer"
+  sh "$tmp" -- -b "$BIN_DIR"
+  rm -f "$tmp"
 fi
 
 # Install chezmoi-recipes
@@ -57,7 +60,7 @@ fi
 
 # Build compiled-home/ so chezmoi can find the config template
 _log "Building overlay"
-chezmoi-recipes overlay --recipes-dir "$SOURCE_DIR/recipes"
+(cd "$SOURCE_DIR" && chezmoi-recipes overlay --recipes-dir "$SOURCE_DIR/recipes")
 
 # Initialize chezmoi (processes config template, prompts for user data)
 _log "Initializing chezmoi"
