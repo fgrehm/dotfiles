@@ -34,6 +34,12 @@ teardown() {
   [ -f "$HOME/.shellrc.d/mise.sh" ]
 }
 
+@test "mise: config.toml is skipped in container" {
+  chezmoi_apply_full
+
+  [ ! -f "$HOME/.config/mise/config.toml" ]
+}
+
 @test "mise: apply is idempotent" {
   chezmoi_apply_full
 

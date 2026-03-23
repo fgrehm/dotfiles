@@ -26,7 +26,7 @@ teardown() {
 }
 
 @test "coding-agents: overlay includes pi-agent install script" {
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-pi-agent.sh" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_after_install-pi-agent.sh" ]
 }
 
 @test "coding-agents: overlay includes dot-ai install scripts" {
