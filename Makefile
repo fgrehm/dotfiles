@@ -2,7 +2,7 @@ SHELL_FILES := $(shell find recipes \( -name "*.sh" -o -name "*.sh.tmpl" -o -nam
 
 .DEFAULT_GOAL := help
 
-.PHONY: help test shell-fmt shell-fmt-check shell-lint check init apply diff doctor
+.PHONY: help test test-ci test-e2e test-e2e-ci shell-fmt shell-fmt-check shell-lint check init apply diff doctor
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
@@ -34,5 +34,11 @@ check: shell-fmt-check shell-lint ## Run shell formatting check and shellcheck
 test: ## Run unit tests - file deployment (requires container or DOTFILES_E2E=1)
 	bats --print-output-on-failure test/unit/
 
+test-ci: ## Run unit tests with JUnit output for CI
+	bats --print-output-on-failure --report-formatter junit --output test-results/ test/unit/
+
 test-e2e: ## Run e2e tests - installs real tools (requires container)
 	DOTFILES_INTEGRATION=1 bats --print-output-on-failure test/e2e/
+
+test-e2e-ci: ## Run e2e tests with JUnit output for CI
+	DOTFILES_INTEGRATION=1 bats --print-output-on-failure --report-formatter junit --output test-results/ test/e2e/

@@ -2,6 +2,7 @@ name: e2e
 
 permissions:
   contents: read
+  checks: write
 
 on:
   push:
@@ -51,7 +52,15 @@ jobs:
             | tar -xz -C /usr/local/bin chezmoi-recipes
 
       - name: Unit tests (file deployment)
-        run: make test
+        run: make test-ci
 
       - name: E2E tests (tool installation)
-        run: make test-e2e
+        run: make test-e2e-ci
+
+      - name: Publish test results
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Bats
+          path: test-results/*.xml
+          reporter: java-junit
