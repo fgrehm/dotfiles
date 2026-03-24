@@ -2,7 +2,6 @@ name: e2e
 
 permissions:
   contents: read
-  checks: write
 
 on:
   push:
@@ -57,10 +56,8 @@ jobs:
       - name: E2E tests (tool installation)
         run: make test-e2e-ci
 
-      - name: Publish test results
-        uses: dorny/test-reporter@v1
+      - name: Test Summary
+        uses: test-summary/action@v2
         if: always()
         with:
-          name: Bats
-          path: test-results/*.xml
-          reporter: java-junit
+          paths: test-results/*.xml
