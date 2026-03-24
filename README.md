@@ -14,16 +14,7 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and
 ## Quick Start
 
 ```bash
-# Install chezmoi and chezmoi-recipes
-sh -c "$(wget -q -O - https://raw.githubusercontent.com/fgrehm/chezmoi-recipes/main/install.sh)" -- <GITHUB_USERNAME>
-```
-
-**Already have both tools:**
-
-```bash
-chezmoi init <GITHUB_USERNAME>
-chezmoi diff    # preview
-chezmoi apply   # apply
+sh -c "$(wget -qO- https://raw.githubusercontent.com/fgrehm/dotfiles/main/install.sh)"
 ```
 
 ## How It Works

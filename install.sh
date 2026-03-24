@@ -37,7 +37,7 @@ if ! command -v chezmoi >/dev/null 2>&1; then
   tmp=$(mktemp) || _die "failed to create temp file"
   trap 'rm -f "$tmp"' EXIT
   wget -qO "$tmp" "https://get.chezmoi.io" || _die "failed to download chezmoi installer"
-  sh "$tmp" -- -b "$BIN_DIR"
+  BINDIR="$BIN_DIR" sh "$tmp"
   rm -f "$tmp"
   trap - EXIT
 fi
