@@ -87,10 +87,10 @@ seed_chezmoi_config() {
 TOML
 }
 
-# Run chezmoi apply, skipping script execution.
-# Use this to test file deployment without triggering install scripts.
+# Run chezmoi apply, skipping script execution and external downloads.
+# Use this to test file deployment without triggering install scripts or network requests.
 chezmoi_apply_files() {
-  chezmoi apply --no-tty --exclude=scripts --source "$DOTFILES"
+  chezmoi apply --no-tty --exclude=scripts,externals --source "$DOTFILES"
 }
 
 # Add a recipe with a single chezmoi source file.

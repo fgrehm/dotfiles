@@ -26,8 +26,9 @@ teardown() {
   [ -f "$DOTFILES/compiled-home/private_dot_config/git/ignore" ]
   [ -f "$DOTFILES/compiled-home/dot_shellrc.d/git.sh" ]
   [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-git.sh.tmpl" ]
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-diffnav.sh.tmpl" ]
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-worktrunk.sh.tmpl" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiexternals/diffnav.toml" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiexternals/worktrunk.toml" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiexternals/delta.toml" ]
   [ -f "$DOTFILES/compiled-home/private_dot_config/diffnav/config.yml" ]
   [ -f "$DOTFILES/compiled-home/private_dot_config/worktrunk/config.toml" ]
 }
@@ -122,7 +123,7 @@ TMPL
 @test "git: diff is clean after apply" {
   chezmoi_apply_files
 
-  run chezmoi diff --no-tty --exclude=scripts --source "$DOTFILES"
+  run chezmoi diff --no-tty --exclude=scripts,externals --source "$DOTFILES"
   [ "$status" -eq 0 ]
   [ -z "$output" ]
 }

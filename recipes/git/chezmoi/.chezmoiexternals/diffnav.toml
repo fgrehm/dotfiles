@@ -1,0 +1,7 @@
+{{- $arch := .chezmoi.arch -}}
+{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- end -}}
+[".local/bin/diffnav"]
+  type = "archive-file"
+  url = "https://github.com/dlvhdr/diffnav/releases/latest/download/diffnav_Linux_{{ $arch }}.tar.gz"
+  executable = true
+  path = "diffnav"

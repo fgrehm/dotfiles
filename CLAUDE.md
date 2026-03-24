@@ -107,6 +107,34 @@ template directives should use `.sh` extension (not `.sh.tmpl`).
   `sudo` conditionals.
 - Run `make check` to lint (shfmt + shellcheck).
 
+## GitHub Binary Installs
+
+For tools distributed as GitHub release tarballs, use chezmoi's `.chezmoiexternals/` directory instead of a shell install script. Each recipe places a `<tool>.toml` file in `chezmoi/.chezmoiexternals/`. Files in this directory are always rendered as templates (no `.tmpl` extension needed).
+
+```toml
+# recipes/git/chezmoi/.chezmoiexternals/diffnav.toml
+{{- $arch := .chezmoi.arch -}}
+{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- end -}}
+[".local/bin/diffnav"]
+  type = "archive-file"
+  url = {{ gitHubLatestReleaseAssetURL "dlvhdr/diffnav" (printf "diffnav_Linux_%s.tar.gz" $arch) | quote }}
+  executable = true
+  path = "diffnav"
+```
+
+For releases with a version-prefixed directory inside the archive, use `gitHubLatestRelease` to get the version for `path`:
+
+```toml
+{{- $version := (gitHubLatestRelease "owner/repo").TagName | trimPrefix "v" -}}
+[".local/bin/tool"]
+  type = "archive-file"
+  url = {{ gitHubLatestReleaseAssetURL "owner/repo" (printf "tool-%s-linux.tar.gz" $version) | quote }}
+  path = {{ printf "tool-%s/tool" $version | quote }}
+  executable = true
+```
+
+Multiple recipes can each contribute `.chezmoiexternals/*.toml` files without conflict since each file has a unique name. Use a shell install script only for apt packages, tools needing post-install setup, or standalone binaries (not archives).
+
 ## Script Patterns
 
 Install scripts follow this pattern:
