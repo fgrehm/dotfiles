@@ -35,10 +35,12 @@ test: ## Run unit tests - file deployment (requires container or DOTFILES_E2E=1)
 	bats --print-output-on-failure test/unit/
 
 test-ci: ## Run unit tests with JUnit output for CI
+	mkdir -p test-results
 	bats --print-output-on-failure --report-formatter junit --output test-results/ test/unit/
 
 test-e2e: ## Run e2e tests - installs real tools (requires container)
 	DOTFILES_INTEGRATION=1 bats --print-output-on-failure test/e2e/
 
 test-e2e-ci: ## Run e2e tests with JUnit output for CI
+	mkdir -p test-results
 	DOTFILES_INTEGRATION=1 bats --print-output-on-failure --report-formatter junit --output test-results/ test/e2e/
