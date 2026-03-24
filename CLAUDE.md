@@ -171,6 +171,41 @@ fi
 Key points: guard with `command -v`, `set -eo pipefail` inside function only,
 graceful failure (don't block the rest of `chezmoi apply`).
 
+## Completion Scripts
+
+Completion scripts (`run_onchange_after_completions-*.sh.tmpl`) are non-essential
+and must never block `chezmoi apply`. Do NOT use `set -euo pipefail` at the top
+level. Instead, wrap each generation command in an `if !` block:
+
+```bash
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+if ! command -v <tool> &>/dev/null; then
+  log_skip "<tool> not found, skipping completions"
+  exit 0
+fi
+
+BASH_DIR="$HOME/.local/share/bash-completion/completions"
+ZSH_DIR="$HOME/.zsh/completions"
+mkdir -p "$BASH_DIR" "$ZSH_DIR"
+
+log_info "Generating <tool> completions..."
+if ! <tool> completion bash >"$BASH_DIR/<tool>"; then
+  log_error "Failed to generate <tool> bash completions (non-fatal)"
+fi
+if ! <tool> completion zsh >"$ZSH_DIR/_<tool>"; then
+  log_error "Failed to generate <tool> zsh completions (non-fatal)"
+fi
+```
+
+Key points: prepend `$HOME/.local/bin` to PATH so freshly installed binaries are
+discoverable during `chezmoi apply`; no `set -euo pipefail`; `if !` per command.
+
 ## Script Ordering
 
 chezmoi runs scripts in two phases, sorted lexicographically within each:
