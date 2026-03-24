@@ -22,7 +22,7 @@ project_root() {
 # Create a temporary dotfiles repo seeded from the real repo's home/ and recipes/.
 # Sets DOTFILES to the created directory.
 setup_dotfiles_repo() {
-  DOTFILES="$(mktemp -d)"
+  export DOTFILES="$(mktemp -d)"
   cd "$DOTFILES"
   git init -q -b main
 
