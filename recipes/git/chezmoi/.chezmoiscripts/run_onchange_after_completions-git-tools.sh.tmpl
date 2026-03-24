@@ -1,0 +1,28 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Re-run when external definitions change:
+# diffnav-hash: # {{ include ".chezmoiexternals/diffnav.toml" | sha256sum }}
+# worktrunk-hash: # {{ include ".chezmoiexternals/worktrunk.toml" | sha256sum }}
+set -euo pipefail
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+BASH_DIR="$HOME/.local/share/bash-completion/completions"
+ZSH_DIR="$HOME/.zsh/completions"
+mkdir -p "$BASH_DIR" "$ZSH_DIR"
+
+if command -v diffnav &>/dev/null; then
+  log_info "Generating diffnav completions..."
+  diffnav completion bash >"$BASH_DIR/diffnav"
+  diffnav completion zsh >"$ZSH_DIR/_diffnav"
+else
+  log_skip "diffnav not found, skipping completions"
+fi
+
+if command -v wt &>/dev/null; then
+  log_info "Generating wt completions..."
+  COMPLETE=bash wt >"$BASH_DIR/wt"
+  COMPLETE=zsh wt >"$ZSH_DIR/_wt"
+else
+  log_skip "wt not found, skipping completions"
+fi
