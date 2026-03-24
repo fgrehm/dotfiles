@@ -39,6 +39,25 @@ A recipe is a directory under `recipes/` with a `README.md` and a `chezmoi/`
 subdirectory. The `chezmoi/` contents use standard chezmoi naming (`dot_`,
 `private_`, `run_once_`, `.tmpl`, etc.) and get overlaid into `compiled-home/`.
 
+## Directory Privacy Must Be Consistent Across Recipes
+
+chezmoi maps `dot_config` and `private_dot_config` to the same target directory
+(`.config`) but with different permissions. If two recipes in the overlay use
+different privacy prefixes for the same target directory, chezmoi will refuse to
+apply with:
+
+```
+chezmoi: .config: inconsistent state (...dot_config, ...private_dot_config)
+```
+
+**Rule: all recipes that write under `.config` must use `private_dot_config`.
+Never use `dot_config` for `.config`.** The `.config` directory holds user
+application state and is private by convention. Mixing `dot_config` and
+`private_dot_config` across recipes is always a bug.
+
+This is caught by `test/unit/basics.bats` ("overlay fails when recipes mix
+dot_config and private_dot_config for the same target").
+
 ## Environment Detection
 
 `.chezmoi.toml.tmpl` sets template data based on auto-detection:
@@ -153,7 +172,7 @@ Two mechanisms for environment-conditional deployment:
 when a deployed config file changes, embed its hash in a comment:
 
 ```bash
-# config hash: # {{ include "dot_config/mise/config.toml" | sha256sum }}
+# config hash: # {{ include "private_dot_config/mise/config.toml" | sha256sum }}
 ```
 
 ## Testing

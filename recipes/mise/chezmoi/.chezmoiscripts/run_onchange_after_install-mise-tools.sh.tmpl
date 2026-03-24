@@ -8,7 +8,7 @@ log_skip "Skipping mise tool install (container)"
 exit 0
 # {{ end }}
 
-# config hash: # {{ include "dot_config/mise/config.toml" | sha256sum }}
+# config hash: # {{ include "private_dot_config/mise/config.toml" | sha256sum }}
 
 export PATH="$HOME/.local/bin:$PATH"
 
