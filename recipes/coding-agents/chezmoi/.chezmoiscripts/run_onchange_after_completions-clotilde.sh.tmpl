@@ -1,0 +1,25 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Re-run when the clotilde install script changes:
+# clotilde-hash: # {{ include ".chezmoiscripts/run_once_install-clotilde.sh.tmpl" | sha256sum }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+if ! command -v clotilde &>/dev/null; then
+  log_skip "clotilde not found, skipping completions"
+  exit 0
+fi
+
+BASH_DIR="$HOME/.local/share/bash-completion/completions"
+ZSH_DIR="$HOME/.zsh/completions"
+mkdir -p "$BASH_DIR" "$ZSH_DIR"
+
+log_info "Generating clotilde completions..."
+if ! clotilde completion bash >"$BASH_DIR/clotilde"; then
+  log_error "Failed to generate clotilde bash completions (non-fatal)"
+fi
+if ! clotilde completion zsh >"$ZSH_DIR/_clotilde"; then
+  log_error "Failed to generate clotilde zsh completions (non-fatal)"
+fi

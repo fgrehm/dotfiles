@@ -24,6 +24,11 @@ Key points for reviews:
 - Plain `.sh` files (no template directives) must have: `# vim: ft=bash`.
 - Install scripts guard with `command -v`, use `set -eo pipefail` inside `_install()`
   only, and fail gracefully (don't block `chezmoi apply`).
+- Completion scripts (`run_onchange_after_completions-*.sh.tmpl`) must NOT use
+  `set -euo pipefail` at the top level. Wrap each generation call in `if !` so a
+  transient failure doesn't block `chezmoi apply`. Always prepend
+  `export PATH="$HOME/.local/bin:$PATH"` so freshly installed binaries are
+  discoverable during apply.
 - Use `wget` instead of `curl` (curl not guaranteed on Debian).
 
 ## Script Ordering

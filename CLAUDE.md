@@ -107,6 +107,34 @@ template directives should use `.sh` extension (not `.sh.tmpl`).
   `sudo` conditionals.
 - Run `make check` to lint (shfmt + shellcheck).
 
+## GitHub Binary Installs
+
+For tools distributed as GitHub release tarballs, use chezmoi's `.chezmoiexternals/` directory instead of a shell install script. Each recipe places a `<tool>.toml` file in `chezmoi/.chezmoiexternals/`. Files in this directory are always rendered as templates (no `.tmpl` extension needed).
+
+```toml
+# recipes/git/chezmoi/.chezmoiexternals/diffnav.toml
+{{- $arch := .chezmoi.arch -}}
+{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- end -}}
+[".local/bin/diffnav"]
+  type = "archive-file"
+  url = {{ gitHubLatestReleaseAssetURL "dlvhdr/diffnav" (printf "diffnav_Linux_%s.tar.gz" $arch) | quote }}
+  executable = true
+  path = "diffnav"
+```
+
+For releases with a version-prefixed directory inside the archive, use `gitHubLatestRelease` to get the version for `path`:
+
+```toml
+{{- $version := (gitHubLatestRelease "owner/repo").TagName | trimPrefix "v" -}}
+[".local/bin/tool"]
+  type = "archive-file"
+  url = {{ gitHubLatestReleaseAssetURL "owner/repo" (printf "tool-%s-linux.tar.gz" $version) | quote }}
+  path = {{ printf "tool-%s/tool" $version | quote }}
+  executable = true
+```
+
+Multiple recipes can each contribute `.chezmoiexternals/*.toml` files without conflict since each file has a unique name. Use a shell install script only for apt packages, tools needing post-install setup, or standalone binaries (not archives).
+
 ## Script Patterns
 
 Install scripts follow this pattern:
@@ -142,6 +170,41 @@ fi
 
 Key points: guard with `command -v`, `set -eo pipefail` inside function only,
 graceful failure (don't block the rest of `chezmoi apply`).
+
+## Completion Scripts
+
+Completion scripts (`run_onchange_after_completions-*.sh.tmpl`) are non-essential
+and must never block `chezmoi apply`. Do NOT use `set -euo pipefail` at the top
+level. Instead, wrap each generation command in an `if !` block:
+
+```bash
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+if ! command -v <tool> &>/dev/null; then
+  log_skip "<tool> not found, skipping completions"
+  exit 0
+fi
+
+BASH_DIR="$HOME/.local/share/bash-completion/completions"
+ZSH_DIR="$HOME/.zsh/completions"
+mkdir -p "$BASH_DIR" "$ZSH_DIR"
+
+log_info "Generating <tool> completions..."
+if ! <tool> completion bash >"$BASH_DIR/<tool>"; then
+  log_error "Failed to generate <tool> bash completions (non-fatal)"
+fi
+if ! <tool> completion zsh >"$ZSH_DIR/_<tool>"; then
+  log_error "Failed to generate <tool> zsh completions (non-fatal)"
+fi
+```
+
+Key points: prepend `$HOME/.local/bin` to PATH so freshly installed binaries are
+discoverable during `chezmoi apply`; no `set -euo pipefail`; `if !` per command.
 
 ## Script Ordering
 

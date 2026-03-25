@@ -1,0 +1,37 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Re-run when external definitions change:
+# diffnav-hash: # {{ include ".chezmoiexternals/diffnav.toml" | sha256sum }}
+# worktrunk-hash: # {{ include ".chezmoiexternals/worktrunk.toml" | sha256sum }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+BASH_DIR="$HOME/.local/share/bash-completion/completions"
+ZSH_DIR="$HOME/.zsh/completions"
+mkdir -p "$BASH_DIR" "$ZSH_DIR"
+
+if command -v diffnav &>/dev/null; then
+  log_info "Generating diffnav completions..."
+  if ! diffnav completion bash >"$BASH_DIR/diffnav"; then
+    log_error "Failed to generate diffnav bash completions (non-fatal)"
+  fi
+  if ! diffnav completion zsh >"$ZSH_DIR/_diffnav"; then
+    log_error "Failed to generate diffnav zsh completions (non-fatal)"
+  fi
+else
+  log_skip "diffnav not found, skipping completions"
+fi
+
+if command -v wt &>/dev/null; then
+  log_info "Generating wt completions..."
+  if ! COMPLETE=bash wt >"$BASH_DIR/wt"; then
+    log_error "Failed to generate wt bash completions (non-fatal)"
+  fi
+  if ! COMPLETE=zsh wt >"$ZSH_DIR/_wt"; then
+    log_error "Failed to generate wt zsh completions (non-fatal)"
+  fi
+else
+  log_skip "wt not found, skipping completions"
+fi

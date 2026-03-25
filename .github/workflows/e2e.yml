@@ -51,7 +51,13 @@ jobs:
             | tar -xz -C /usr/local/bin chezmoi-recipes
 
       - name: Unit tests (file deployment)
-        run: make test
+        run: make test-ci
 
       - name: E2E tests (tool installation)
-        run: make test-e2e
+        run: make test-e2e-ci
+
+      - name: Test Summary
+        uses: test-summary/action@v2
+        if: always()
+        with:
+          paths: test-results/*.xml

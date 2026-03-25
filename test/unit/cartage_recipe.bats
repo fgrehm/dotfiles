@@ -58,7 +58,7 @@ teardown() {
 @test "cartage: diff is clean after apply in container" {
   chezmoi_apply_files
 
-  run chezmoi diff --no-tty --exclude=scripts --source "$DOTFILES"
+  run chezmoi diff --no-tty --exclude=scripts,externals --source "$DOTFILES"
   [ "$status" -eq 0 ]
   [ -z "$output" ]
 }
