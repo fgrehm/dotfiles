@@ -5,9 +5,3 @@
   url = "https://github.com/max-sixty/worktrunk/releases/latest/download/worktrunk-{{ $arch }}-unknown-linux-musl.tar.xz"
   path = "worktrunk-{{ $arch }}-unknown-linux-musl/wt"
   executable = true
-
-[".local/bin/git-wt"]
-  type = "archive-file"
-  url = "https://github.com/max-sixty/worktrunk/releases/latest/download/worktrunk-{{ $arch }}-unknown-linux-musl.tar.xz"
-  path = "worktrunk-{{ $arch }}-unknown-linux-musl/git-wt"
-  executable = true
