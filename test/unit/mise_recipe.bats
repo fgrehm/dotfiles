@@ -28,7 +28,7 @@ teardown() {
 }
 
 @test "mise: overlay includes mise-tools onchange script" {
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_onchange_after_install-mise-tools.sh.tmpl" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_onchange_after_install-mise-tools.sh" ]
 }
 
 @test "mise: deploys shellrc.d fragment" {

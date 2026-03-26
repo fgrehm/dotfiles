@@ -1,0 +1,4 @@
+# Skipped in containers (no systemd for ollama service)
+{{ if .isContainer }}
+.chezmoiscripts/install-ollama.sh
+{{ end }}

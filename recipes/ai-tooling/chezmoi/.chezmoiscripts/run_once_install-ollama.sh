@@ -1,0 +1,12 @@
+#!/bin/env bash
+# vim: ft=bash
+# Skipped in containers via .chezmoiignore
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if command -v ollama &>/dev/null; then
+  log_skip "ollama already installed"
+  exit 0
+fi
+
+log_info "Installing ollama..."
+curl -fsSL https://ollama.com/install.sh | sh

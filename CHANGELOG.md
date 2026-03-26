@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-03-26
+
+- **ai-tooling recipe**: renamed from `coding-agents`, added install script for ollama (skipped in containers)
+
 ## 2026-03-23
 
 ### Added

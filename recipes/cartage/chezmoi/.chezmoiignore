@@ -1,5 +1,7 @@
+# Skipped in containers (no systemd for user services)
 {{ if .isContainer }}
 .config/systemd/user/cartage.service
+.chezmoiscripts/enable-cartage.sh
 {{ else }}
 .local/bin/pbcopy
 .local/bin/pbpaste
