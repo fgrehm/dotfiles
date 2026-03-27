@@ -32,31 +32,44 @@ elif command -v curl &>/dev/null; then
   fetch_mode="curl"
 fi
 
-if [[ -n "${GITHUB_TOKEN:-}" ]] && [[ "$fetch_mode" == "curl" ]]; then
-  auth_header=(-H "Authorization: token $GITHUB_TOKEN")
+wget_auth=()
+curl_auth=()
+if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+  wget_auth=(--header "Authorization: Bearer $GITHUB_TOKEN" --header "Accept: application/vnd.github+json")
+  curl_auth=(-H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github+json")
 fi
 
 check_count=0
 behind_count=0
 error_count=0
 unpinned_count=0
+declare -A latest_cache
 
-# Fetch the latest release tag for a GitHub repo.
+# Fetch the latest release tag for a GitHub repo (cached per repo).
 # Usage: fetch_latest owner/repo
 fetch_latest() {
   local repo="$1"
+  if [[ -v latest_cache["$repo"] ]]; then
+    echo "${latest_cache["$repo"]}"
+    return
+  fi
+
   local url="https://api.github.com/repos/$repo/releases/latest"
+  local tag
 
   if [[ "$fetch_mode" == "gh" ]]; then
-    gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || true
+    tag=$(gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || true)
   elif [[ "$fetch_mode" == "wget" ]]; then
-    wget -qO- "$url" 2>/dev/null | grep -oP '"tag_name"\s*:\s*"\K[^"]+' || true
+    tag=$(wget -qO- "${wget_auth[@]}" "$url" 2>/dev/null | grep -oP '"tag_name"\s*:\s*"\K[^"]+' || true)
   elif [[ "$fetch_mode" == "curl" ]]; then
-    curl -fsSL "${auth_header[@]}" "$url" 2>/dev/null | grep -oP '"tag_name"\s*:\s*"\K[^"]+' || true
+    tag=$(curl -fsSL "${curl_auth[@]}" "$url" 2>/dev/null | grep -oP '"tag_name"\s*:\s*"\K[^"]+' || true)
   else
     echo "ERROR: neither wget nor curl found" >&2
     return 1
   fi
+
+  latest_cache["$repo"]="$tag"
+  echo "$tag"
 }
 
 # Compare a pinned version against the latest release.
