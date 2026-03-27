@@ -1,5 +1,4 @@
 # vim: ft=toml.gotmpl
-# renovate: datasource=github-releases depName=fgrehm/cartage
 {{- $version := "0.2.1" -}}
 [".local/bin/cartage"]
   type = "archive-file"

@@ -1,5 +1,4 @@
 # vim: ft=toml.gotmpl
-# renovate: datasource=github-releases depName=fgrehm/clotilde
 {{- $version := "0.10.0" -}}
 [".local/bin/clotilde"]
   type = "archive-file"
