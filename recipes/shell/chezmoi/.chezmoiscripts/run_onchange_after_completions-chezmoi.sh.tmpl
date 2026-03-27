@@ -3,6 +3,8 @@
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
+export PATH="$HOME/.local/bin:$PATH"
+
 BASH_DIR="$HOME/.local/share/bash-completion/completions"
 ZSH_DIR="$HOME/.zsh/completions"
 mkdir -p "$BASH_DIR" "$ZSH_DIR"
