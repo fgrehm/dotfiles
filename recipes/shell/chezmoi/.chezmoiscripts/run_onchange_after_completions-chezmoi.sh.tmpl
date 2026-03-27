@@ -1,0 +1,16 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+BASH_DIR="$HOME/.local/share/bash-completion/completions"
+ZSH_DIR="$HOME/.zsh/completions"
+mkdir -p "$BASH_DIR" "$ZSH_DIR"
+
+log_info "Generating chezmoi completions..."
+if ! chezmoi completion bash >"$BASH_DIR/chezmoi"; then
+  log_error "Failed to generate chezmoi bash completions (non-fatal)"
+fi
+if ! chezmoi completion zsh >"$ZSH_DIR/_chezmoi"; then
+  log_error "Failed to generate chezmoi zsh completions (non-fatal)"
+fi

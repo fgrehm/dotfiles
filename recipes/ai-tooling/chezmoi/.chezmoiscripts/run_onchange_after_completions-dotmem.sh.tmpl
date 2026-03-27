@@ -1,0 +1,25 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Re-run when the dotmem external definition changes:
+# dotmem-hash: # {{ include ".chezmoiexternals/dotmem.toml" | sha256sum }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+if ! command -v dotmem &>/dev/null; then
+  log_skip "dotmem not found, skipping completions"
+  exit 0
+fi
+
+BASH_DIR="$HOME/.local/share/bash-completion/completions"
+ZSH_DIR="$HOME/.zsh/completions"
+mkdir -p "$BASH_DIR" "$ZSH_DIR"
+
+log_info "Generating dotmem completions..."
+if ! dotmem completion bash >"$BASH_DIR/dotmem"; then
+  log_error "Failed to generate dotmem bash completions (non-fatal)"
+fi
+if ! dotmem completion zsh >"$ZSH_DIR/_dotmem"; then
+  log_error "Failed to generate dotmem zsh completions (non-fatal)"
+fi

@@ -4,6 +4,7 @@
 # Re-run when external definitions change:
 # diffnav-hash: # {{ include ".chezmoiexternals/diffnav.toml" | sha256sum }}
 # worktrunk-hash: # {{ include ".chezmoiexternals/worktrunk.toml" | sha256sum }}
+# gh-hash: # {{ include ".chezmoiexternals/gh.toml" | sha256sum }}
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 export PATH="$HOME/.local/bin:$PATH"
@@ -34,4 +35,16 @@ if command -v wt &>/dev/null; then
   fi
 else
   log_skip "wt not found, skipping completions"
+fi
+
+if command -v gh &>/dev/null; then
+  log_info "Generating gh completions..."
+  if ! gh completion -s bash >"$BASH_DIR/gh"; then
+    log_error "Failed to generate gh bash completions (non-fatal)"
+  fi
+  if ! gh completion -s zsh >"$ZSH_DIR/_gh"; then
+    log_error "Failed to generate gh zsh completions (non-fatal)"
+  fi
+else
+  log_skip "gh not found, skipping completions"
 fi
