@@ -1,8 +1,24 @@
 # Changelog
 
-## 2026-03-26
+## 2026-03-27
 
-- **ai-tooling recipe**: renamed from `coding-agents`, added install script for ollama (skipped in containers)
+### Added
+
+- **chezmoiexternals**: replaced binary install scripts with `.chezmoiexternals/*.toml` for cartage, zellij, clotilde, dotmem, ttyd, vhs -- pinned versions, no more shell download logic
+- **ai-tooling recipe**: renamed from `coding-agents`, added ollama (skipped in containers via `.chezmoiignore`)
+
+### Fixed
+
+- **neovim**: pinned to v0.11.6, fixed hardcoded `x86_64` arch (now detects at runtime)
+- **diffnav**: scoped as pager to `git diff` and `git show` only, no longer overrides `git log`
+- **chezmoiexternals modeline**: vim modeline must go at bottom of `.toml` files -- `{{- -}}` trim markers break TOML parsing if it's first
+- **clotilde completions**: hash now points to `clotilde.toml` external instead of deleted install script
+
+### Changed
+
+- **devcontainer**: chezmoi-recipes pinned to v0.5.0
+- **CLAUDE.md / copilot-instructions.md**: updated chezmoiexternals patterns, version pinning convention, modeline placement rule
+
 
 ## 2026-03-23
 
