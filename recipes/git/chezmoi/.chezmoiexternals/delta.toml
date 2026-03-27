@@ -1,3 +1,4 @@
+# vim: ft=toml.gotmpl
 {{- $arch := .chezmoi.arch -}}
 {{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- else if eq $arch "arm64" -}}{{- $arch = "aarch64" -}}{{- end -}}
 {{- $version := "0.19.1" -}}

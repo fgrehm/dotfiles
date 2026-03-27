@@ -1,3 +1,4 @@
+# vim: ft=toml.gotmpl
 {{- $arch := .chezmoi.arch -}}
 {{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- end -}}
 [".local/bin/diffnav"]

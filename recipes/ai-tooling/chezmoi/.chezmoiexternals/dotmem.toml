@@ -1,3 +1,4 @@
+# vim: ft=toml.gotmpl
 # renovate: datasource=github-releases depName=fgrehm/dotmem
 {{- $version := "0.2.0" -}}
 [".local/bin/dotmem"]
