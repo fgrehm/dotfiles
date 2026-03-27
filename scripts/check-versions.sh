@@ -12,21 +12,27 @@
 # Auth (checked in order):
 #   1. gh CLI (if installed and authenticated)
 #   2. GITHUB_TOKEN env var (for CI)
-#   3. Unauthenticated curl (60 req/hour rate limit)
+#   3. Unauthenticated wget/curl (60 req/hour rate limit)
 #
-# Requires: curl, GNU grep with PCRE support (gh optional)
+# Requires: wget or curl, GNU grep with PCRE support (gh optional)
 
 set -euo pipefail
 
 recipes_dir="${1:-.}"
 
-# Determine fetch strategy once at startup
-fetch_mode="curl"
+# Determine fetch strategy once at startup (prefer wget, fallback to curl)
+fetch_mode=""
 auth_header=()
 
 if command -v gh &>/dev/null && gh auth status &>/dev/null; then
   fetch_mode="gh"
-elif [[ -n "${GITHUB_TOKEN:-}" ]]; then
+elif command -v wget &>/dev/null; then
+  fetch_mode="wget"
+elif command -v curl &>/dev/null; then
+  fetch_mode="curl"
+fi
+
+if [[ -n "${GITHUB_TOKEN:-}" ]] && [[ "$fetch_mode" == "curl" ]]; then
   auth_header=(-H "Authorization: token $GITHUB_TOKEN")
 fi
 
@@ -39,12 +45,17 @@ unpinned_count=0
 # Usage: fetch_latest owner/repo
 fetch_latest() {
   local repo="$1"
+  local url="https://api.github.com/repos/$repo/releases/latest"
+
   if [[ "$fetch_mode" == "gh" ]]; then
     gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || true
+  elif [[ "$fetch_mode" == "wget" ]]; then
+    wget -qO- "$url" 2>/dev/null | grep -oP '"tag_name"\s*:\s*"\K[^"]+' || true
+  elif [[ "$fetch_mode" == "curl" ]]; then
+    curl -fsSL "${auth_header[@]}" "$url" 2>/dev/null | grep -oP '"tag_name"\s*:\s*"\K[^"]+' || true
   else
-    curl -fsSL "${auth_header[@]}" \
-      "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null \
-      | grep -oP '"tag_name"\s*:\s*"\K[^"]+' || true
+    echo "ERROR: neither wget nor curl found" >&2
+    return 1
   fi
 }
 
