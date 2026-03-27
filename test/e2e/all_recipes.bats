@@ -57,8 +57,7 @@ teardown_file() {
 }
 
 @test "git: gh-pr-review extension is installed" {
-  run gh extension list
-  [[ "$output" == *"gh-pr-review"* ]]
+  command -v gh-pr-review
 }
 
 @test "git: config and ignore are deployed" {
