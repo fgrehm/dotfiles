@@ -1,4 +1,3 @@
-# vim: ft=toml.gotmpl
 {{- $arch := .chezmoi.arch -}}
 {{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- else if eq $arch "arm64" -}}{{- $arch = "aarch64" -}}{{- end -}}
 [".local/bin/wt"]
@@ -6,3 +5,4 @@
   url = "https://github.com/max-sixty/worktrunk/releases/latest/download/worktrunk-{{ $arch }}-unknown-linux-musl.tar.xz"
   path = "worktrunk-{{ $arch }}-unknown-linux-musl/wt"
   executable = true
+# vim: ft=toml.gotmpl

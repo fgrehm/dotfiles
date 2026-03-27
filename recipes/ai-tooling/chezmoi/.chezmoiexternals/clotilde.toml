@@ -1,7 +1,7 @@
-# vim: ft=toml.gotmpl
 {{- $version := "0.10.0" -}}
 [".local/bin/clotilde"]
   type = "archive-file"
   url = "https://github.com/fgrehm/clotilde/releases/download/v{{ $version }}/clotilde_linux_{{ .chezmoi.arch }}.tar.gz"
   path = "clotilde"
   executable = true
+# vim: ft=toml.gotmpl
