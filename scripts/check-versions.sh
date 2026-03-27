@@ -5,7 +5,6 @@
 # Scans for pinned versions in:
 #   - .chezmoiexternals/*.toml  ({{- $version := "x.y.z" -}} pattern)
 #   - .chezmoiscripts/*.sh*     (VERSION="x.y.z" + github.com URL)
-#   - .chezmoiscripts/*.sh*     (gh extension install owner/repo --pin vX.Y.Z)
 #
 # Also reports .chezmoiexternals/*.toml files using /latest/download/ URLs
 # (no pinned version, shows latest available for awareness).
@@ -108,20 +107,6 @@ while read -r script_file; do
   # Derive tool name from script filename (strip run_once_install- prefix and extensions)
   tool=$(basename "$script_file" | sed -E 's/^run_(once|onchange)_(before_|after_)?install-//; s/\.(sh|bash)(\.tmpl)?$//')
   check_version "$tool" "$pinned" "$repo"
-done < <(find "$recipes_dir" -path '*/.chezmoiscripts/*' \( -name '*.sh' -o -name '*.sh.tmpl' \) -type f | sort)
-
-# --- gh extension install ... --pin vX.Y.Z ---
-
-while read -r script_file; do
-  # Match: gh extension install owner/repo --pin vX.Y.Z
-  while IFS= read -r line; do
-    ext_repo=$(echo "$line" | grep -oP 'gh\s+extension\s+install\s+\K\S+' || true)
-    ext_version=$(echo "$line" | grep -oP '\-\-pin\s+v?\K[0-9][0-9a-zA-Z._-]*' || true)
-    if [[ -n "$ext_repo" && -n "$ext_version" ]]; then
-      tool=$(basename "$ext_repo")
-      check_version "$tool" "$ext_version" "$ext_repo"
-    fi
-  done < <(grep -P 'gh\s+extension\s+install.*--pin' "$script_file" 2>/dev/null || true)
 done < <(find "$recipes_dir" -path '*/.chezmoiscripts/*' \( -name '*.sh' -o -name '*.sh.tmpl' \) -type f | sort)
 
 # --- Summary ---
