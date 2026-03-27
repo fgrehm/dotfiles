@@ -1,0 +1,7 @@
+# renovate: datasource=github-releases depName=fgrehm/cartage
+{{- $version := "0.2.1" -}}
+[".local/bin/cartage"]
+  type = "archive-file"
+  url = "https://github.com/fgrehm/cartage/releases/download/v{{ $version }}/cartage_linux_{{ .chezmoi.arch }}.tar.gz"
+  executable = true
+  path = "cartage"

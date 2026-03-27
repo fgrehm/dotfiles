@@ -22,7 +22,7 @@ teardown() {
 }
 
 @test "cartage: overlay includes all recipe files in compiled-home" {
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-cartage.sh.tmpl" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiexternals/cartage.toml" ]
   [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_onchange_after_enable-cartage.sh" ]
   [ -f "$DOTFILES/compiled-home/private_dot_config/systemd/user/cartage.service" ]
   [ -f "$DOTFILES/compiled-home/dot_local/bin/symlink_pbcopy" ]
