@@ -4,6 +4,7 @@
 
 ### Added
 
+- **git recipe**: added gh CLI via chezmoiexternals (pinned to v2.89.0) and `gh-pr-review` extension (pinned to v1.6.2)
 - **chezmoiexternals**: replaced binary install scripts with `.chezmoiexternals/*.toml` for cartage, zellij, clotilde, dotmem, ttyd, vhs -- pinned versions, no more shell download logic
 - **ai-tooling recipe**: renamed from `coding-agents`, added ollama (skipped in containers via `.chezmoiignore`)
 

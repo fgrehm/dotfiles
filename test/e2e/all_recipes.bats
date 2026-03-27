@@ -51,6 +51,16 @@ teardown_file() {
   wt --version
 }
 
+@test "git: gh is available" {
+  command -v gh
+  gh --version
+}
+
+@test "git: gh-pr-review extension is installed" {
+  run gh extension list
+  [[ "$output" == *"gh-pr-review"* ]]
+}
+
 @test "git: config and ignore are deployed" {
   [ -f "$HOME/.config/git/config" ]
   [ -f "$HOME/.config/git/ignore" ]
