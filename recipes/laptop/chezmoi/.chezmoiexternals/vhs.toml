@@ -1,0 +1,10 @@
+# vim: ft=toml.gotmpl
+{{- $arch := .chezmoi.arch -}}
+{{- if eq $arch "arm64" -}}{{- $arch = "arm64" -}}{{- else -}}{{- $arch = "x86_64" -}}{{- end -}}
+# renovate: datasource=github-releases depName=charmbracelet/vhs
+{{- $version := "0.11.0" -}}
+[".local/bin/vhs"]
+  type = "archive-file"
+  url = "https://github.com/charmbracelet/vhs/releases/download/v{{ $version }}/vhs_{{ $version }}_Linux_{{ $arch }}.tar.gz"
+  path = "vhs_{{ $version }}_Linux_{{ $arch }}/vhs"
+  executable = true

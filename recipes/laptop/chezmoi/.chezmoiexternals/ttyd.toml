@@ -1,0 +1,9 @@
+# vim: ft=toml.gotmpl
+{{- $arch := .chezmoi.arch -}}
+{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- else if eq $arch "arm64" -}}{{- $arch = "aarch64" -}}{{- end -}}
+# renovate: datasource=github-releases depName=tsl0922/ttyd
+{{- $version := "1.7.7" -}}
+[".local/bin/ttyd"]
+  type = "file"
+  url = "https://github.com/tsl0922/ttyd/releases/download/{{ $version }}/ttyd.{{ $arch }}"
+  executable = true
