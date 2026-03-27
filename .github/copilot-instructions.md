@@ -54,6 +54,23 @@ Key points for reviews:
 - Use `.chezmoiignore` or `.recipeignore` to skip files/recipes by environment.
 - camelCase for template variables.
 
+## .chezmoiignore target names for scripts
+
+chezmoi strips the run-type prefix and `.tmpl` extension when computing the
+target name used in `.chezmoiignore`. Do **not** flag existing ignore entries
+as wrong just because the source filename has a prefix. Examples:
+
+| Source filename | `.chezmoiignore` pattern |
+|---|---|
+| `run_once_install-ollama.sh` | `.chezmoiscripts/install-ollama.sh` |
+| `run_once_after_install-pi-agent.sh` | `.chezmoiscripts/install-pi-agent.sh` |
+| `run_onchange_after_enable-cartage.sh` | `.chezmoiscripts/enable-cartage.sh` |
+| `run_onchange_after_install-mise-tools.sh` | `.chezmoiscripts/install-mise-tools.sh` |
+
+The pattern `.chezmoiscripts/install-ollama.sh` correctly skips
+`run_once_install-ollama.sh`. Suggesting it should be changed to
+`run_once_install-ollama.sh` is incorrect.
+
 ## Testing
 
 - Every recipe needs `test/unit/<recipe>.bats` (file deployment checks).
