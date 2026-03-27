@@ -82,8 +82,8 @@ while IFS= read -r toml_file; do
 
   if [[ -n "$pinned" && -n "$repo" ]]; then
     check_version "$tool" "$pinned" "$repo"
-  elif [[ -z "$pinned" && -n "$repo" ]]; then
-    # No pinned version but has a GitHub URL (e.g. /latest/download/)
+  elif [[ -z "$pinned" && -n "$repo" ]] && grep -q 'releases/latest/download/' "$toml_file"; then
+    # No $version variable and uses /releases/latest/download/ URL
     latest=$(fetch_latest "$repo")
     latest_clean="${latest#v}"
     printf "  %-20s  %-12s  %-12s  %s\n" "$tool" "(latest)" "${latest_clean:--}" "not pinned"
@@ -107,7 +107,7 @@ while IFS= read -r script_file; do
   # Derive tool name from script filename (strip run_once_install- prefix and extensions)
   tool=$(basename "$script_file" | sed -E 's/^run_(once|onchange)_(before_|after_)?install-//; s/\.(sh|bash)(\.tmpl)?$//')
   check_version "$tool" "$pinned" "$repo"
-done < <(find "$recipes_dir" -path '*/.chezmoiscripts/*' \( -name '*.sh' -o -name '*.sh.tmpl' \) -type f | sort)
+done < <(find "$recipes_dir" -path '*/.chezmoiscripts/*' \( -name '*.sh' -o -name '*.sh.tmpl' -o -name '*.bash' -o -name '*.bash.tmpl' \) -type f | sort)
 
 # --- Summary ---
 
