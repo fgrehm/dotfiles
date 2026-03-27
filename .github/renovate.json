@@ -1,0 +1,22 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["\\.chezmoiexternals/.*\\.toml$"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[\\S]+) depName=(?<depName>[\\S]+)\\n.*\\$version := \"(?<currentValue>[^\"]+)\""
+      ],
+      "extractVersionTemplate": "^v?(?<version>.*)$"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["\\.chezmoiscripts/.*\\.sh(\\.tmpl)?$"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[\\S]+) depName=(?<depName>[\\S]+)\\nVERSION=\"(?<currentValue>[^\"]+)\""
+      ],
+      "extractVersionTemplate": "^v?(?<version>.*)$"
+    }
+  ]
+}
