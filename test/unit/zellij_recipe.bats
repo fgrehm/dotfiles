@@ -22,7 +22,7 @@ teardown() {
 }
 
 @test "zellij: overlay includes all recipe files in compiled-home" {
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-zellij.sh.tmpl" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiexternals/zellij.toml" ]
   [ -f "$DOTFILES/compiled-home/private_dot_config/zellij/config.kdl" ]
   [ -f "$DOTFILES/compiled-home/private_dot_config/zellij/layouts/zellaude.kdl" ]
 }
