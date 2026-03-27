@@ -1,0 +1,7 @@
+{{- $version := "0.2.0" -}}
+[".local/bin/dotmem"]
+  type = "archive-file"
+  url = "https://github.com/fgrehm/dotmem/releases/download/v{{ $version }}/dotmem_linux_{{ .chezmoi.arch }}.tar.gz"
+  path = "dotmem"
+  executable = true
+# vim: ft=toml.gotmpl

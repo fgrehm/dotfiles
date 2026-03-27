@@ -1,3 +1,5 @@
+# Skipped in containers (mise tools are for development only)
 {{ if .isContainer }}
 .config/mise/config.toml
+.chezmoiscripts/install-mise-tools.sh
 {{ end }}

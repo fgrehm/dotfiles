@@ -20,8 +20,18 @@ Key points for reviews:
 - 2-space indentation, validated by `shfmt` and `shellcheck` (`make check`).
 - `.sh.tmpl` files must have custom delimiters:
   `# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"`.
-- `.sh.tmpl` files must have a vim modeline: `# vim: ft=bash.gotmpl`.
+- `.sh.tmpl` files must have a vim modeline: `# vim: ft=bash.gotmpl` (line 2).
 - Plain `.sh` files (no template directives) must have: `# vim: ft=bash`.
+
+## GitHub Binary Installs
+
+- Use `.chezmoiexternals/<tool>.toml` instead of shell scripts for GitHub
+  release tarballs. Files are always rendered as templates (no `.tmpl` needed).
+- Pin versions explicitly with `{{- $version := "x.y.z" -}}`. Do NOT use
+  `gitHubLatestReleaseAssetURL` or `gitHubLatestRelease` -- they make GitHub
+  API calls that break unit tests.
+- Add `# vim: ft=toml.gotmpl` as the **last line** of each `.toml` file.
+  Putting it first breaks Go template whitespace trimming.
 - Install scripts guard with `command -v`, use `set -eo pipefail` inside `_install()`
   only, and fail gracefully (don't block `chezmoi apply`).
 - Completion scripts (`run_onchange_after_completions-*.sh.tmpl`) must NOT use
@@ -43,6 +53,23 @@ Key points for reviews:
 - `.isContainer` distinguishes containers from laptops.
 - Use `.chezmoiignore` or `.recipeignore` to skip files/recipes by environment.
 - camelCase for template variables.
+
+## .chezmoiignore target names for scripts
+
+chezmoi strips the run-type prefix and `.tmpl` extension when computing the
+target name used in `.chezmoiignore`. Do **not** flag existing ignore entries
+as wrong just because the source filename has a prefix. Examples:
+
+| Source filename | `.chezmoiignore` pattern |
+|---|---|
+| `run_once_install-ollama.sh` | `.chezmoiscripts/install-ollama.sh` |
+| `run_once_after_install-pi-agent.sh` | `.chezmoiscripts/install-pi-agent.sh` |
+| `run_onchange_after_enable-cartage.sh` | `.chezmoiscripts/enable-cartage.sh` |
+| `run_onchange_after_install-mise-tools.sh` | `.chezmoiscripts/install-mise-tools.sh` |
+
+The pattern `.chezmoiscripts/install-ollama.sh` correctly skips
+`run_once_install-ollama.sh`. Suggesting it should be changed to
+`run_once_install-ollama.sh` is incorrect.
 
 ## Testing
 

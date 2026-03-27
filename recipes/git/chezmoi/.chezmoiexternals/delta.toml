@@ -6,3 +6,4 @@
   url = "https://github.com/dandavison/delta/releases/download/{{ $version }}/delta-{{ $version }}-{{ $arch }}-unknown-linux-gnu.tar.gz"
   path = "delta-{{ $version }}-{{ $arch }}-unknown-linux-gnu/delta"
   executable = true
+# vim: ft=toml.gotmpl

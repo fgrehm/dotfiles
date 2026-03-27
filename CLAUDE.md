@@ -106,6 +106,9 @@ template directives should use `.sh` extension (not `.sh.tmpl`).
 - Use `$SUDO` variable (set via template conditional) instead of inline template
   `sudo` conditionals.
 - Run `make check` to lint (shfmt + shellcheck).
+- Vim modelines: `# vim: ft=bash.gotmpl` on `.sh.tmpl` files (line 2, after
+  shebang); `# vim: ft=toml.gotmpl` on `.chezmoiexternals/*.toml` files (last
+  line -- putting it first breaks Go template trimming).
 
 ## GitHub Binary Installs
 
@@ -115,23 +118,32 @@ For tools distributed as GitHub release tarballs, use chezmoi's `.chezmoiexterna
 # recipes/git/chezmoi/.chezmoiexternals/diffnav.toml
 {{- $arch := .chezmoi.arch -}}
 {{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- end -}}
+{{- $version := "1.2.3" -}}
 [".local/bin/diffnav"]
   type = "archive-file"
-  url = {{ gitHubLatestReleaseAssetURL "dlvhdr/diffnav" (printf "diffnav_Linux_%s.tar.gz" $arch) | quote }}
+  url = "https://github.com/dlvhdr/diffnav/releases/download/v{{ $version }}/diffnav_Linux_{{ $arch }}.tar.gz"
   executable = true
   path = "diffnav"
+# vim: ft=toml.gotmpl
 ```
 
-For releases with a version-prefixed directory inside the archive, use `gitHubLatestRelease` to get the version for `path`:
+For releases where the archive path contains the version, pin it the same way:
 
 ```toml
-{{- $version := (gitHubLatestRelease "owner/repo").TagName | trimPrefix "v" -}}
+{{- $arch := .chezmoi.arch -}}
+{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- else if eq $arch "arm64" -}}{{- $arch = "aarch64" -}}{{- end -}}
+{{- $version := "1.2.3" -}}
 [".local/bin/tool"]
   type = "archive-file"
-  url = {{ gitHubLatestReleaseAssetURL "owner/repo" (printf "tool-%s-linux.tar.gz" $version) | quote }}
-  path = {{ printf "tool-%s/tool" $version | quote }}
+  url = "https://github.com/owner/repo/releases/download/v{{ $version }}/tool-{{ $version }}-{{ $arch }}-linux.tar.gz"
+  path = "tool-{{ $version }}-{{ $arch }}-linux/tool"
   executable = true
+# vim: ft=toml.gotmpl
 ```
+
+Pin versions explicitly -- do NOT use `gitHubLatestReleaseAssetURL` or
+`gitHubLatestRelease`. Those make GitHub API calls that cause rate-limit
+failures in unit tests even with `--exclude=externals`.
 
 Multiple recipes can each contribute `.chezmoiexternals/*.toml` files without conflict since each file has a unique name. Use a shell install script only for apt packages, tools needing post-install setup, or standalone binaries (not archives).
 

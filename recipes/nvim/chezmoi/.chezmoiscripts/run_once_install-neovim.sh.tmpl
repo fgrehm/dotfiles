@@ -14,15 +14,23 @@ SUDO="sudo"
 SUDO=""
 # {{ end }}
 
+VERSION="0.11.6"
+arch="$(uname -m)"
+case "$arch" in
+  aarch64 | arm64) arch="aarch64" ;;
+  *) arch="x86_64" ;;
+esac
+
 _install() {
   set -e
   log_info "Installing Neovim..."
+  # Installed globally (/opt + /usr/local/bin) so `sudo nvim` works.
   # https://github.com/neovim/neovim/releases
-  run_quiet wget -qO /tmp/nvim-linux-x86_64.tar.gz \
-    https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz
-  run_quiet "$SUDO" tar -C /opt -xzf /tmp/nvim-linux-x86_64.tar.gz
-  "$SUDO" ln -sf /opt/nvim-linux-x86_64/bin/nvim /usr/local/bin/nvim
-  rm -f /tmp/nvim-linux-x86_64.tar.gz
+  run_quiet wget -qO "/tmp/nvim-linux-${arch}.tar.gz" \
+    "https://github.com/neovim/neovim/releases/download/v${VERSION}/nvim-linux-${arch}.tar.gz"
+  run_quiet "$SUDO" tar -C /opt -xzf "/tmp/nvim-linux-${arch}.tar.gz"
+  "$SUDO" ln -sf "/opt/nvim-linux-${arch}/bin/nvim" /usr/local/bin/nvim
+  rm -f "/tmp/nvim-linux-${arch}.tar.gz"
 }
 
 if ! _install; then

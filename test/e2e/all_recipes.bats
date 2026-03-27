@@ -20,7 +20,7 @@ setup_file() {
   copy_recipe "nvim"
   copy_recipe "zellij"
   copy_recipe "cartage"
-  copy_recipe "coding-agents"
+  copy_recipe "ai-tooling"
   copy_recipe "laptop"
   copy_recipeignore
   seed_chezmoi_config
@@ -51,6 +51,15 @@ teardown_file() {
   wt --version
 }
 
+@test "git: gh is available" {
+  command -v gh
+  gh --version
+}
+
+@test "git: gh-pr-review extension is installed" {
+  command -v gh-pr-review
+}
+
 @test "git: config and ignore are deployed" {
   [ -f "$HOME/.config/git/config" ]
   [ -f "$HOME/.config/git/ignore" ]
@@ -78,23 +87,23 @@ teardown_file() {
   zellij --version
 }
 
-# coding-agents
+# ai-tooling
 
-@test "coding-agents: claude is available" {
+@test "ai-tooling: claude is available" {
   command -v claude
 }
 
-@test "coding-agents: clotilde is available" {
+@test "ai-tooling: clotilde is available" {
   command -v clotilde
   clotilde --version
 }
 
-@test "coding-agents: dotmem is available" {
+@test "ai-tooling: dotmem is available" {
   command -v dotmem
   dotmem --version
 }
 
-@test "coding-agents: dot-ai is cloned" {
+@test "ai-tooling: dot-ai is cloned" {
   [ -d "$HOME/.local/share/dot-ai" ]
 }
 

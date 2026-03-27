@@ -1,0 +1,8 @@
+{{- $arch := .chezmoi.arch -}}
+{{- $version := "2.89.0" -}}
+[".local/bin/gh"]
+  type = "archive-file"
+  url = "https://github.com/cli/cli/releases/download/v{{ $version }}/gh_{{ $version }}_linux_{{ $arch }}.tar.gz"
+  path = "gh_{{ $version }}_linux_{{ $arch }}/bin/gh"
+  executable = true
+# vim: ft=toml.gotmpl

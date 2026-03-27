@@ -35,9 +35,9 @@ teardown() {
   cleanup
 }
 
-@test "laptop: overlay includes install scripts in compiled-home" {
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-vhs.sh" ]
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-ttyd.sh" ]
+@test "laptop: overlay includes externals in compiled-home" {
+  [ -f "$DOTFILES/compiled-home/.chezmoiexternals/vhs.toml" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiexternals/ttyd.toml" ]
 }
 
 @test "laptop: recipeignore excludes recipe when isContainer=true" {
@@ -45,6 +45,6 @@ teardown() {
   rm -rf "$DOTFILES/compiled-home"
   run_overlay
 
-  [ ! -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-vhs.sh" ]
-  [ ! -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-ttyd.sh" ]
+  [ ! -f "$DOTFILES/compiled-home/.chezmoiexternals/vhs.toml" ]
+  [ ! -f "$DOTFILES/compiled-home/.chezmoiexternals/ttyd.toml" ]
 }

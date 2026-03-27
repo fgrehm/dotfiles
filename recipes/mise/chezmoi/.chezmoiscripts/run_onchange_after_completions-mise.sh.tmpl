@@ -1,0 +1,23 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+if ! command -v mise &>/dev/null; then
+  log_skip "mise not found, skipping completions"
+  exit 0
+fi
+
+BASH_DIR="$HOME/.local/share/bash-completion/completions"
+ZSH_DIR="$HOME/.zsh/completions"
+mkdir -p "$BASH_DIR" "$ZSH_DIR"
+
+log_info "Generating mise completions..."
+if ! mise completion bash >"$BASH_DIR/mise"; then
+  log_error "Failed to generate mise bash completions (non-fatal)"
+fi
+if ! mise completion zsh >"$ZSH_DIR/_mise"; then
+  log_error "Failed to generate mise zsh completions (non-fatal)"
+fi

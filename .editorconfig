@@ -12,3 +12,7 @@ indent_size = 2
 [*.sh.tmpl]
 indent_style = space
 indent_size = 2
+
+[*.bats]
+indent_style = space
+indent_size = 2

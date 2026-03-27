@@ -1,0 +1,7 @@
+{{- $version := "0.2.1" -}}
+[".local/bin/cartage"]
+  type = "archive-file"
+  url = "https://github.com/fgrehm/cartage/releases/download/v{{ $version }}/cartage_linux_{{ .chezmoi.arch }}.tar.gz"
+  executable = true
+  path = "cartage"
+# vim: ft=toml.gotmpl

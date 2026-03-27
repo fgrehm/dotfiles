@@ -1,0 +1,25 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Re-run when the cartage external definition changes:
+# cartage-hash: # {{ include ".chezmoiexternals/cartage.toml" | sha256sum }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+if ! command -v cartage &>/dev/null; then
+  log_skip "cartage not found, skipping completions"
+  exit 0
+fi
+
+BASH_DIR="$HOME/.local/share/bash-completion/completions"
+ZSH_DIR="$HOME/.zsh/completions"
+mkdir -p "$BASH_DIR" "$ZSH_DIR"
+
+log_info "Generating cartage completions..."
+if ! cartage completion bash >"$BASH_DIR/cartage"; then
+  log_error "Failed to generate cartage bash completions (non-fatal)"
+fi
+if ! cartage completion zsh >"$ZSH_DIR/_cartage"; then
+  log_error "Failed to generate cartage zsh completions (non-fatal)"
+fi
