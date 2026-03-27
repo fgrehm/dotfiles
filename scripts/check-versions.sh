@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
-# Check pinned versions in .chezmoiexternals/*.toml files against GitHub latest releases.
+# Check pinned versions against GitHub latest releases.
 # Usage: ./scripts/check-versions.sh [recipes-dir]
 #
-# Reads {{- $version := "x.y.z" -}} patterns from .toml files, extracts the
-# GitHub owner/repo from the URL, and compares against the latest release tag.
+# Scans for pinned versions in:
+#   - .chezmoiexternals/*.toml  ({{- $version := "x.y.z" -}} pattern)
+#   - .chezmoiscripts/*.sh*     (VERSION="x.y.z" + github.com URL)
+#   - .chezmoiscripts/*.sh*     (gh extension install owner/repo --pin vX.Y.Z)
+#
+# Also reports .chezmoiexternals/*.toml files using /latest/download/ URLs
+# (no pinned version, shows latest available for awareness).
 #
 # Auth (checked in order):
 #   1. gh CLI (if installed and authenticated)
@@ -29,40 +34,37 @@ fi
 check_count=0
 behind_count=0
 error_count=0
+unpinned_count=0
 
-while read -r toml_file; do
-  # Extract pinned version (first match)
-  pinned=$(grep -oP '\$version\s*:=\s*"\K[^"]+' "$toml_file" 2>/dev/null || true)
-  if [[ -z "$pinned" ]]; then
-    continue
+# Fetch the latest release tag for a GitHub repo.
+# Usage: fetch_latest owner/repo
+fetch_latest() {
+  local repo="$1"
+  if [[ "$fetch_mode" == "gh" ]]; then
+    gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || true
+  else
+    curl -fsSL "${auth_header[@]}" \
+      "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null \
+      | grep -oP '"tag_name"\s*:\s*"\K[^"]+' || true
   fi
+}
 
-  # Extract GitHub owner/repo from URL
-  repo=$(grep -oP 'github\.com/\K[^/]+/[^/]+' "$toml_file" 2>/dev/null | head -1 || true)
-  if [[ -z "$repo" ]]; then
-    continue
-  fi
-
-  tool=$(basename "$toml_file" .toml)
+# Compare a pinned version against the latest release.
+# Usage: check_version tool pinned repo
+check_version() {
+  local tool="$1" pinned="$2" repo="$3"
   check_count=$((check_count + 1))
 
-  # Fetch latest release tag
-  if [[ "$fetch_mode" == "gh" ]]; then
-    latest=$(gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || true)
-  else
-    latest=$(curl -fsSL "${auth_header[@]}" \
-      "https://api.github.com/repos/$repo/releases/latest" 2>/dev/null \
-      | grep -oP '"tag_name"\s*:\s*"\K[^"]+' || true)
-  fi
+  local latest
+  latest=$(fetch_latest "$repo")
 
   if [[ -z "$latest" ]]; then
     printf "  %-20s  %-12s  %-12s  %s\n" "$tool" "$pinned" "?" "ERROR: could not fetch latest from $repo"
     error_count=$((error_count + 1))
-    continue
+    return
   fi
 
-  # Strip leading 'v' for comparison
-  latest_clean="${latest#v}"
+  local latest_clean="${latest#v}"
 
   if [[ "$pinned" == "$latest_clean" ]]; then
     printf "  %-20s  %-12s  %-12s  %s\n" "$tool" "$pinned" "$latest_clean" "up to date"
@@ -70,15 +72,71 @@ while read -r toml_file; do
     printf "  %-20s  %-12s  %-12s  %s\n" "$tool" "$pinned" "$latest_clean" "UPDATE AVAILABLE"
     behind_count=$((behind_count + 1))
   fi
+}
+
+# --- .chezmoiexternals/*.toml with pinned $version ---
+
+while read -r toml_file; do
+  pinned=$(grep -oP '\$version\s*:=\s*"\K[^"]+' "$toml_file" 2>/dev/null || true)
+  repo=$(grep -oP 'github\.com/\K[^/]+/[^/]+' "$toml_file" 2>/dev/null | head -1 || true)
+  tool=$(basename "$toml_file" .toml)
+
+  if [[ -n "$pinned" && -n "$repo" ]]; then
+    check_version "$tool" "$pinned" "$repo"
+  elif [[ -z "$pinned" && -n "$repo" ]]; then
+    # No pinned version but has a GitHub URL (e.g. /latest/download/)
+    latest=$(fetch_latest "$repo")
+    latest_clean="${latest#v}"
+    printf "  %-20s  %-12s  %-12s  %s\n" "$tool" "(latest)" "${latest_clean:--}" "not pinned"
+    unpinned_count=$((unpinned_count + 1))
+  fi
 done < <(find "$recipes_dir" -path '*/.chezmoiexternals/*.toml' -type f | sort)
 
-if [[ $check_count -eq 0 ]]; then
-  echo "No pinned versions found in $recipes_dir"
+# --- Shell scripts with VERSION="x.y.z" + github.com URL ---
+
+while read -r script_file; do
+  pinned=$(grep -oP '^\s*VERSION\s*=\s*"\K[^"]+' "$script_file" 2>/dev/null || true)
+  if [[ -z "$pinned" ]]; then
+    continue
+  fi
+
+  repo=$(grep -oP 'github\.com/\K[^/]+/[^/]+' "$script_file" 2>/dev/null | head -1 || true)
+  if [[ -z "$repo" ]]; then
+    continue
+  fi
+
+  # Derive tool name from script filename (strip run_once_install- prefix and extensions)
+  tool=$(basename "$script_file" | sed -E 's/^run_(once|onchange)_(before_|after_)?install-//; s/\.(sh|bash)(\.tmpl)?$//')
+  check_version "$tool" "$pinned" "$repo"
+done < <(find "$recipes_dir" -path '*/.chezmoiscripts/*' \( -name '*.sh' -o -name '*.sh.tmpl' \) -type f | sort)
+
+# --- gh extension install ... --pin vX.Y.Z ---
+
+while read -r script_file; do
+  # Match: gh extension install owner/repo --pin vX.Y.Z
+  while IFS= read -r line; do
+    ext_repo=$(echo "$line" | grep -oP 'gh\s+extension\s+install\s+\K\S+' || true)
+    ext_version=$(echo "$line" | grep -oP '\-\-pin\s+v?\K[0-9][0-9a-zA-Z._-]*' || true)
+    if [[ -n "$ext_repo" && -n "$ext_version" ]]; then
+      tool=$(basename "$ext_repo")
+      check_version "$tool" "$ext_version" "$ext_repo"
+    fi
+  done < <(grep -P 'gh\s+extension\s+install.*--pin' "$script_file" 2>/dev/null || true)
+done < <(find "$recipes_dir" -path '*/.chezmoiscripts/*' \( -name '*.sh' -o -name '*.sh.tmpl' \) -type f | sort)
+
+# --- Summary ---
+
+if [[ $check_count -eq 0 && $unpinned_count -eq 0 ]]; then
+  echo "No versions found in $recipes_dir"
   exit 0
 fi
 
 echo ""
-echo "Checked $check_count tool(s): $behind_count behind, $error_count error(s)"
+summary="Checked $check_count pinned version(s): $behind_count behind, $error_count error(s)"
+if [[ $unpinned_count -gt 0 ]]; then
+  summary="$summary, $unpinned_count unpinned"
+fi
+echo "$summary"
 
 if [[ $behind_count -gt 0 ]]; then
   exit 1
