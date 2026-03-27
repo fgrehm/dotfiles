@@ -56,11 +56,12 @@ teardown() {
   [[ "$output" == *"prune = true"* ]]
 }
 
-@test "git: config sets diffnav as pager" {
+@test "git: config sets diffnav as pager for diff and show" {
   chezmoi_apply_files
 
   run cat "$HOME/.config/git/config"
-  [[ "$output" == *"pager = diffnav"* ]]
+  [[ "$output" == *"diff = diffnav"* ]]
+  [[ "$output" == *"show = diffnav"* ]]
 }
 
 @test "git: deploys diffnav config" {
