@@ -1,8 +1,8 @@
 #!/bin/env bash
 # vim: ft=bash.gotmpl
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
-# Re-run when the clotilde install script changes:
-# clotilde-hash: # {{ include ".chezmoiscripts/run_once_install-clotilde.sh.tmpl" | sha256sum }}
+# Re-run when the clotilde external definition changes:
+# clotilde-hash: # {{ include ".chezmoiexternals/clotilde.toml" | sha256sum }}
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 export PATH="$HOME/.local/bin:$PATH"
