@@ -14,7 +14,7 @@
 #   2. GITHUB_TOKEN env var (for CI)
 #   3. Unauthenticated curl (60 req/hour rate limit)
 #
-# Requires: curl, grep (gh optional)
+# Requires: curl, GNU grep with PCRE support (gh optional)
 
 set -euo pipefail
 
@@ -75,7 +75,7 @@ check_version() {
 
 # --- .chezmoiexternals/*.toml with pinned $version ---
 
-while read -r toml_file; do
+while IFS= read -r toml_file; do
   pinned=$(grep -oP '\$version\s*:=\s*"\K[^"]+' "$toml_file" 2>/dev/null || true)
   repo=$(grep -oP 'github\.com/\K[^/]+/[^/]+' "$toml_file" 2>/dev/null | head -1 || true)
   tool=$(basename "$toml_file" .toml)
@@ -93,7 +93,7 @@ done < <(find "$recipes_dir" -path '*/.chezmoiexternals/*.toml' -type f | sort)
 
 # --- Shell scripts with VERSION="x.y.z" + github.com URL ---
 
-while read -r script_file; do
+while IFS= read -r script_file; do
   pinned=$(grep -oP '^\s*VERSION\s*=\s*"\K[^"]+' "$script_file" 2>/dev/null || true)
   if [[ -z "$pinned" ]]; then
     continue
@@ -123,6 +123,6 @@ if [[ $unpinned_count -gt 0 ]]; then
 fi
 echo "$summary"
 
-if [[ $behind_count -gt 0 ]]; then
+if [[ $behind_count -gt 0 || $error_count -gt 0 ]]; then
   exit 1
 fi
