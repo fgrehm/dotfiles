@@ -43,8 +43,6 @@ See [`recipes/`](recipes/) for the full list. Each recipe has its own README.
 ## Development
 
 Development and testing happens inside a devcontainer (Debian 13).
-[chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes) binary is mounted
-from the host.
 
 ```bash
 # Open devcontainer, then:
