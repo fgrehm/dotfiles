@@ -1,0 +1,6 @@
+{{- $version := "1.6.2" -}}
+[".local/bin/gh-pr-review"]
+  type = "file"
+  url = "https://github.com/agynio/gh-pr-review/releases/download/v{{ $version }}/linux-{{ .chezmoi.arch }}"
+  executable = true
+# vim: ft=toml.gotmpl

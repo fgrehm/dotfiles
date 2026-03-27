@@ -30,7 +30,7 @@ teardown() {
   [ -f "$DOTFILES/compiled-home/.chezmoiexternals/worktrunk.toml" ]
   [ -f "$DOTFILES/compiled-home/.chezmoiexternals/delta.toml" ]
   [ -f "$DOTFILES/compiled-home/.chezmoiexternals/gh.toml" ]
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_onchange_after_install-gh-extensions.sh" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiexternals/gh-pr-review.toml" ]
   [ -f "$DOTFILES/compiled-home/private_dot_config/diffnav/config.yml" ]
   [ -f "$DOTFILES/compiled-home/private_dot_config/worktrunk/config.toml" ]
 }
