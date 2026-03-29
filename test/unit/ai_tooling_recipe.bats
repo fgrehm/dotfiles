@@ -40,7 +40,7 @@ teardown() {
 }
 
 @test "ai-tooling: overlay includes ollama install script" {
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-ollama.sh" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-ollama.sh.tmpl" ]
 }
 
 @test "ai-tooling: ollama script is skipped in container via .chezmoiignore" {

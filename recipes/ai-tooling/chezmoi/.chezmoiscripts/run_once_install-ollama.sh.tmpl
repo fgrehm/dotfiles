@@ -1,5 +1,6 @@
 #!/bin/env bash
-# vim: ft=bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 # Skipped in containers via .chezmoiignore
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
@@ -8,10 +9,20 @@ if command -v ollama &>/dev/null; then
   exit 0
 fi
 
+# {{ if ne .chezmoi.username "root" }}
+SUDO="sudo"
+# {{ else }}
+SUDO=""
+# {{ end }}
+
 _install() {
   set -eo pipefail
   log_info "Installing ollama..."
   wget -qO- https://ollama.com/install.sh | sh
+  # Disable autostart -- use `systemctl start ollama` on demand.
+  # The install script enables the service by default and re-enables it
+  # on updates (https://github.com/ollama/ollama/issues/1352).
+  "$SUDO" systemctl disable --now ollama.service
 }
 
 if ! _install; then
