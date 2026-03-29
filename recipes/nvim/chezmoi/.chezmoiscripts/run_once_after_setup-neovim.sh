@@ -18,5 +18,9 @@ if [ -d "$HOME/.local/share/nvim/lazy/LazyVim" ]; then
 fi
 
 log_info "Installing Neovim plugins..."
-nvim --headless "+Lazy! sync" +qa >"${TMPDIR:-/tmp}/nvim-lazy-sync.log" 2>&1
-echo
+LAZY_LOG="${TMPDIR:-/tmp}/nvim-lazy-sync.log"
+if ! timeout 120 nvim --headless "+Lazy! sync" +qa >"$LAZY_LOG" 2>&1; then
+  log_error "Neovim plugin sync failed. Output:"
+  cat "$LAZY_LOG"
+  exit 1
+fi
