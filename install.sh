@@ -17,15 +17,18 @@ set -eu
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
 
 _log() { printf '\033[1;34m==> %s\033[0m\n' "$*"; }
-_die() { printf '\033[1;31merror: %s\033[0m\n' "$*" >&2; exit 1; }
+_die() {
+  printf '\033[1;31merror: %s\033[0m\n' "$*" >&2
+  exit 1
+}
 
 [ "$(uname -s)" = "Linux" ] || _die "only Linux is supported"
 command -v git >/dev/null 2>&1 || _die "git is required but not installed (apt-get install git)"
 
 case "$(uname -m)" in
-  x86_64)        ARCH=amd64 ;;
-  aarch64|arm64) ARCH=arm64 ;;
-  *) _die "unsupported architecture: $(uname -m)" ;;
+x86_64) ARCH=amd64 ;;
+aarch64 | arm64) ARCH=arm64 ;;
+*) _die "unsupported architecture: $(uname -m)" ;;
 esac
 
 mkdir -p "$BIN_DIR"
@@ -45,15 +48,19 @@ fi
 # Install chezmoi-recipes
 if ! command -v chezmoi-recipes >/dev/null 2>&1; then
   _log "Installing chezmoi-recipes"
-  wget -qO- "https://github.com/fgrehm/chezmoi-recipes/releases/latest/download/chezmoi-recipes_linux_${ARCH}.tar.gz" \
-    | tar xz -C "$BIN_DIR"
+  wget -qO- "https://github.com/fgrehm/chezmoi-recipes/releases/latest/download/chezmoi-recipes_linux_${ARCH}.tar.gz" |
+    tar xz -C "$BIN_DIR"
 fi
 
-REPO_URL='git@github.com:fgrehm/dotfiles.git'
+REPO_URL='https://github.com/fgrehm/dotfiles.git'
 SOURCE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/chezmoi"
 
-# Clone dotfiles
-if [ ! -d "$SOURCE_DIR/.git" ]; then
+# If run from within the repo, use it directly instead of cloning
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+if [ -f "$SCRIPT_DIR/.chezmoiroot" ]; then
+  _log "Running from local repo at $SCRIPT_DIR"
+  SOURCE_DIR="$SCRIPT_DIR"
+elif [ ! -d "$SOURCE_DIR/.git" ]; then
   _log "Cloning $REPO_URL"
   git clone "$REPO_URL" "$SOURCE_DIR"
 else

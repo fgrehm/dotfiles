@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-03-29
+
+### Changed
+
+- **ai-tooling recipe**: disable ollama autostart after install, start on demand with `systemctl start ollama`
+- **git recipe**: SSH URL rewrite (`insteadOf`) now conditional on SSH key being present, HTTPS by default
+- **nvim recipe**: show plugin sync output on failure instead of swallowing it, add 2 minute timeout
+- **install.sh**: detect when run from within the repo and skip cloning
+
 ## 2026-03-27
 
 ### Added
