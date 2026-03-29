@@ -34,8 +34,10 @@
 	process = git-lfs filter-process
 	required = true
 	clean = git-lfs clean -- %f
+{{- if stat (joinPath .chezmoi.homeDir ".ssh/id_ed25519.pub") }}
 [url "git@github.com:"]
 	insteadOf = https://github.com/
+{{- end }}
 [diff]
 	colorMoved = zebra
 	algorithm = histogram
