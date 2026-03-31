@@ -1,5 +1,7 @@
 #!/bin/env bash
-# vim: ft=bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# ssh key present: # {{ stat (joinPath .chezmoi.homeDir ".ssh/id_ed25519") | not | not }}
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 INSTALL_DIR="$HOME/.local/share/dot-ai-private"
