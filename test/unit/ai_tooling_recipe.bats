@@ -31,7 +31,7 @@ teardown() {
 
 @test "ai-tooling: overlay includes dot-ai install scripts" {
   [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-dot-ai.sh" ]
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-dot-ai-private.sh" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_onchange_after_install-dot-ai-private.sh.tmpl" ]
 }
 
 @test "ai-tooling: overlay includes clotilde and dotmem externals" {
