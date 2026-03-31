@@ -113,7 +113,7 @@ while IFS= read -r toml_file; do
     printf "  %-20s  %-12s  %-12s  %s\n" "$tool" "(latest)" "${latest_clean:--}" "not pinned"
     unpinned_count=$((unpinned_count + 1))
   fi
-done < <(find "$recipes_dir" -path '*/.chezmoiexternals/*.toml' -type f | sort)
+done < <(find "$recipes_dir" -not -path '*/compiled-home/*' -path '*/.chezmoiexternals/*.toml' -type f | sort)
 
 # --- Shell scripts with VERSION="x.y.z" + github.com URL ---
 
@@ -131,7 +131,7 @@ while IFS= read -r script_file; do
   # Derive tool name from script filename (strip run_once_install- prefix and extensions)
   tool=$(basename "$script_file" | sed -E 's/^run_(once|onchange)_(before_|after_)?install-//; s/\.(sh|bash)(\.tmpl)?$//')
   check_version "$tool" "$pinned" "$repo"
-done < <(find "$recipes_dir" -path '*/.chezmoiscripts/*' \( -name '*.sh' -o -name '*.sh.tmpl' -o -name '*.bash' -o -name '*.bash.tmpl' \) -type f | sort)
+done < <(find "$recipes_dir" -not -path '*/compiled-home/*' -path '*/.chezmoiscripts/*' \( -name '*.sh' -o -name '*.sh.tmpl' -o -name '*.bash' -o -name '*.bash.tmpl' \) -type f | sort)
 
 # --- Summary ---
 
