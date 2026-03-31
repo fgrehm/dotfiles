@@ -8,6 +8,11 @@ SSH_DIR="$HOME/.ssh"
 OP_VAULT="# {{ .onepasswordSshVault }}"
 OP_ITEM="# {{ .onepasswordSshItem }}"
 
+if [ -z "$OP_VAULT" ] || [ -z "$OP_ITEM" ]; then
+  log_skip "1Password vault/item not configured, skipping SSH key setup"
+  exit 0
+fi
+
 if [ -f "$SSH_DIR/id_ed25519" ] && [ -f "$SSH_DIR/id_ed25519.pub" ]; then
   log_skip "SSH keys already exist"
   exit 0

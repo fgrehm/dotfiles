@@ -13,8 +13,8 @@ write_1password_config_template() {
 [data]
     name = "Test User"
     email = "test@example.com"
-    onepasswordSshVault = "Keys"
-    onepasswordSshItem = "SSH"
+    onepasswordSshVault = ""
+    onepasswordSshItem = ""
     isContainer = false
     isDebian = true
     hasNvidiaGPU = false
