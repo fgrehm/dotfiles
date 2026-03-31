@@ -15,6 +15,7 @@
 
 - **delta**: update to v0.19.2
 - **neovim**: update to v0.12.0
+- **clotilde**: update to v0.11.0
 - **nvim recipe**: fix installer lint issue
 - **docs**: document two-apply bootstrap flow for fresh machines
 
