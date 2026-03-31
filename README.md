@@ -40,6 +40,16 @@ compiled-home/                generated (gitignored), fed to chezmoi
 
 See [`recipes/`](recipes/) for the full list. Each recipe has its own README.
 
+## Fresh Machine Setup
+
+On a new laptop, `chezmoi apply` needs to run twice:
+
+1. **First apply** -- installs 1Password and the `op` CLI, then downloads SSH keys
+   from your 1Password vault. Other recipes that need SSH (e.g. private repos) will
+   skip gracefully on this run.
+2. **Second apply** -- SSH keys are now on disk; any recipe that skipped will retry
+   and complete normally.
+
 ## Development
 
 Development and testing happens inside a devcontainer (Debian 13).
