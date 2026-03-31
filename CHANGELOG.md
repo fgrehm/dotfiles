@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-03-31
+
+### Added
+
+- **1password recipe**: install 1Password desktop app and CLI from official apt repo, bootstrap SSH keys from vault/item after install (skipped in containers, vault/item prompted at init time)
+
+### Fixed
+
+- **check-versions script**: exclude `compiled-home/` from directory scan to prevent checking pinned versions twice (once from source, once from generated overlay)
+- **ai-tooling recipe**: retry dot-ai-private clone after SSH key becomes available
+
+### Changed
+
+- **delta**: update to v0.19.2
+- **neovim**: update to v0.12.0
+- **nvim recipe**: fix installer lint issue
+- **docs**: document two-apply bootstrap flow for fresh machines
+
 ## 2026-03-29
 
 ### Changed
