@@ -53,6 +53,13 @@ sourceDir = "{{ .chezmoi.workingTree }}"
     recipesDir = "{{ .chezmoi.workingTree }}/recipes"
     name = {{ promptStringOnce . "name" "Full name" | quote }}
     email = {{ promptStringOnce . "email" "Email" | quote }}
+    {{- if $isContainer }}
+    onepasswordSshVault = ""
+    onepasswordSshItem = ""
+    {{- else }}
+    onepasswordSshVault = {{ promptStringOnce . "onepasswordSshVault" "1Password vault for SSH keys" | quote }}
+    onepasswordSshItem = {{ promptStringOnce . "onepasswordSshItem" "1Password item for SSH keys" | quote }}
+    {{- end }}
     isContainer = {{ $isContainer }}
     isDebian = {{ $isDebian }}
     hasNvidiaGPU = {{ $hasNvidiaGPU }}

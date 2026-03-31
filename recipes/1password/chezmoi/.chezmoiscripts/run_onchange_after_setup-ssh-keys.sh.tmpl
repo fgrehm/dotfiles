@@ -1,0 +1,58 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# config: vault=# {{ .onepasswordSshVault }} item=# {{ .onepasswordSshItem }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+SSH_DIR="$HOME/.ssh"
+OP_VAULT="# {{ .onepasswordSshVault }}"
+OP_ITEM="# {{ .onepasswordSshItem }}"
+
+if [ -f "$SSH_DIR/id_ed25519" ] && [ -f "$SSH_DIR/id_ed25519.pub" ]; then
+  log_skip "SSH keys already exist"
+  exit 0
+fi
+
+if ! command -v op &>/dev/null; then
+  log_skip "1Password CLI not found, skipping SSH key setup"
+  exit 0
+fi
+
+if ! op whoami &>/dev/null; then
+  log_info "Signing in to 1Password..."
+  if ! eval "$(op signin)"; then
+    log_error "1Password sign-in failed, skipping SSH key setup"
+    log_info "Run 'chezmoi apply' again after signing in with 'op signin'"
+    exit 0
+  fi
+fi
+
+log_info "Downloading SSH keys from 1Password (vault: $OP_VAULT, item: $OP_ITEM)..."
+mkdir -p "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+
+_download() {
+  local name="$1" mode="$2"
+  local path="op://$OP_VAULT/$OP_ITEM/$name"
+  if op read "$path" >"$SSH_DIR/$name" 2>/dev/null; then
+    chmod "$mode" "$SSH_DIR/$name"
+    log_info "Downloaded $name"
+  else
+    rm -f "$SSH_DIR/$name"
+    return 1
+  fi
+}
+
+if ! _download id_ed25519 600; then
+  log_error "Failed to download id_ed25519 from 1Password"
+  exit 1
+fi
+
+if ! _download id_ed25519.pub 644; then
+  log_error "Failed to download id_ed25519.pub from 1Password"
+  exit 1
+fi
+
+# Optional signing keys
+_download id_ed25519-sign 600 || true
+_download id_ed25519-sign.pub 644 || true

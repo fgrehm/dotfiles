@@ -54,7 +54,7 @@ make check      # lint shell scripts (shfmt + shellcheck)
 
 `.chezmoi.toml.tmpl` auto-detects containers via `/.dockerenv`, env vars, etc.
 Template data available: `.name`, `.email`, `.isContainer`, `.isDebian`,
-`.hasNvidiaGPU`.
+`.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
 
 ## License
 

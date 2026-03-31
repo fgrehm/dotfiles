@@ -66,6 +66,8 @@ dot_config and private_dot_config for the same target").
 |----------|--------|
 | `.name` | Prompted via `promptStringOnce` at `chezmoi init` |
 | `.email` | Prompted via `promptStringOnce` at `chezmoi init` |
+| `.onepasswordSshVault` | Prompted at `chezmoi init` (laptop only; empty string in containers) |
+| `.onepasswordSshItem` | Prompted at `chezmoi init` (laptop only; empty string in containers) |
 | `.isContainer` | `/.dockerenv`, `/run/.containerenv`, `CODESPACES`, etc. |
 | `.isDebian` | `.chezmoi.osRelease.id == "debian"` |
 | `.hasNvidiaGPU` | `lspci` output (skipped in containers) |
