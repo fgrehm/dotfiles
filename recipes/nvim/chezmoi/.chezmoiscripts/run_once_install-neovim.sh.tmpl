@@ -15,22 +15,24 @@ SUDO=""
 # {{ end }}
 
 VERSION="0.12.0"
-arch="$(uname -m)"
-case "$arch" in
-aarch64 | arm64) arch="aarch64" ;;
-*) arch="x86_64" ;;
-esac
+ARCHIVE="/tmp/nvim-linux-x86_64.tar.gz"
+SHA256="160b69125defb16e60b283b69be112fd4850d67ac8f9a752328c20ad43ec34af"
 
 _install() {
   set -e
   log_info "Installing Neovim..."
   # Installed globally (/opt + /usr/local/bin) so `sudo nvim` works.
   # https://github.com/neovim/neovim/releases
-  run_quiet wget -qO "/tmp/nvim-linux-${arch}.tar.gz" \
-    "https://github.com/neovim/neovim/releases/download/v${VERSION}/nvim-linux-${arch}.tar.gz"
-  run_quiet "$SUDO" tar -C /opt -xzf "/tmp/nvim-linux-${arch}.tar.gz"
-  "$SUDO" ln -sf "/opt/nvim-linux-${arch}/bin/nvim" /usr/local/bin/nvim
-  rm -f "/tmp/nvim-linux-${arch}.tar.gz"
+  run_quiet wget -qO "$ARCHIVE" \
+    "https://github.com/neovim/neovim/releases/download/v${VERSION}/nvim-linux-x86_64.tar.gz"
+  echo "${SHA256}  ${ARCHIVE}" | sha256sum -c --status || {
+    log_error "Neovim archive checksum mismatch -- aborting"
+    rm -f "$ARCHIVE"
+    exit 1
+  }
+  run_quiet "$SUDO" tar -C /opt -xzf "$ARCHIVE"
+  "$SUDO" ln -sf "/opt/nvim-linux-x86_64/bin/nvim" /usr/local/bin/nvim
+  rm -f "$ARCHIVE"
 }
 
 if ! _install; then
