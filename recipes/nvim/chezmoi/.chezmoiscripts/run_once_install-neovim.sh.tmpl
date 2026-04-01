@@ -30,6 +30,6 @@ if ! echo "${SHA256}  ${ARCHIVE}" | sha256sum -c --status; then
   rm -f "$ARCHIVE"
   exit 1
 fi
-run_quiet "$SUDO" tar -C /opt -xzf "$ARCHIVE"
-"$SUDO" ln -sf "/opt/nvim-linux-x86_64/bin/nvim" /usr/local/bin/nvim
+run_quiet $SUDO tar -C /opt -xzf "$ARCHIVE"
+$SUDO ln -sf "/opt/nvim-linux-x86_64/bin/nvim" /usr/local/bin/nvim
 rm -f "$ARCHIVE"
