@@ -1,7 +1,8 @@
 {{- $version := "0.2.1" -}}
 [".local/bin/cartage"]
   type = "archive-file"
-  url = "https://github.com/fgrehm/cartage/releases/download/v{{ $version }}/cartage_linux_{{ .chezmoi.arch }}.tar.gz"
+  url = "https://github.com/fgrehm/cartage/releases/download/v{{ $version }}/cartage_linux_amd64.tar.gz"
   executable = true
   path = "cartage"
+  checksum.sha256 = "e8d662b8db4fe6ff58f785161734f9b5dd8553da7f0cf8e1803d241d72850783"
 # vim: ft=toml.gotmpl

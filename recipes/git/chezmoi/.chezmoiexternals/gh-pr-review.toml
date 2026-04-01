@@ -1,6 +1,7 @@
 {{- $version := "1.6.2" -}}
 [".local/bin/gh-pr-review"]
   type = "file"
-  url = "https://github.com/agynio/gh-pr-review/releases/download/v{{ $version }}/linux-{{ .chezmoi.arch }}"
+  url = "https://github.com/agynio/gh-pr-review/releases/download/v{{ $version }}/linux-amd64"
   executable = true
+  checksum.sha256 = "2b7d4f2416f195e98010cb3e2b5684b285808e62864f89dea8497dbe691d7ed0"
 # vim: ft=toml.gotmpl

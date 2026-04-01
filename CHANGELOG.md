@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-04-01
+
+### Added
+
+- **security**: pin hardcoded sha256 checksums for all chezmoiexternals; chezmoi now verifies each download before extracting
+- **platform**: restrict to amd64 only; `run_once_before_000-check-arch.sh` fails fast on non-x86_64, arch conditionals removed from all externals
+
 ## 2026-03-31
 
 ### Added

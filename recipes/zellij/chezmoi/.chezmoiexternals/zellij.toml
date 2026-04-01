@@ -1,9 +1,8 @@
-{{- $arch := .chezmoi.arch -}}
-{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- else if eq $arch "arm64" -}}{{- $arch = "aarch64" -}}{{- end -}}
 {{- $version := "0.44.0" -}}
 [".local/bin/zellij"]
   type = "archive-file"
-  url = "https://github.com/zellij-org/zellij/releases/download/v{{ $version }}/zellij-{{ $arch }}-unknown-linux-musl.tar.gz"
+  url = "https://github.com/zellij-org/zellij/releases/download/v{{ $version }}/zellij-x86_64-unknown-linux-musl.tar.gz"
   path = "zellij"
   executable = true
+  checksum.sha256 = "7e981d50c98ec13ad6cc882e8ca4da32544dd6b69fd0d1b2b753eb597847adb3"
 # vim: ft=toml.gotmpl

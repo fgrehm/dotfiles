@@ -1,9 +1,8 @@
-{{- $arch := .chezmoi.arch -}}
-{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- else if eq $arch "arm64" -}}{{- $arch = "aarch64" -}}{{- end -}}
 {{- $version := "0.19.2" -}}
 [".local/bin/delta"]
   type = "archive-file"
-  url = "https://github.com/dandavison/delta/releases/download/{{ $version }}/delta-{{ $version }}-{{ $arch }}-unknown-linux-gnu.tar.gz"
-  path = "delta-{{ $version }}-{{ $arch }}-unknown-linux-gnu/delta"
+  url = "https://github.com/dandavison/delta/releases/download/{{ $version }}/delta-{{ $version }}-x86_64-unknown-linux-gnu.tar.gz"
+  path = "delta-{{ $version }}-x86_64-unknown-linux-gnu/delta"
   executable = true
+  checksum.sha256 = "8e695c5f586a8c53d6c3b01be0b4a422ed218bfed2a56191caebe373a1c18ab2"
 # vim: ft=toml.gotmpl
