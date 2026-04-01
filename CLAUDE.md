@@ -118,34 +118,40 @@ For tools distributed as GitHub release tarballs, use chezmoi's `.chezmoiexterna
 
 ```toml
 # recipes/git/chezmoi/.chezmoiexternals/diffnav.toml
-{{- $arch := .chezmoi.arch -}}
-{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- end -}}
 {{- $version := "1.2.3" -}}
 [".local/bin/diffnav"]
   type = "archive-file"
-  url = "https://github.com/dlvhdr/diffnav/releases/download/v{{ $version }}/diffnav_Linux_{{ $arch }}.tar.gz"
+  url = "https://github.com/dlvhdr/diffnav/releases/download/v{{ $version }}/diffnav_Linux_x86_64.tar.gz"
   executable = true
   path = "diffnav"
+  checksum.sha256 = "<sha256 of the amd64 archive>"
 # vim: ft=toml.gotmpl
 ```
 
-For releases where the archive path contains the version, pin it the same way:
+For releases where the archive path contains the version:
 
 ```toml
-{{- $arch := .chezmoi.arch -}}
-{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- else if eq $arch "arm64" -}}{{- $arch = "aarch64" -}}{{- end -}}
 {{- $version := "1.2.3" -}}
 [".local/bin/tool"]
   type = "archive-file"
-  url = "https://github.com/owner/repo/releases/download/v{{ $version }}/tool-{{ $version }}-{{ $arch }}-linux.tar.gz"
-  path = "tool-{{ $version }}-{{ $arch }}-linux/tool"
+  url = "https://github.com/owner/repo/releases/download/v{{ $version }}/tool-{{ $version }}-x86_64-linux.tar.gz"
+  path = "tool-{{ $version }}-x86_64-linux/tool"
   executable = true
+  checksum.sha256 = "<sha256 of the amd64 archive>"
 # vim: ft=toml.gotmpl
 ```
 
 Pin versions explicitly -- do NOT use `gitHubLatestReleaseAssetURL` or
 `gitHubLatestRelease`. Those make GitHub API calls that cause rate-limit
 failures in unit tests even with `--exclude=externals`.
+
+Always include `checksum.sha256` with the SHA-256 of the downloaded archive or
+file (amd64 only -- no arch conditionals). Do NOT use `checksum.sha256url`
+pointing at the project's checksums file: an attacker who compromises a release
+can modify both the asset and the checksums file. The hardcoded value in this
+repo is the trust anchor. To get the hash, download the asset and run
+`sha256sum` on it, or find it in the project's `checksums.txt` at release time
+and copy the value here.
 
 Multiple recipes can each contribute `.chezmoiexternals/*.toml` files without conflict since each file has a unique name. Use a shell install script only for apt packages, tools needing post-install setup, or standalone binaries (not archives).
 

@@ -30,6 +30,12 @@ Key points for reviews:
 - Pin versions explicitly with `{{- $version := "x.y.z" -}}`. Do NOT use
   `gitHubLatestReleaseAssetURL` or `gitHubLatestRelease` -- they make GitHub
   API calls that break unit tests.
+- Always add `checksum.sha256 = "<hex>"` with the SHA-256 of the amd64 asset.
+  Do NOT use `checksum.sha256url` -- an attacker can modify both the asset and
+  the remote checksums file in the same release. The hardcoded value in this
+  repo is the trust anchor. Get it with `sha256sum` on the downloaded file.
+- No arch conditionals -- this repo is amd64 only. Hardcode `amd64`/`x86_64`
+  directly in URLs.
 - Add `# vim: ft=toml.gotmpl` as the **last line** of each `.toml` file.
   Putting it first breaks Go template whitespace trimming.
 - Install scripts guard with `command -v`, use `set -eo pipefail` inside `_install()`
