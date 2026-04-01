@@ -19,7 +19,7 @@ ARCHIVE="/tmp/nvim-linux-x86_64.tar.gz"
 SHA256="160b69125defb16e60b283b69be112fd4850d67ac8f9a752328c20ad43ec34af"
 
 _install() {
-  set -e
+  set -eo pipefail
   log_info "Installing Neovim..."
   # Installed globally (/opt + /usr/local/bin) so `sudo nvim` works.
   # https://github.com/neovim/neovim/releases
