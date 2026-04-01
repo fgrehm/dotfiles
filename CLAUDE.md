@@ -175,21 +175,22 @@ SUDO="sudo"
 SUDO=""
 # {{ end }}
 
-_install() {
-  set -eo pipefail
-  log_info "Installing <tool>..."
-  "$SUDO" apt-get update -qq
-  "$SUDO" apt-get install -y <tool>
-}
+set -eo pipefail
 
-if ! _install; then
-  log_error "Failed to install <tool>"
-  log_info "Run 'chezmoi apply' again after fixing the issue."
-fi
+log_info "Installing <tool>..."
+run_quiet $SUDO apt-get update -qq
+run_quiet $SUDO apt-get install -y <tool>
 ```
 
-Key points: guard with `command -v`, `set -eo pipefail` inside function only,
-graceful failure (don't block the rest of `chezmoi apply`).
+Key points:
+- Guard with `command -v` for idempotency.
+- `set -eo pipefail` at the top level (after guards and variable setup) -- hard fail
+  on any error so chezmoi does not mark the script as completed. This lets
+  `chezmoi apply` retry the script on the next run without needing to manipulate
+  chezmoi state. A script that exits 0 after a failure would be silently marked
+  done and require `chezmoi state delete` to retry.
+- Use unquoted `$SUDO` (not `"$SUDO"`) -- quoting expands to an empty-string
+  command when running as root.
 
 ## Completion Scripts
 

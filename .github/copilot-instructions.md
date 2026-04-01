@@ -38,8 +38,11 @@ Key points for reviews:
   directly in URLs.
 - Add `# vim: ft=toml.gotmpl` as the **last line** of each `.toml` file.
   Putting it first breaks Go template whitespace trimming.
-- Install scripts guard with `command -v`, use `set -eo pipefail` inside `_install()`
-  only, and fail gracefully (don't block `chezmoi apply`).
+- Install scripts guard with `command -v` for idempotency, then `set -eo pipefail`
+  at the top level. Hard-fail on any error -- a script that exits 0 after failure
+  is silently marked done by chezmoi and requires `chezmoi state delete` to retry.
+  Hard-failing lets `chezmoi apply` retry automatically on the next run.
+  Use unquoted `$SUDO` (not `"$SUDO"`) to avoid empty-string command errors as root.
 - Completion scripts (`run_onchange_after_completions-*.sh.tmpl`) must NOT use
   `set -euo pipefail` at the top level. Wrap each generation call in `if !` so a
   transient failure doesn't block `chezmoi apply`. Always prepend

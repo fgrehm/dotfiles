@@ -15,17 +15,11 @@ SUDO="sudo"
 SUDO=""
 # {{ end }}
 
-_install() {
-  set -eo pipefail
-  log_info "Installing ollama..."
-  wget -qO- https://ollama.com/install.sh | sh
-  # Disable autostart -- use `systemctl start ollama` on demand.
-  # The install script enables the service by default and re-enables it
-  # on updates (https://github.com/ollama/ollama/issues/1352).
-  "$SUDO" systemctl disable --now ollama.service
-}
+set -eo pipefail
 
-if ! _install; then
-  log_error "Failed to install ollama (network unavailable?)"
-  log_info "Run 'chezmoi apply' again after fixing the issue."
-fi
+log_info "Installing ollama..."
+wget -qO- https://ollama.com/install.sh | sh
+# Disable autostart -- use `systemctl start ollama` on demand.
+# The install script enables the service by default and re-enables it
+# on updates (https://github.com/ollama/ollama/issues/1352).
+$SUDO systemctl disable --now ollama.service

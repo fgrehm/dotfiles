@@ -18,26 +18,18 @@ VERSION="0.12.0"
 ARCHIVE="/tmp/nvim-linux-x86_64.tar.gz"
 SHA256="160b69125defb16e60b283b69be112fd4850d67ac8f9a752328c20ad43ec34af"
 
-_install() {
-  set -eo pipefail
-  log_info "Installing Neovim..."
-  # Installed globally (/opt + /usr/local/bin) so `sudo nvim` works.
-  # https://github.com/neovim/neovim/releases
-  run_quiet wget -qO "$ARCHIVE" \
-    "https://github.com/neovim/neovim/releases/download/v${VERSION}/nvim-linux-x86_64.tar.gz"
-  # exit (not return) so checksum mismatch is fatal and bypasses the graceful
-  # handler below -- a tampered archive should block chezmoi apply entirely.
-  if ! echo "${SHA256}  ${ARCHIVE}" | sha256sum -c --status; then
-    log_error "Neovim archive checksum mismatch -- potential tampering, aborting"
-    rm -f "$ARCHIVE"
-    exit 1
-  fi
-  run_quiet $SUDO tar -C /opt -xzf "$ARCHIVE"
-  $SUDO ln -sf "/opt/nvim-linux-x86_64/bin/nvim" /usr/local/bin/nvim
-  rm -f "$ARCHIVE"
-}
+set -eo pipefail
 
-if ! _install; then
-  log_error "Failed to install Neovim (network unavailable?)"
-  log_info "Run 'chezmoi apply' again after fixing the issue."
+log_info "Installing Neovim..."
+# Installed globally (/opt + /usr/local/bin) so `sudo nvim` works.
+# https://github.com/neovim/neovim/releases
+run_quiet wget -qO "$ARCHIVE" \
+  "https://github.com/neovim/neovim/releases/download/v${VERSION}/nvim-linux-x86_64.tar.gz"
+if ! echo "${SHA256}  ${ARCHIVE}" | sha256sum -c --status; then
+  log_error "Neovim archive checksum mismatch -- potential tampering, aborting"
+  rm -f "$ARCHIVE"
+  exit 1
 fi
+run_quiet $SUDO tar -C /opt -xzf "$ARCHIVE"
+$SUDO ln -sf "/opt/nvim-linux-x86_64/bin/nvim" /usr/local/bin/nvim
+rm -f "$ARCHIVE"
