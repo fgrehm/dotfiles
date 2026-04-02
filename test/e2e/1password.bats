@@ -28,6 +28,7 @@ setup() {
   setup_dotfiles_repo
   write_1password_config_template
   copy_recipeignore
+  copy_recipe "base"
   copy_recipe "1password"
   cd "$DOTFILES"
   seed_chezmoi_config "false"

@@ -1,9 +1,8 @@
-{{- $arch := .chezmoi.arch -}}
-{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- end -}}
 {{- $version := "0.11.0" -}}
 [".local/bin/diffnav"]
   type = "archive-file"
-  url = "https://github.com/dlvhdr/diffnav/releases/download/v{{ $version }}/diffnav_Linux_{{ $arch }}.tar.gz"
+  url = "https://github.com/dlvhdr/diffnav/releases/download/v{{ $version }}/diffnav_Linux_x86_64.tar.gz"
   executable = true
   path = "diffnav"
+  checksum.sha256 = "35b0c3afb84f14b7e0aed411fbb9fd352b67a90885448f94a38829ebf74275e4"
 # vim: ft=toml.gotmpl

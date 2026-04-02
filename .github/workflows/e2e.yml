@@ -16,13 +16,14 @@ jobs:
       image: debian:trixie
 
     env:
+      # test-summary/action@v2.4 still targets node20; force node24 until they ship a node24 build
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Cache apt packages
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: /var/cache/apt/archives
           key: apt-${{ hashFiles('.github/workflows/e2e.yml') }}
@@ -34,7 +35,7 @@ jobs:
         run: wget -qO- https://mise.jdx.dev/install.sh | sh
 
       - name: Cache mise tools
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.local/share/mise
           key: mise-${{ hashFiles('.tool-versions') }}
@@ -57,7 +58,7 @@ jobs:
         run: make test-e2e-ci
 
       - name: Test Summary
-        uses: test-summary/action@v2
+        uses: test-summary/action@v2.4
         if: always()
         with:
           paths: test-results/*.xml

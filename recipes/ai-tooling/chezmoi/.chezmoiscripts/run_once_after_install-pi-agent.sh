@@ -17,13 +17,7 @@ else
   exit 0
 fi
 
-_install() {
-  set -eo pipefail
-  log_info "Installing Pi coding agent..."
-  "${NPM_CMD[@]}" install -g @mariozechner/pi-coding-agent
-}
+set -eo pipefail
 
-if ! _install; then
-  log_error "Failed to install Pi coding agent"
-  log_info "Run 'chezmoi apply' again after fixing the issue."
-fi
+log_info "Installing Pi coding agent..."
+"${NPM_CMD[@]}" install -g @mariozechner/pi-coding-agent

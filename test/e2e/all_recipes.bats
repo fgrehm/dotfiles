@@ -14,6 +14,7 @@ setup_file() {
   skip_if_no_integration
   isolate_home
   setup_dotfiles_repo
+  copy_recipe "base"
   copy_recipe "shell"
   copy_recipe "git"
   copy_recipe "mise"
@@ -32,6 +33,13 @@ setup_file() {
 
 teardown_file() {
   cleanup
+}
+
+# base
+
+@test "base: jq is available" {
+  command -v jq
+  jq --version
 }
 
 # git

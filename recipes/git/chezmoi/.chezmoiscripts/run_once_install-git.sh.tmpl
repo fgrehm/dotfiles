@@ -14,14 +14,8 @@ SUDO="sudo"
 SUDO=""
 # {{ end }}
 
-_install() {
-  set -e
-  log_info "Installing git..."
-  run_quiet "$SUDO" apt-get update -qq
-  run_quiet "$SUDO" apt-get install -y git
-}
+set -eo pipefail
 
-if ! _install; then
-  log_error "Failed to install git"
-  log_info "Run 'chezmoi apply' again after fixing the issue."
-fi
+log_info "Installing git..."
+run_quiet $SUDO apt-get update -qq
+run_quiet $SUDO apt-get install -y git

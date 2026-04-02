@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-04-02
+
+### Added
+
+- **base recipe**: new recipe that installs foundational apt packages (jq, wget, gnupg) with a `000-` prefix so it runs before all other scripts
+
+### Changed
+
+- **install scripts**: all `run_once_` install scripts now hard-fail (`set -eo pipefail` at top level, no graceful `_install()` wrapper) so `chezmoi apply` retries automatically on failure without needing `chezmoi state delete`
+- **ci**: bump `actions/checkout` v4→v6, `actions/cache` v4→v5 to target Node.js 24 natively
+
+## 2026-04-01
+
+### Added
+
+- **security**: pin hardcoded sha256 checksums for all chezmoiexternals; chezmoi now verifies each download before extracting
+- **security**: verify nvim tarball sha256 before extracting; checksum mismatch is fatal
+- **platform**: restrict to amd64 only; `run_once_before_000-check-arch.sh` fails fast on non-x86_64, arch conditionals removed from all externals
+
 ## 2026-03-31
 
 ### Added

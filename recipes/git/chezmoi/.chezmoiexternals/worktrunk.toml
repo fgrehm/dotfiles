@@ -1,9 +1,8 @@
-{{- $arch := .chezmoi.arch -}}
-{{- if eq $arch "amd64" -}}{{- $arch = "x86_64" -}}{{- else if eq $arch "arm64" -}}{{- $arch = "aarch64" -}}{{- end -}}
 {{- $version := "0.33.0" -}}
 [".local/bin/wt"]
   type = "archive-file"
-  url = "https://github.com/max-sixty/worktrunk/releases/download/v{{ $version }}/worktrunk-{{ $arch }}-unknown-linux-musl.tar.xz"
-  path = "worktrunk-{{ $arch }}-unknown-linux-musl/wt"
+  url = "https://github.com/max-sixty/worktrunk/releases/download/v{{ $version }}/worktrunk-x86_64-unknown-linux-musl.tar.xz"
+  path = "worktrunk-x86_64-unknown-linux-musl/wt"
   executable = true
+  checksum.sha256 = "a46ab45ddc6e28383445b69cae884ec43e3b1efb14d22e1c0993d66ebb0787a8"
 # vim: ft=toml.gotmpl
