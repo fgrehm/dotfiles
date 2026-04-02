@@ -1,0 +1,21 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if command -v jq &>/dev/null; then
+  log_skip "jq already installed"
+  exit 0
+fi
+
+# {{ if ne .chezmoi.username "root" }}
+SUDO="sudo"
+# {{ else }}
+SUDO=""
+# {{ end }}
+
+set -eo pipefail
+
+log_info "Installing jq..."
+run_quiet $SUDO apt-get update -qq
+run_quiet $SUDO apt-get install -y jq
