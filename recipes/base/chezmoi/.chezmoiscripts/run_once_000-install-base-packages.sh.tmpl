@@ -12,7 +12,7 @@ SUDO=""
 packages=()
 command -v jq     &>/dev/null || packages+=(jq)
 command -v wget   &>/dev/null || packages+=(wget)
-command -v gnupg  &>/dev/null || packages+=(gnupg)
+command -v gpg    &>/dev/null || packages+=(gnupg)
 
 if [ ${#packages[@]} -eq 0 ]; then
   log_skip "base packages already installed"

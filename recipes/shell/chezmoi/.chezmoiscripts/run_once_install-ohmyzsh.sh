@@ -1,4 +1,5 @@
 #!/bin/env bash
+# vim: ft=bash
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 # Check both $HOME/.oh-my-zsh and $ZSH (devcontainers may pre-set $ZSH)
