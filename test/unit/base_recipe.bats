@@ -22,11 +22,11 @@ teardown() {
 }
 
 @test "base: overlay includes install script in compiled-home" {
-  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_000-install-base-packages.sh" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_000-install-base-packages.sh.tmpl" ]
 }
 
 @test "base: install script sorts before other run_once_ scripts" {
   # 000- prefix must lexicographically precede all install-* scripts
   first=$(ls "$DOTFILES/compiled-home/.chezmoiscripts/run_once_"* 2>/dev/null | head -1 | xargs basename)
-  [ "$first" = "run_once_000-install-base-packages.sh" ]
+  [ "$first" = "run_once_000-install-base-packages.sh.tmpl" ]
 }
