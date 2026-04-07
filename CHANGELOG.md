@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-04-07
+
+- **updates**: dotmem (0.3.0), nvim (0.12.1), worktrunk (0.34.2)
+
 ## 2026-04-02
 
 ### Added
