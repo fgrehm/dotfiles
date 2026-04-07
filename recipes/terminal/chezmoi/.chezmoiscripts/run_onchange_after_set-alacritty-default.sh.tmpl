@@ -1,0 +1,20 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if ! command -v alacritty &>/dev/null; then
+  log_skip "alacritty not installed, skipping default terminal setup"
+  exit 0
+fi
+
+# {{ if ne .chezmoi.username "root" }}
+SUDO="sudo"
+# {{ else }}
+SUDO=""
+# {{ end }}
+
+set -eo pipefail
+
+log_info "Setting alacritty as default terminal..."
+run_quiet $SUDO update-alternatives --set x-terminal-emulator /usr/bin/alacritty
