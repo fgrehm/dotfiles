@@ -1,0 +1,8 @@
+{{- $version := "0.61.0" -}}
+[".local/bin/lazygit"]
+  type = "archive-file"
+  url = "https://github.com/jesseduffield/lazygit/releases/download/v{{ $version }}/lazygit_{{ $version }}_Linux_x86_64.tar.gz"
+  executable = true
+  path = "lazygit"
+  checksum.sha256 = "4a9702b346283a23a6919c9424617e14788ac00e9cd3c9be266bac48cc6de8eb"
+# vim: ft=toml.gotmpl

@@ -6,7 +6,7 @@ Project context for AI assistants working on this repo.
 
 A chezmoi dotfiles repo organized with
 [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Target: Debian 13
-(Trixie) laptops and devcontainers/Codespaces.
+(Trixie) laptops running KDE Plasma 6, and devcontainers/Codespaces.
 
 chezmoi-recipes adds a recipe layer on top of chezmoi: related config files and
 install scripts are grouped into self-contained directories under `recipes/`.
@@ -96,8 +96,14 @@ laptop
 ```
 
 Use `.recipeignore` to exclude entire recipes (e.g. laptop-only tools) rather
-than adding `isContainer` guards inside individual scripts. Scripts that have no
-template directives should use `.sh` extension (not `.sh.tmpl`).
+than adding `isContainer` guards inside individual scripts.
+
+**Rule: any script that uses template directives (`# {{ if ... }}`, `# {{
+include ... }}`, template variables) MUST have the `.sh.tmpl` extension.**
+Without `.tmpl`, chezmoi treats the file as a plain script and template
+directives become inert comments, causing guards like `# {{ if .isContainer }}`
+to silently fail (the guarded code always runs). Scripts with no template
+directives should use plain `.sh`.
 
 ## Code Style
 

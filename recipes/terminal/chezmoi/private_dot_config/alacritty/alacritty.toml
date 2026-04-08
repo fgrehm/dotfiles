@@ -1,0 +1,17 @@
+[font]
+normal = { family = "CaskaydiaMono Nerd Font Mono" }
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\n"
+
+[[keyboard.bindings]]
+key = "N"
+mods = "Control|Shift"
+action = "CreateNewWindow"
+
+# Prevents mouse cursor from going missing at times
+# https://github.com/alacritty/alacritty/issues/6703
+[mouse]
+hide_when_typing = false

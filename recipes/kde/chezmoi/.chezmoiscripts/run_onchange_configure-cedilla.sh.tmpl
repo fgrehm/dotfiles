@@ -1,0 +1,57 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+#
+# On Debian with en_US.UTF-8 locale, the GTK cedilla immodule won't activate
+# because 'en' is missing from its locale filter. This script patches:
+#
+# 1. GTK immodules cache - adds 'en' to the cedilla locale list so
+#    GTK_IM_MODULE=cedilla (set in ~/.config/environment.d/cedilla.conf)
+#    actually takes effect in English locales.
+#
+# 2. X11 Compose file - replaces c-acute/C-acute with c-cedilla/C-cedilla so
+#    XWayland and X11 apps produce the correct character from dead_acute + c.
+#
+# These are system files that apt upgrades may overwrite. The script is
+# idempotent (checks before patching) so it re-applies cleanly via
+# run_onchange_ on the next chezmoi apply after an upgrade.
+
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if [ "${XDG_CURRENT_DESKTOP:-}" != "KDE" ]; then
+  log_skip "Not running KDE Plasma, skipping cedilla configuration"
+  exit 0
+fi
+
+# {{ if ne .chezmoi.username "root" }}
+SUDO="sudo"
+# {{ else }}
+SUDO=""
+# {{ end }}
+
+set -eo pipefail
+
+# --- GTK immodules cache ---
+for cache in /usr/lib/*/gtk-3.0/*/immodules.cache /usr/lib/*/gtk-2.0/*/immodules.cache; do
+  [[ -f "$cache" ]] || continue
+  if grep -q '"cedilla"' "$cache" && ! grep -q 'cedilla.*:en"' "$cache"; then
+    log_info "Patching GTK immodules cache: $cache"
+    run_quiet $SUDO sed -i 's/\(cedilla.*"az:ca:co:fr:gv:oc:pt:sq:tr:wa\)"/\1:en"/' "$cache"
+  else
+    log_skip "GTK immodules cache already patched: $cache"
+  fi
+done
+
+# --- X11 Compose file ---
+COMPOSE="/usr/share/X11/locale/en_US.UTF-8/Compose"
+if [[ -f "$COMPOSE" ]]; then
+  if grep -qP '<dead_acute>.*<c>.*"ć"' "$COMPOSE"; then
+    log_info "Patching X11 Compose file..."
+    run_quiet $SUDO sed -i \
+      -e '/<dead_acute>.*<c>/s/"ć"/"ç"/' \
+      -e '/<dead_acute>.*<C>/s/"Ć"/"Ç"/' \
+      "$COMPOSE"
+  else
+    log_skip "X11 Compose file already patched"
+  fi
+fi

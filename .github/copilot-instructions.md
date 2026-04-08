@@ -17,11 +17,22 @@ Key points for reviews:
 
 ## Shell Scripts
 
+- Scripts source `$CHEZMOI_SOURCE_DIR/scripts/ui.bash` for logging helpers
+  (`log_info`, `log_skip`, `log_error`, `run_quiet`). This file is added by
+  `chezmoi-recipes overlay` into `compiled-home/scripts/`. It is NOT missing
+  from the repo -- do not suggest inlining these functions or adding fallback
+  definitions.
 - 2-space indentation, validated by `shfmt` and `shellcheck` (`make check`).
 - `.sh.tmpl` files must have custom delimiters:
   `# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"`.
 - `.sh.tmpl` files must have a vim modeline: `# vim: ft=bash.gotmpl` (line 2).
 - Plain `.sh` files (no template directives) must have: `# vim: ft=bash`.
+- **Critical: scripts that use template directives (`# {{ if ... }}`, `# {{
+  include ... }}`, template variables like `.isContainer`, `.chezmoi.username`)
+  MUST have `.sh.tmpl` extension.** Without `.tmpl`, chezmoi treats the file as
+  plain shell and template directives become inert comments. This causes guards
+  like `# {{ if .isContainer }}` to silently fail (the guarded code always
+  runs). Flag any `.sh` file containing `# {{` as a bug.
 
 ## GitHub Binary Installs
 
