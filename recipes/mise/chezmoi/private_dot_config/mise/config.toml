@@ -1,3 +1,6 @@
+[settings.ruby]
+compile = false
+
 [tools]
 node = "latest"
 go = "latest"
