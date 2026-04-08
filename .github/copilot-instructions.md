@@ -17,6 +17,11 @@ Key points for reviews:
 
 ## Shell Scripts
 
+- Scripts source `$CHEZMOI_SOURCE_DIR/scripts/ui.bash` for logging helpers
+  (`log_info`, `log_skip`, `log_error`, `run_quiet`). This file is added by
+  `chezmoi-recipes overlay` into `compiled-home/scripts/`. It is NOT missing
+  from the repo -- do not suggest inlining these functions or adding fallback
+  definitions.
 - 2-space indentation, validated by `shfmt` and `shellcheck` (`make check`).
 - `.sh.tmpl` files must have custom delimiters:
   `# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"`.
