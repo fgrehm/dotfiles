@@ -2,6 +2,24 @@
 
 ## 2026-04-07
 
+### Added
+
+- **terminal recipe**: install alacritty via apt, deploy config (CaskaydiaMono Nerd Font, keybindings, cursor fix), set as default terminal
+- **kde recipe**: configure keyboard layouts (US + US-intl dead keys), remap caps lock to ctrl, Super+Space layout switch, fix cedilla input for en_US locale
+- **ci**: add `make check` (shfmt + shellcheck) lint step to CI workflow
+- **devcontainer**: add shfmt and shellcheck to `.tool-versions`, Dockerfile now reads tool versions from `.tool-versions` (single source of truth)
+
+### Fixed
+
+- **cartage recipe**: rename `enable-cartage.sh` to `.sh.tmpl` so template guards (`# {{ if .isContainer }}`) are actually evaluated by chezmoi; without `.tmpl`, the guard was inert and the script always skipped on laptops
+- **mise recipe**: same `.sh` -> `.sh.tmpl` fix for `install-mise-tools.sh`; mise tool install was always skipped on laptops
+- **base recipe**: fix shfmt formatting (alignment whitespace)
+- **shellcheck**: set `--severity=warning` in Makefile to skip intentional SC2086 on unquoted `$SUDO`
+
+### Changed
+
+- **CLAUDE.md**: document KDE Plasma 6 as target desktop environment; add rule about `.sh.tmpl` extension requirement for scripts with template directives
+- **copilot-instructions.md**: add review rule to flag `.sh` files containing template directives as bugs
 - **updates**: dotmem (0.3.0), nvim (0.12.1), worktrunk (0.34.2)
 
 ## 2026-04-02
