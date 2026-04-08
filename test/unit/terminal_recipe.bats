@@ -37,7 +37,9 @@ teardown() {
 
 @test "terminal: overlay includes config and scripts in compiled-home" {
   [ -f "$DOTFILES/compiled-home/private_dot_config/alacritty/alacritty.toml" ]
+  [ -f "$DOTFILES/compiled-home/private_dot_config/fontconfig/conf.d/01-emoji.conf" ]
   [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-alacritty.sh.tmpl" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-nerdfonts.sh.tmpl" ]
   [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_onchange_after_set-alacritty-default.sh.tmpl" ]
 }
 
@@ -51,6 +53,13 @@ teardown() {
   chezmoi_apply_files
 
   grep -q 'CaskaydiaMono Nerd Font Mono' "$HOME/.config/alacritty/alacritty.toml"
+}
+
+@test "terminal: deploys fontconfig emoji fallback" {
+  chezmoi_apply_files
+
+  [ -f "$HOME/.config/fontconfig/conf.d/01-emoji.conf" ]
+  grep -q 'Noto Color Emoji' "$HOME/.config/fontconfig/conf.d/01-emoji.conf"
 }
 
 @test "terminal: recipeignore excludes recipe when isContainer=true" {

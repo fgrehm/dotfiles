@@ -5,7 +5,9 @@ Terminal emulator setup.
 ## What it does
 
 - Installs [alacritty](https://alacritty.org/) via apt
+- Installs [CascadiaMono Nerd Font](https://github.com/ryanoasis/nerd-fonts) (pinned, checksum verified)
 - Deploys `~/.config/alacritty/alacritty.toml`
+- Deploys `~/.config/fontconfig/conf.d/01-emoji.conf` (Noto Color Emoji fallback)
 - Sets alacritty as default terminal via `update-alternatives`
 
 ## Config highlights
