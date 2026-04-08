@@ -1,9 +1,10 @@
 # Changelog
 
-## 2026-04-07
+## 2026-04-08
 
 ### Added
 
+- **git recipe**: Install lazygit 0.61.0
 - **terminal recipe**: install alacritty via apt, deploy config (keybindings, cursor fix), set as default terminal; install CascadiaMono Nerd Font (pinned v3.4.0, checksum verified) with Noto Color Emoji fontconfig fallback
 - **shell recipe**: set zsh as default shell via `chsh` (run_once_after, skips if already set)
 - **kde recipe**: configure keyboard layouts (US + US-intl dead keys), remap caps lock to ctrl, Super+Space layout switch, fix cedilla input for en_US locale
