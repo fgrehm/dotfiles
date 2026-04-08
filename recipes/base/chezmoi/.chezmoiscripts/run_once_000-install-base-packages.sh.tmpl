@@ -11,6 +11,7 @@ SUDO=""
 
 packages=()
 command -v jq &>/dev/null || packages+=(jq)
+command -v unzip &>/dev/null || packages+=(unzip)
 command -v wget &>/dev/null || packages+=(wget)
 command -v gpg &>/dev/null || packages+=(gnupg)
 
