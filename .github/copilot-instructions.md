@@ -22,6 +22,12 @@ Key points for reviews:
   `# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"`.
 - `.sh.tmpl` files must have a vim modeline: `# vim: ft=bash.gotmpl` (line 2).
 - Plain `.sh` files (no template directives) must have: `# vim: ft=bash`.
+- **Critical: scripts that use template directives (`# {{ if ... }}`, `# {{
+  include ... }}`, template variables like `.isContainer`, `.chezmoi.username`)
+  MUST have `.sh.tmpl` extension.** Without `.tmpl`, chezmoi treats the file as
+  plain shell and template directives become inert comments. This causes guards
+  like `# {{ if .isContainer }}` to silently fail (the guarded code always
+  runs). Flag any `.sh` file containing `# {{` as a bug.
 
 ## GitHub Binary Installs
 

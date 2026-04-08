@@ -96,8 +96,14 @@ laptop
 ```
 
 Use `.recipeignore` to exclude entire recipes (e.g. laptop-only tools) rather
-than adding `isContainer` guards inside individual scripts. Scripts that have no
-template directives should use `.sh` extension (not `.sh.tmpl`).
+than adding `isContainer` guards inside individual scripts.
+
+**Rule: any script that uses template directives (`# {{ if ... }}`, `# {{
+include ... }}`, template variables) MUST have the `.sh.tmpl` extension.**
+Without `.tmpl`, chezmoi treats the file as a plain script and template
+directives become inert comments, causing guards like `# {{ if .isContainer }}`
+to silently fail (the guarded code always runs). Scripts with no template
+directives should use plain `.sh`.
 
 ## Code Style
 
