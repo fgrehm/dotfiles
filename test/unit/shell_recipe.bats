@@ -29,6 +29,7 @@ teardown() {
   [ -f "$DOTFILES/compiled-home/dot_shellrc.d/aliases.sh" ]
   [ -f "$DOTFILES/compiled-home/create_dot_shellrc.local" ]
   [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-ohmyzsh.sh" ]
+  [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_after_set-default-shell.sh.tmpl" ]
 }
 
 @test "shell: deploys bashrc, shellrc, and zshrc" {

@@ -4,7 +4,8 @@
 
 ### Added
 
-- **terminal recipe**: install alacritty via apt, deploy config (CaskaydiaMono Nerd Font, keybindings, cursor fix), set as default terminal
+- **terminal recipe**: install alacritty via apt, deploy config (keybindings, cursor fix), set as default terminal; install CascadiaMono Nerd Font (pinned v3.4.0, checksum verified) with Noto Color Emoji fontconfig fallback
+- **shell recipe**: set zsh as default shell via `chsh` (run_once_after, skips if already set)
 - **kde recipe**: configure keyboard layouts (US + US-intl dead keys), remap caps lock to ctrl, Super+Space layout switch, fix cedilla input for en_US locale
 - **ci**: add `make check` (shfmt + shellcheck) lint step to CI workflow
 - **devcontainer**: add shfmt and shellcheck to `.tool-versions`, Dockerfile now reads tool versions from `.tool-versions` (single source of truth)

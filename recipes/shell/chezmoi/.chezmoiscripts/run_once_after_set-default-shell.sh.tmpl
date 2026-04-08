@@ -1,0 +1,27 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+ZSH_BIN="$(command -v zsh 2>/dev/null || true)"
+if [ -z "$ZSH_BIN" ]; then
+  log_skip "zsh not found, skipping default shell setup"
+  exit 0
+fi
+
+CURRENT_SHELL="$(getent passwd "$(whoami)" | cut -d: -f7)"
+if [ "$CURRENT_SHELL" = "$ZSH_BIN" ]; then
+  log_skip "zsh is already the default shell"
+  exit 0
+fi
+
+# {{ if ne .chezmoi.username "root" }}
+SUDO="sudo"
+# {{ else }}
+SUDO=""
+# {{ end }}
+
+set -eo pipefail
+
+log_info "Setting zsh as default shell..."
+run_quiet $SUDO chsh -s "$ZSH_BIN" "$(whoami)"
