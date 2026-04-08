@@ -20,4 +20,6 @@ Terminal emulator setup.
 ## Requirements
 
 - Debian 13 (Trixie)
+- Depends on `base` recipe for `unzip` and `wget`; `fc-cache` is from
+  `fontconfig` which is pre-installed on Debian desktop
 - Skipped in containers via `.recipeignore`

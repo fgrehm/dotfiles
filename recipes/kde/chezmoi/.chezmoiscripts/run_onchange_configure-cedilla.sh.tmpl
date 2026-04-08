@@ -11,6 +11,10 @@
 #
 # 2. X11 Compose file - replaces c-acute/C-acute with c-cedilla/C-cedilla so
 #    XWayland and X11 apps produce the correct character from dead_acute + c.
+#
+# These are system files that apt upgrades may overwrite. The script is
+# idempotent (checks before patching) so it re-applies cleanly via
+# run_onchange_ on the next chezmoi apply after an upgrade.
 
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
