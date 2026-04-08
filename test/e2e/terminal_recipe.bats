@@ -26,6 +26,7 @@ setup() {
   setup_dotfiles_repo
   write_laptop_config_template
   copy_recipeignore
+  copy_recipe "base"
   copy_recipe "terminal"
   cd "$DOTFILES"
   seed_chezmoi_config "false"

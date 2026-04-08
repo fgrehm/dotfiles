@@ -14,6 +14,11 @@
 
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
+if [ "${XDG_CURRENT_DESKTOP:-}" != "KDE" ]; then
+  log_skip "Not running KDE Plasma, skipping cedilla configuration"
+  exit 0
+fi
+
 # {{ if ne .chezmoi.username "root" }}
 SUDO="sudo"
 # {{ else }}
