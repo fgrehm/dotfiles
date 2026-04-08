@@ -16,4 +16,4 @@ ENV PATH="/home/vscode/.local/bin:/home/vscode/.local/share/mise/shims:${PATH}"
 RUN wget -qO- https://mise.jdx.dev/install.sh | sh
 
 # Install tools (keep versions in sync with .tool-versions)
-RUN mise use --global bats@1.11.1 chezmoi@2.70.0 && mise install
+RUN mise use --global bats@1.11.1 chezmoi@2.70.0 shfmt@3.13.1 shellcheck@0.11.0 && mise install

@@ -1,4 +1,6 @@
 {{- if .isContainer }}
 laptop
 1password
+terminal
+kde
 {{- end }}

@@ -6,7 +6,7 @@ Project context for AI assistants working on this repo.
 
 A chezmoi dotfiles repo organized with
 [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Target: Debian 13
-(Trixie) laptops and devcontainers/Codespaces.
+(Trixie) laptops running KDE Plasma 6, and devcontainers/Codespaces.
 
 chezmoi-recipes adds a recipe layer on top of chezmoi: related config files and
 install scripts are grouped into self-contained directories under `recipes/`.
