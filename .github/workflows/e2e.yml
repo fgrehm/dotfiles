@@ -40,7 +40,7 @@ jobs:
           path: ~/.local/share/mise
           key: mise-${{ hashFiles('.tool-versions') }}
 
-      - name: Install tools (bats, chezmoi)
+      - name: Install tools
         run: |
           "$HOME/.local/bin/mise" install
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
@@ -50,6 +50,9 @@ jobs:
         run: |
           wget -qO- "https://github.com/fgrehm/chezmoi-recipes/releases/latest/download/chezmoi-recipes_linux_amd64.tar.gz" \
             | tar -xz -C /usr/local/bin chezmoi-recipes
+
+      - name: Lint shell scripts
+        run: make check
 
       - name: Unit tests (file deployment)
         run: make test-ci

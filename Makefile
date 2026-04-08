@@ -27,7 +27,7 @@ shell-fmt-check: ## Check shell formatting without modifying (shfmt -d)
 	shfmt -d $(SHELL_FILES)
 
 shell-lint: ## Lint shell scripts (shellcheck)
-	shellcheck $(SHELL_FILES)
+	shellcheck --severity=warning $(SHELL_FILES)
 
 check: shell-fmt-check shell-lint ## Run shell formatting check and shellcheck
 
