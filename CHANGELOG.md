@@ -15,6 +15,7 @@
 - **cartage recipe**: rename `enable-cartage.sh` to `.sh.tmpl` so template guards (`# {{ if .isContainer }}`) are actually evaluated by chezmoi; without `.tmpl`, the guard was inert and the script always skipped on laptops
 - **mise recipe**: same `.sh` -> `.sh.tmpl` fix for `install-mise-tools.sh`; mise tool install was always skipped on laptops
 - **base recipe**: fix shfmt formatting (alignment whitespace)
+- **mise recipe**: use precompiled Ruby binaries (`compile = false`) instead of building from source
 - **shellcheck**: set `--severity=warning` in Makefile to skip intentional SC2086 on unquoted `$SUDO`
 
 ### Changed
