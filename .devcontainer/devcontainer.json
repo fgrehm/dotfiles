@@ -1,7 +1,8 @@
 {
   "name": "dotfiles-dev",
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile",
+    "context": ".."
   },
   "mounts": [
     // Optional: mount a local chezmoi-recipes binary to override the image-installed one.

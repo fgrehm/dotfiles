@@ -1,3 +1,4 @@
-# Keep versions in sync with .devcontainer/Dockerfile
 bats 1.11.1
 chezmoi 2.70.0
+shfmt 3.13.1
+shellcheck 0.11.0
