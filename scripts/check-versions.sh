@@ -93,6 +93,7 @@ check_version() {
     printf "  %-20s  %-12s  %-12s  %s\n" "$tool" "$pinned" "$latest_clean" "up to date"
   else
     printf "  %-20s  %-12s  %-12s  %s\n" "$tool" "$pinned" "$latest_clean" "UPDATE AVAILABLE"
+    printf "    %s\n" "https://github.com/$repo/releases/tag/$latest"
     behind_count=$((behind_count + 1))
   fi
 }
