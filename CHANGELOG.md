@@ -6,12 +6,17 @@
 - **shell recipe**: deploy `.profile` (login shell PATH for `~/.local/bin` and `~/bin`)
 - **shell recipe**: deploy `.ssh/config` (`AddKeysToAgent yes`)
 - **kde recipe**: deploy `ssh-agent.conf` (SSH_AUTH_SOCK, ksshaskpass integration)
-- **terminal recipe**: Alacritty work theme (Gruvbox Dark) with dedicated desktop entry (`Work Terminal`)
+- **terminal recipe**: Alacritty work terminal (Nord theme) with dedicated desktop entry
 
 ### Changed
 
 - **zellij recipe**: remove zellaude layout, `zac()` now attaches without a layout
 - **zellij recipe**: remove tab sync keybinding (`s` in tab mode) to prevent accidental activation
+
+### Fixed
+
+- **git recipe**: restore worktrunk config (worktree path, skip prompts) and diffnav `sideBySide: false`
+- **terminal recipe**: fix work terminal desktop entry `$HOME` expansion, use `general.import` (alacritty deprecation)
 
 ## 2026-04-08
 
