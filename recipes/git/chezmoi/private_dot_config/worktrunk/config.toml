@@ -1,14 +1,8 @@
 # worktrunk user config — https://worktrunk.dev/config/
-# Create/edit with: wt config create
-#
-# [worktrees]
-# # Where new worktrees are created. Variables: repo_path, branch, branch | sanitize
-# path = "{{ repo_path }}/../{{ branch | sanitize }}"
-#
-# [llm]
-# # Command to generate commit messages
-# # commit_message_cmd = ["claude", "-p", "Generate a conventional commit message:"]
-#
-# [shell]
-# # Shell for lifecycle hooks (default: $SHELL)
-# # shell = "/bin/zsh"
+
+worktree-path = "{{ repo_path }}/.worktrees/{{ branch | sanitize }}"
+skip-commit-generation-prompt = true
+skip-shell-integration-prompt = true
+
+[merge]
+squash = false
