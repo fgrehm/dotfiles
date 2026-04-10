@@ -2,7 +2,7 @@
 Version=1.0
 Name=Work Terminal
 Comment=Terminal with work theme
-Exec=alacritty --class AlacrittyWork --config-file %h/.config/alacritty/alacritty-work.toml
+Exec=sh -c -- "alacritty --class AlacrittyWork --config-file $HOME/.config/alacritty/alacritty-work.toml"
 Terminal=false
 Type=Application
 Icon=utilities-terminal
