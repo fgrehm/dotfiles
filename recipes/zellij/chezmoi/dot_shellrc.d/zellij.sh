@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 # Zellij helpers.
 
-# Attach to a zellij session (creating it if needed) with the zellaude layout.
+# Attach to a zellij session, creating it if needed.
 zac() {
-  zellij attach --create "$1" options --default-layout zellaude
+  zellij attach --create "$1"
 }

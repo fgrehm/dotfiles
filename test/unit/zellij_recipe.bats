@@ -24,19 +24,13 @@ teardown() {
 @test "zellij: overlay includes all recipe files in compiled-home" {
   [ -f "$DOTFILES/compiled-home/.chezmoiexternals/zellij.toml" ]
   [ -f "$DOTFILES/compiled-home/private_dot_config/zellij/config.kdl" ]
-  [ -f "$DOTFILES/compiled-home/private_dot_config/zellij/layouts/zellaude.kdl" ]
+  [ -f "$DOTFILES/compiled-home/dot_shellrc.d/zellij.sh" ]
 }
 
 @test "zellij: chezmoi apply deploys config.kdl" {
   chezmoi_apply_files
 
   [ -f "$HOME/.config/zellij/config.kdl" ]
-}
-
-@test "zellij: chezmoi apply deploys zellaude layout" {
-  chezmoi_apply_files
-
-  [ -f "$HOME/.config/zellij/layouts/zellaude.kdl" ]
 }
 
 @test "zellij: config uses locked mode by default" {
