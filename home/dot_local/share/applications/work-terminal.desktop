@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Name=Work Terminal
+Comment=Terminal with work theme
+Exec=alacritty --class AlacrittyWork --config-file %h/.config/alacritty/alacritty-work.toml
+Terminal=false
+Type=Application
+Icon=utilities-terminal
+Categories=System;TerminalEmulator;
+StartupNotify=false
