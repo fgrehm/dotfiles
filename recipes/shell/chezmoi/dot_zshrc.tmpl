@@ -6,8 +6,10 @@ ZSH_THEME="robbyrussell"
 
 plugins=()
 
-# User completions directory (standard zsh pattern).
-[ ! -d "$HOME/.zsh/completions" ] && mkdir -p "$HOME/.zsh/completions"
+# User completions directory. Must be 755 (not group-writable) or oh-my-zsh's
+# compinit -i will silently drop it from fpath and completions won't load.
+mkdir -p "$HOME/.zsh/completions"
+chmod 755 "$HOME/.zsh" "$HOME/.zsh/completions"
 fpath=("$HOME/.zsh/completions" $fpath)
 
 source $ZSH/oh-my-zsh.sh

@@ -1,4 +1,12 @@
-# Changelog
+# CHANGELOG
+
+## 2026-04-14
+
+### Fixed
+
+- **shell recipe**: fix zsh tab completion — `~/.zsh/completions` was group-writable (775), causing oh-my-zsh's `compinit -i` to silently drop it from fpath; enforce 755 on the directory at shell startup
+
+## 2026-04-10
 
 ### Added
 
