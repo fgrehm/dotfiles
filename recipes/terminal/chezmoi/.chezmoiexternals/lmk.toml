@@ -1,0 +1,8 @@
+{{- $version := "2.2.2" -}}
+[".local/bin/lmk"]
+  type = "archive-file"
+  url = "https://github.com/fgrehm/lmk/releases/download/v{{ $version }}/lmk_{{ $version }}_Linux_x86_64.tar.gz"
+  executable = true
+  path = "lmk"
+  checksum.sha256 = "a4ea7840bb7d9a300c38fb4a434891a3fdfe8711f91d69390d39fbacad56e0ab"
+# vim: ft=toml.gotmpl
