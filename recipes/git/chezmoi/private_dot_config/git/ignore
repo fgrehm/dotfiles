@@ -6,9 +6,9 @@
 .bundle/
 .claude/clotilde
 .claude/settings.local.json
+.pi/extensions/aitap.ts
 .svn
 .vagrant/
 .worktrees/
 vendor/bundle
-MEMORY.local.md
 CLAUDE.local.md
