@@ -34,11 +34,6 @@ teardown() {
   [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_onchange_after_install-dot-ai-private.sh.tmpl" ]
 }
 
-@test "ai-tooling: overlay includes clotilde and dotmem externals" {
-  [ -f "$DOTFILES/compiled-home/.chezmoiexternals/clotilde.toml" ]
-  [ -f "$DOTFILES/compiled-home/.chezmoiexternals/dotmem.toml" ]
-}
-
 @test "ai-tooling: overlay includes ollama install script" {
   [ -f "$DOTFILES/compiled-home/.chezmoiscripts/run_once_install-ollama.sh.tmpl" ]
 }

@@ -12,8 +12,6 @@ agent, shared skills).
 - **ollama**: installs via official script (skipped in containers, see `.chezmoiignore`)
 - **dot-ai-private**: clones the private overlay repo and runs its `install.sh`
   (skips gracefully if SSH access is not available)
-- **dotmem**: installs [dotmem](https://github.com/fgrehm/dotmem) binary to `~/.local/bin`
-  (centralized Claude Code memory management)
 - **Clotilde**: installs [clotilde](https://github.com/fgrehm/clotilde) binary to `~/.local/bin`
   (Claude Code session manager)
 

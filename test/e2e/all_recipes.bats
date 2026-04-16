@@ -106,11 +106,6 @@ teardown_file() {
   clotilde --version
 }
 
-@test "ai-tooling: dotmem is available" {
-  command -v dotmem
-  dotmem --version
-}
-
 @test "ai-tooling: dot-ai is cloned" {
   [ -d "$HOME/.local/share/dot-ai" ]
 }
