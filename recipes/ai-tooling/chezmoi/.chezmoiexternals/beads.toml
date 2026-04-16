@@ -1,0 +1,8 @@
+{{- $version := "1.0.2" -}}
+[".local/bin/bd"]
+  type = "archive-file"
+  url = "https://github.com/gastownhall/beads/releases/download/v{{ $version }}/beads_{{ $version }}_linux_amd64.tar.gz"
+  path = "bd"
+  executable = true
+  checksum.sha256 = "66280bca14581218684027fee000810c2e40a9c6fe00e876ff64bdcb01a036c0"
+# vim: ft=toml.gotmpl

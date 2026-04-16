@@ -4,8 +4,6 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and
 [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes), built for Debian
 13 (Trixie). Also works in devcontainers/Codespaces.
 
-> **Status:** early development, migrating from a previous setup.
-
 ## Supported Platforms
 
 - **Debian 13** (laptop)

@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Switch Alacritty color theme on the fly using alacritty msg config
+
+THEMES_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/alacritty/themes"
+
+list_themes() {
+  for f in "$THEMES_DIR"/*.toml; do
+    [[ -f "$f" ]] && basename "$f" .toml
+  done
+}
+
+usage() {
+  echo "Usage: alacritty-theme [<theme>]"
+  echo ""
+  echo "Available themes:"
+  list_themes | sed 's/^/  /'
+}
+
+if [[ $# -eq 0 ]]; then
+  usage
+  exit 0
+fi
+
+theme="$1"
+theme_file="$THEMES_DIR/${theme}.toml"
+
+if [[ ! -f "$theme_file" ]]; then
+  echo "error: unknown theme '$theme'" >&2
+  echo "" >&2
+  echo "Available themes:" >&2
+  list_themes | sed 's/^/  /' >&2
+  exit 1
+fi
+
+alacritty msg config -r
+alacritty msg config "$(cat "$theme_file")"
+echo "$theme" > "/tmp/alacritty-theme-${ALACRITTY_WINDOW_ID}"
+echo "switched to '$theme'"

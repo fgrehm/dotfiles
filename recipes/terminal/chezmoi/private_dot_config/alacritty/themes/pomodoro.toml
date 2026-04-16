@@ -1,0 +1,38 @@
+# Pomodoro
+# Warm dark theme for focus sessions -- tomato red foreground for the clock digits
+
+[colors.primary]
+background = '#2e0a0a'
+foreground = '#e05a4e'
+
+[colors.cursor]
+text   = '#2e0a0a'
+cursor = '#ff6a5e'
+
+[colors.vi_mode_cursor]
+text   = '#2e0a0a'
+cursor = '#ff6a5e'
+
+[colors.selection]
+text       = '#2e0a0a'
+background = '#e05a4e'
+
+[colors.normal]
+black   = '#2a1212'
+red     = '#e05a4e'
+green   = '#7a9060'
+yellow  = '#c8883a'
+blue    = '#6a8ab0'
+magenta = '#c06878'
+cyan    = '#6a9e98'
+white   = '#d4c4bc'
+
+[colors.bright]
+black   = '#4a2020'
+red     = '#ff7a6e'
+green   = '#9ab080'
+yellow  = '#e8a858'
+blue    = '#8aaad0'
+magenta = '#e08898'
+cyan    = '#8abeb8'
+white   = '#f0e0d8'

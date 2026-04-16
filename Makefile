@@ -1,4 +1,4 @@
-SHELL_FILES := $(shell find recipes \( -name "*.sh" -o -name "*.sh.tmpl" -o -name "*.bash" \) 2>/dev/null | sort)
+SHELL_FILES := $(shell find recipes \( -name "*.sh" -o -name "*.sh.tmpl" -o -name "*.bash" \) -not -path "*/private_dot_ai/agent-skills/*" 2>/dev/null | sort)
 
 .DEFAULT_GOAL := help
 

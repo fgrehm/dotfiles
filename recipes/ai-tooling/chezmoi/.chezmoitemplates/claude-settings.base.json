@@ -1,0 +1,45 @@
+{
+  "env": {
+    "DISABLE_TELEMETRY": "1",
+    "DISABLE_ERROR_REPORTING": "1"
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "Bash(bash */.claude/skills/end-of-session/collect.sh)",
+      "Bash(gh pr-review review view*)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(chmod 777 *)",
+      "Bash(sudo rm *)",
+      "Bash(dd *)",
+      "Bash(mkfs *)",
+      "Bash(curl * | sh)",
+      "Bash(curl * | bash)",
+      "Bash(wget * | sh)",
+      "Bash(wget * | bash)",
+      "Bash(gh issue comment*)",
+      "Bash(gh pr comment*)",
+      "Bash(gh pr review*)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(~/.ssh/*)",
+      "Read(~/.aws/*)"
+    ],
+    "ask": [
+      "Bash(git push --force *)",
+      "Bash(git push --force-with-lease *)",
+      "Bash(git reset --hard *)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash ~/.claude/statusline.sh"
+  },
+  "cleanupPeriodDays": 90
+}

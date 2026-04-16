@@ -1,0 +1,55 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Re-run when the base settings change:
+# base-hash: # {{ include ".chezmoitemplates/claude-settings.base.json" | sha256sum }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+set -eo pipefail
+
+if ! command -v jq &>/dev/null; then
+  log_error "jq required for Claude settings merge"
+  exit 1
+fi
+
+TARGET="$HOME/.claude/settings.json"
+BASE="$(mktemp)"
+trap 'rm -f "$BASE"' EXIT
+
+cat >"$BASE" <<'CLAUDE_SETTINGS_BASE_JSON'
+# {{ include ".chezmoitemplates/claude-settings.base.json" }}
+CLAUDE_SETTINGS_BASE_JSON
+
+mkdir -p "$(dirname "$TARGET")"
+
+if [ ! -e "$TARGET" ]; then
+  cp "$BASE" "$TARGET"
+  log_info "Installed Claude Code settings.json from base"
+  exit 0
+fi
+
+# Deep-merge base on top of the existing file:
+# - Objects merge recursively, base wins for shared scalar keys.
+# - Permission arrays (allow, deny, ask) are concatenated and deduplicated.
+# - Machine-local keys (hooks, plugins, model, ...) survive because they are
+#   absent from the base.
+merged="$(jq -s '
+  def merge_arrays: map(. // []) | add | unique;
+  .[0] as $local | .[1] as $base |
+  ($local * $base) |
+  .permissions.allow = ([$local.permissions.allow, $base.permissions.allow] | merge_arrays) |
+  .permissions.deny  = ([$local.permissions.deny,  $base.permissions.deny]  | merge_arrays) |
+  .permissions.ask   = ([$local.permissions.ask,   $base.permissions.ask]   | merge_arrays)
+' "$TARGET" "$BASE")"
+
+current_sorted="$(jq --sort-keys . "$TARGET")"
+merged_sorted="$(printf '%s' "$merged" | jq --sort-keys .)"
+
+if [ "$current_sorted" = "$merged_sorted" ]; then
+  log_skip "Claude Code settings.json already up to date"
+  exit 0
+fi
+
+log_info "Merging Claude Code settings base into $TARGET"
+printf '%s\n' "$merged" | jq . >"$TARGET.tmp"
+mv "$TARGET.tmp" "$TARGET"
