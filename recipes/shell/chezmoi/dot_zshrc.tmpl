@@ -47,8 +47,9 @@ function git_stash_count() {
 ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[blue]%})"
 ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[blue]%})"
 
-PROMPT="{{ if .isContainer }}🐳 {{ end }}%(?:%{$fg_bold[green]%}%1{➜%} :%{$fg_bold[red]%}%1{➜%} ) %{$fg[cyan]%}%c%{$reset_color%}"
+PROMPT="{{ if .isContainer }}🐳 {{ end }}%{$fg[cyan]%}%c%{$reset_color%}"
 PROMPT+=' $(git_prompt_info)$(git_dirty_count)$(git_ahead_behind)$(git_stash_count)'
+PROMPT+=$'\n%(?:%{$fg_bold[green]%}%1{➜%} :%{$fg_bold[red]%}%1{➜%} ) '
 
 # Source shared shell configuration (env vars, aliases, PATH)
 if [ -f ~/.shellrc ]; then
