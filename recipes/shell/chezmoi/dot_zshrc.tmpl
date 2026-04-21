@@ -47,9 +47,19 @@ function git_stash_count() {
 ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[blue]%})"
 ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[blue]%})"
 
+_PROMPT_NL=''
+function _precmd_prompt_nl() {
+  if git rev-parse --is-inside-work-tree &>/dev/null; then
+    _PROMPT_NL=$'\n'
+  else
+    _PROMPT_NL=''
+  fi
+}
+precmd_functions+=(_precmd_prompt_nl)
+
 PROMPT="{{ if .isContainer }}🐳 {{ end }}%{$fg[cyan]%}%c%{$reset_color%}"
 PROMPT+=' $(git_prompt_info)$(git_dirty_count)$(git_ahead_behind)$(git_stash_count)'
-PROMPT+=$'\n%(?:%{$fg_bold[green]%}%1{➜%} :%{$fg_bold[red]%}%1{➜%} ) '
+PROMPT+='${_PROMPT_NL}%(?:%{$fg_bold[green]%}%1{➜%} :%{$fg_bold[red]%}%1{➜%} )%{$reset_color%} '
 
 # Source shared shell configuration (env vars, aliases, PATH)
 if [ -f ~/.shellrc ]; then
