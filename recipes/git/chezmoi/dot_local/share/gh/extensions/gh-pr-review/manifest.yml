@@ -1,0 +1,6 @@
+owner: agynio
+name: gh-pr-review
+host: github.com
+tag: v1.6.2
+ispinned: true
+path: ~/.local/bin/gh-pr-review
