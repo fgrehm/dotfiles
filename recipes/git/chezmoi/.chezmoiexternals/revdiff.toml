@@ -1,8 +1,8 @@
-{{- $version := "0.15.3" -}}
+{{- $version := "0.22.0" -}}
 [".local/bin/revdiff"]
   type = "archive-file"
   url = "https://github.com/umputun/revdiff/releases/download/v{{ $version }}/revdiff_{{ $version }}_linux_amd64.tar.gz"
   path = "revdiff"
   executable = true
-  checksum.sha256 = "fc2f924af9b591bebcebd177bfdcf54e1a2aee5e23f3afcac5e36d0c5981057b"
+  checksum.sha256 = "e6400b3d6b0dda9d8f7243720ffcd3a7d171c26d4303af19fca05bf813dd2fb4"
 # vim: ft=toml.gotmpl

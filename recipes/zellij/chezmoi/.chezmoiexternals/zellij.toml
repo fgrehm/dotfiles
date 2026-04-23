@@ -1,8 +1,8 @@
-{{- $version := "0.44.0" -}}
+{{- $version := "0.44.1" -}}
 [".local/bin/zellij"]
   type = "archive-file"
   url = "https://github.com/zellij-org/zellij/releases/download/v{{ $version }}/zellij-x86_64-unknown-linux-musl.tar.gz"
   path = "zellij"
   executable = true
-  checksum.sha256 = "7e981d50c98ec13ad6cc882e8ca4da32544dd6b69fd0d1b2b753eb597847adb3"
+  checksum.sha256 = "669825021d529fca5d939888263c9d2a90762145191fa07581a15250e8af2b49"
 # vim: ft=toml.gotmpl

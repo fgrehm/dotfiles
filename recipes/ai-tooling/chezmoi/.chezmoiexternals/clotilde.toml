@@ -1,8 +1,8 @@
-{{- $version := "0.11.0" -}}
+{{- $version := "0.12.0" -}}
 [".local/bin/clotilde"]
   type = "archive-file"
   url = "https://github.com/fgrehm/clotilde/releases/download/v{{ $version }}/clotilde_linux_amd64.tar.gz"
   path = "clotilde"
   executable = true
-  checksum.sha256 = "3ef4f22879448a6d887ff825dc54f2327bcdade921b3fef9522b05dd279e7c50"
+  checksum.sha256 = "82ef37d51a7f46db5554ca4714a245b6ce47de57d0cd0b559166e9dfb73d6bb8"
 # vim: ft=toml.gotmpl

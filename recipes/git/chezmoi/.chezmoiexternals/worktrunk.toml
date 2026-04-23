@@ -1,8 +1,8 @@
-{{- $version := "0.34.2" -}}
+{{- $version := "0.43.0" -}}
 [".local/bin/wt"]
   type = "archive-file"
   url = "https://github.com/max-sixty/worktrunk/releases/download/v{{ $version }}/worktrunk-x86_64-unknown-linux-musl.tar.xz"
   path = "worktrunk-x86_64-unknown-linux-musl/wt"
   executable = true
-  checksum.sha256 = "20d9c8be83bd795bfad8c4bf01a140c0c9142bfa8ae81fc96bedf464c1e4c175"
+  checksum.sha256 = "6bd8c60e7b7a5f49223520ba5901e6c6ebc19b2a0666496fcb2c56b7f2510040"
 # vim: ft=toml.gotmpl
