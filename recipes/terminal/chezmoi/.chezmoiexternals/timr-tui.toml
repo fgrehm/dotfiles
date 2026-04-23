@@ -1,0 +1,8 @@
+{{- $version := "1.8.0" -}}
+[".local/bin/timr-tui"]
+  type = "archive-file"
+  url = "https://github.com/sectore/timr-tui/releases/download/v{{ $version }}/timr-tui-{{ $version }}-linux_x86_64.tar.gz"
+  executable = true
+  path = "timr-tui"
+  checksum.sha256 = "0d1e8f0fd31e6a6eb96d0cfdcc78f88ab5948009d1cb8daa746cae865c6d412b"
+# vim: ft=toml.gotmpl
