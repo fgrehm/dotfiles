@@ -1,0 +1,34 @@
+#!/bin/bash
+# Called from tinty hook: theme-apply-global <rendered-theme-file>
+# Copies colors, writes the universal current-theme file, live-updates all
+# running Alacritty windows via IPC.
+
+THEME_FILE="$1"
+if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
+  printf 'theme-apply-global: missing or invalid theme file\n' >&2
+  exit 1
+fi
+
+SCHEME=$(basename "$THEME_FILE" .toml)
+
+cp -f "$THEME_FILE" "$HOME/.config/alacritty/colors.toml"
+
+mkdir -p "$HOME/.local/share/theme"
+printf '%s\n' "$SCHEME" >"$HOME/.local/share/theme/current"
+
+# Clear per-window overrides so new shells fall back to global
+if [ -d "${XDG_RUNTIME_DIR:-}/theme" ]; then
+  rm -f "$XDG_RUNTIME_DIR/theme"/window-* 2>/dev/null || true
+fi
+
+# Live-update all running Alacritty windows by iterating their IPC sockets
+if command -v alacritty >/dev/null 2>&1; then
+  THEME_CONTENT=$(cat "$THEME_FILE")
+  while IFS= read -r pid; do
+    socket=$(tr '\0' '\n' </proc/"$pid"/environ 2>/dev/null | grep '^ALACRITTY_SOCKET=' | cut -d= -f2-)
+    if [ -S "$socket" ]; then
+      ALACRITTY_SOCKET="$socket" alacritty msg config -r 2>/dev/null || true
+      ALACRITTY_SOCKET="$socket" alacritty msg config "$THEME_CONTENT" 2>/dev/null || true
+    fi
+  done < <(pgrep -x alacritty 2>/dev/null) || true
+fi

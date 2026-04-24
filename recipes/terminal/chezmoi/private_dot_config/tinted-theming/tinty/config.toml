@@ -5,4 +5,15 @@ shell = "/bin/sh -c '{}'"
 name = "tinted-alacritty"
 path = "https://github.com/tinted-theming/tinted-alacritty"
 themes-dir = "colors"
-hook = "cp -f %f ~/.config/alacritty/colors.toml"
+hook = "$HOME/.local/bin/theme-apply-global %f"
+
+[[items]]
+name = "tinted-shell"
+path = "https://github.com/tinted-theming/tinted-shell"
+themes-dir = "scripts"
+hook = "sh %f"
+
+[[items]]
+name = "tinted-fzf"
+path = "https://github.com/tinted-theming/tinted-fzf"
+themes-dir = "sh"

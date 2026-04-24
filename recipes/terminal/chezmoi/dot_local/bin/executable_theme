@@ -1,0 +1,103 @@
+#!/bin/bash
+# Switch base16 themes across all integrated apps.
+#
+# Per-window (default):
+#   theme <name>         apply to this Alacritty window only
+#   theme reset          clear per-window override, revert to global
+#
+# Global:
+#   theme -g <name>      apply everywhere via tinty
+#   theme -g reset       clear all per-window overrides
+#
+# Other:
+#   theme list           list available schemes
+#   theme pick           fzf picker
+#   theme current        show effective theme for this window
+
+TINTY_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/tinted-theming/tinty"
+WINDOW_THEME_DIR="${XDG_RUNTIME_DIR:-/tmp}/theme"
+GLOBAL=0
+
+_resolve() {
+  case "$1" in
+    gruvbox)      printf 'base16-gruvbox-dark-hard' ;;
+    dracula)      printf 'base16-dracula' ;;
+    catppuccin)   printf 'base16-catppuccin-mocha' ;;
+    nord)         printf 'base16-nord' ;;
+    tokyo-night)  printf 'base16-tokyo-night-storm' ;;
+    rose-pine)    printf 'base16-rose-pine' ;;
+    everforest)   printf 'base16-everforest' ;;
+    *)            printf 'base16-%s' "${1#base16-}" ;;
+  esac
+}
+
+_apply_window() {
+  local scheme="$1"
+  local colors_file="$TINTY_DATA/repos/tinted-alacritty/colors/${scheme}.toml"
+
+  if [ ! -f "$colors_file" ]; then
+    printf 'error: no theme file for %s (run: tinty install)\n' "$scheme" >&2
+    return 1
+  fi
+
+  mkdir -p "$WINDOW_THEME_DIR"
+  printf '%s\n' "$scheme" >"$WINDOW_THEME_DIR/window-${ALACRITTY_WINDOW_ID:-default}"
+
+  if [ -n "${ALACRITTY_SOCKET:-}" ] && command -v alacritty >/dev/null 2>&1; then
+    alacritty msg config -r 2>/dev/null || true
+    alacritty msg config "$(cat "$colors_file")" 2>/dev/null || true
+  fi
+
+  printf 'Applied %s (this window)\n' "$scheme"
+}
+
+# Strip leading -g / --global flags
+while [ "${1:-}" = "-g" ] || [ "${1:-}" = "--global" ]; do
+  GLOBAL=1
+  shift
+done
+
+CMD="${1:-}"
+case "$CMD" in
+  list)
+    tinty list
+    ;;
+  pick)
+    if ! command -v fzf >/dev/null 2>&1; then
+      printf 'error: fzf not installed\n' >&2
+      exit 1
+    fi
+    SCHEME=$(tinty list | fzf --height=40% --layout=reverse)
+    [ -z "$SCHEME" ] && exit 0
+    if [ "$GLOBAL" = 1 ]; then
+      tinty apply "$SCHEME"
+    else
+      _apply_window "$(_resolve "$SCHEME")"
+    fi
+    ;;
+  current)
+    theme-read
+    ;;
+  reset)
+    if [ "$GLOBAL" = 1 ]; then
+      rm -f "$WINDOW_THEME_DIR"/window-* 2>/dev/null || true
+      printf 'All per-window overrides cleared. Effective: %s\n' "$(theme-read)"
+    else
+      rm -f "$WINDOW_THEME_DIR/window-${ALACRITTY_WINDOW_ID:-}" 2>/dev/null || true
+      printf 'Override cleared. Effective: %s\n' "$(theme-read)"
+    fi
+    ;;
+  "")
+    printf 'Usage: theme [-g] <scheme>   e.g. theme gruvbox, theme -g catppuccin\n'
+    printf '       theme list | pick | current | reset\n'
+    exit 1
+    ;;
+  *)
+    SCHEME=$(_resolve "$CMD")
+    if [ "$GLOBAL" = 1 ]; then
+      tinty apply "$SCHEME"
+    else
+      _apply_window "$SCHEME"
+    fi
+    ;;
+esac
