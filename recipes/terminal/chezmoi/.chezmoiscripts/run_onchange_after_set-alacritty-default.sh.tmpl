@@ -16,5 +16,16 @@ SUDO=""
 
 set -eo pipefail
 
-log_info "Setting alacritty as default terminal..."
+log_info "Setting alacritty as default terminal (update-alternatives)..."
 run_quiet $SUDO update-alternatives --set x-terminal-emulator /usr/bin/alacritty
+
+# KDE Plasma reads its default terminal from kdeglobals, not from
+# update-alternatives. The GUI (System Settings -> Default Applications ->
+# Terminal Emulator) writes both keys below; .desktop launchers with
+# Terminal=true on Plasma 6 resolve via TerminalService.
+if [ "${XDG_CURRENT_DESKTOP:-}" = "KDE" ] && command -v kwriteconfig6 &>/dev/null; then
+  log_info "Setting alacritty as default terminal in KDE (kdeglobals)..."
+  kwriteconfig6 --file kdeglobals --group General --key TerminalApplication alacritty
+  kwriteconfig6 --file kdeglobals --group General --key TerminalService Alacritty.desktop
+  log_info "Restart Plasma for KDE apps to pick this up: kquitapp6 plasmashell && kstart plasmashell"
+fi
