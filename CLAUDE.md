@@ -28,8 +28,6 @@ recipes/              modular recipe directories
     README.md         required (discovery marker)
     chezmoi/          chezmoi source fragment (dot_*, .chezmoiscripts/, etc.)
 compiled-home/        generated, gitignored
-test/unit/            bats unit tests (file deployment)
-test/e2e/             bats e2e tests (full apply with installs)
 .devcontainer/        devcontainer config (Debian 13 + mise)
 ```
 
@@ -54,9 +52,6 @@ chezmoi: .config: inconsistent state (...dot_config, ...private_dot_config)
 Never use `dot_config` for `.config`.** The `.config` directory holds user
 application state and is private by convention. Mixing `dot_config` and
 `private_dot_config` across recipes is always a bug.
-
-This is caught by `test/unit/basics.bats` ("overlay fails when recipes mix
-dot_config and private_dot_config for the same target").
 
 ## Environment Detection
 
@@ -148,8 +143,7 @@ For releases where the archive path contains the version:
 ```
 
 Pin versions explicitly -- do NOT use `gitHubLatestReleaseAssetURL` or
-`gitHubLatestRelease`. Those make GitHub API calls that cause rate-limit
-failures in unit tests even with `--exclude=externals`.
+`gitHubLatestRelease`. Those make GitHub API calls that may hit rate limits.
 
 Always include `checksum.sha256` with the SHA-256 of the downloaded archive or
 file (amd64 only -- no arch conditionals). Do NOT use `checksum.sha256url`
@@ -264,36 +258,6 @@ when a deployed config file changes, embed its hash in a comment:
 ```bash
 # config hash: # {{ include "private_dot_config/mise/config.toml" | sha256sum }}
 ```
-
-## Testing
-
-Tests run inside the devcontainer (or with `DOTFILES_E2E=1`).
-
-```bash
-make test       # unit tests (file deployment)
-make test-e2e   # e2e tests (full apply with installs)
-make check      # shfmt + shellcheck
-```
-
-**Every new recipe needs tests:**
-
-- `test/unit/<recipe>.bats` — verifies files land in the right destinations
-  using `chezmoi_apply_files` (`--exclude=scripts`, no installs run). Required
-  for any recipe that deploys config files.
-- `test/e2e/<recipe>.bats` — runs `chezmoi_apply_full` (scripts included),
-  checks the binary is on `$PATH`, and verifies idempotency. Required for any
-  recipe with install scripts that download binaries.
-
-Look at existing tests in `test/unit/` and `test/e2e/` for examples before
-writing new ones.
-
-Test helper (`test/test_helper.bash`) provides:
-- `setup_dotfiles_repo` - creates temp repo with chezmoi-recipes layout
-- `write_minimal_config_template` - non-interactive config (no prompts)
-- `add_recipe`, `add_home_file` - populate test fixtures
-- `run_overlay` - run `chezmoi-recipes overlay`
-- `isolate_home` - override HOME/XDG to temp dirs
-- `chezmoi_init` - non-interactive `chezmoi init`
 
 ## Dangerous Commands
 
