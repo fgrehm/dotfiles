@@ -19,11 +19,6 @@ branch=$(git -C "$cwd" rev-parse --abbrev-ref HEAD 2>/dev/null)
 # Build output
 parts=""
 
-# Session name (if set via env var)
-if [ -n "$CLOTILDE_SESSION_NAME" ]; then
-  parts+=$(printf '\033[0;35m[%s] \033[0m' "$CLOTILDE_SESSION_NAME")
-fi
-
 # Directory
 parts+=$(printf '\033[0;36m%s\033[0m' "$dir")
 
