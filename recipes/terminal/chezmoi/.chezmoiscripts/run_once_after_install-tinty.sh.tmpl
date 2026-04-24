@@ -1,0 +1,21 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+export PATH="$HOME/.local/bin:$PATH"
+
+if ! command -v tinty &>/dev/null; then
+  log_skip "tinty not installed, skipping theme setup"
+  exit 0
+fi
+
+set -eo pipefail
+
+log_info "Fetching tinty template repositories..."
+run_quiet tinty install
+
+if [ ! -f "$HOME/.config/alacritty/colors.toml" ]; then
+  log_info "Seeding initial theme (base16-gruvbox-dark-hard)..."
+  run_quiet tinty apply base16-gruvbox-dark-hard
+fi

@@ -1,0 +1,8 @@
+default-scheme = "base16-gruvbox-dark-hard"
+shell = "/bin/sh -c '{}'"
+
+[[items]]
+name = "tinted-alacritty"
+path = "https://github.com/tinted-theming/tinted-alacritty"
+themes-dir = "colors"
+hook = "cp -f %f ~/.config/alacritty/colors.toml"

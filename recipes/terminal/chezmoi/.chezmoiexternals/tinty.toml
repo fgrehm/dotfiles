@@ -1,0 +1,8 @@
+{{- $version := "0.31.0" -}}
+[".local/bin/tinty"]
+  type = "archive-file"
+  url = "https://github.com/tinted-theming/tinty/releases/download/v{{ $version }}/tinty-x86_64-unknown-linux-gnu.tar.gz"
+  executable = true
+  path = "tinty"
+  checksum.sha256 = "6a8e843f974a4f6e38862e7feb969c26baa7e6e149814cf8cff20184bbcbaa04"
+# vim: ft=toml.gotmpl
