@@ -53,5 +53,5 @@ return {
       end
     end,
   },
-  { "LazyVim/LazyVim", opts = { colorscheme = "base16-gruvbox-dark-hard" } },
+  { "LazyVim/LazyVim", opts = { colorscheme = "default" } },
 }
