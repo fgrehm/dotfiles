@@ -33,6 +33,7 @@ return {
     lazy = false,
     priority = 1000,
     config = function()
+      require("tinted-nvim").setup()
       vim.o.termguicolors = true
       vim.schedule(apply_theme)
 
