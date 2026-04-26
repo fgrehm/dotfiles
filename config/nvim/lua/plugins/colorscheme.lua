@@ -1,30 +1,13 @@
 local DEFAULT = "base16-gruvbox-dark-hard"
 
-local function read_theme()
+local function read_per_window()
   local wid = os.getenv("ALACRITTY_WINDOW_ID")
-  local runtime = os.getenv("XDG_RUNTIME_DIR") or "/tmp"
-  if wid then
-    local wf = io.open(runtime .. "/theme/window-" .. wid, "r")
-    if wf then
-      local s = vim.trim(wf:read("*l") or "")
-      wf:close()
-      if s ~= "" then return s end
-    end
-  end
-  local gf = io.open(os.getenv("HOME") .. "/.local/share/theme/current", "r")
-  if gf then
-    local s = vim.trim(gf:read("*l") or "")
-    gf:close()
-    if s ~= "" then return s end
-  end
-  return DEFAULT
-end
-
-local function apply_theme()
-  local scheme = read_theme()
-  if vim.g.colors_name ~= scheme then
-    vim.cmd.colorscheme(scheme)
-  end
+  if not wid then return nil end
+  local f = io.open((os.getenv("XDG_RUNTIME_DIR") or "/tmp") .. "/theme/window-" .. wid, "r")
+  if not f then return nil end
+  local s = vim.trim(f:read("*l") or "")
+  f:close()
+  return s ~= "" and s or nil
 end
 
 return {
@@ -32,26 +15,37 @@ return {
     "tinted-theming/tinted-nvim",
     lazy = false,
     priority = 1000,
-    config = function()
-      require("tinted-nvim").setup()
-      vim.o.termguicolors = true
-      vim.schedule(apply_theme)
+    opts = {
+      default_scheme = DEFAULT,
+      selector = {
+        enabled = true,
+        mode = "file",
+        path = os.getenv("HOME") .. "/.local/share/theme/current",
+        watch = true,
+      },
+    },
+    config = function(_, opts)
+      require("tinted-nvim").setup(opts)
 
-      vim.api.nvim_create_autocmd("FocusGained", {
-        group = vim.api.nvim_create_augroup("tinted_theme_sync", { clear = true }),
-        callback = apply_theme,
-      })
-
-      -- Watch global theme file for changes while nvim has focus
-      local uv = vim.uv or vim.loop
-      local global_file = os.getenv("HOME") .. "/.local/share/theme/current"
-      local handle = uv.new_fs_event()
-      if handle then
-        uv.fs_event_start(handle, global_file, {}, function()
-          vim.schedule(apply_theme)
+      -- Per-window override: applied after global (deferred past LazyVim init)
+      local pw = read_per_window()
+      if pw then
+        vim.schedule(function()
+          vim.cmd.colorscheme(pw)
         end)
       end
+
+      -- Re-check per-window on focus; global changes are handled by selector watcher
+      vim.api.nvim_create_autocmd("FocusGained", {
+        group = vim.api.nvim_create_augroup("tinted_theme_sync", { clear = true }),
+        callback = function()
+          local scheme = read_per_window()
+          if scheme and vim.g.colors_name ~= scheme then
+            vim.cmd.colorscheme(scheme)
+          end
+        end,
+      })
     end,
   },
-  { "LazyVim/LazyVim", opts = { colorscheme = "default" } },
+  { "LazyVim/LazyVim", opts = { colorscheme = "" } },
 }
