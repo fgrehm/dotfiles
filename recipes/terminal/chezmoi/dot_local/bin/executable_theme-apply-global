@@ -9,7 +9,9 @@ if [ -z "$THEME_FILE" ] || [ ! -f "$THEME_FILE" ]; then
   exit 1
 fi
 
-SCHEME=$(basename "$THEME_FILE" .toml)
+TINTY_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/tinted-theming/tinty"
+SCHEME=$(cat "$TINTY_DATA/current_scheme" 2>/dev/null || tinty current 2>/dev/null || true)
+[ -z "$SCHEME" ] && SCHEME="base16-gruvbox-dark-hard"
 
 cp -f "$THEME_FILE" "$HOME/.config/alacritty/colors.toml"
 
