@@ -50,6 +50,10 @@ return {
       })
     end,
   },
+  -- tinted-nvim ships lua/lualine/themes/base16.lua; declaring it as a lualine
+  -- dependency puts it earlier in runtimepath so lualine finds tinted-nvim's
+  -- base16 theme instead of its own bundled version (which requires nvim-base16).
+  { "nvim-lualine/lualine.nvim", dependencies = { "tinted-theming/tinted-nvim" } },
   -- habamax is a Neovim builtin: loads cleanly so LazyVim emits no warning,
   -- then vim.schedule above overrides it with the real scheme.
   { "LazyVim/LazyVim", opts = { colorscheme = "habamax" } },
