@@ -1,0 +1,14 @@
+[workspace]
+env = {
+  CARTAGE_PATH_MAP = "/workspaces:${localWorkspaceParentFolder}"
+}
+mount = [
+  "type=bind,source=${localEnv:XDG_RUNTIME_DIR},target=/run/host,readonly",
+  "type=bind,source=${localEnv:HOME}/.local/bin/lmk,target=/usr/local/bin/lmk,readonly",
+  "type=bind,source=${localEnv:HOME}/.local/bin/lazychat,target=/usr/local/bin/lazychat,readonly",
+  "type=bind,source=${localEnv:HOME}/.local/bin/cartage,target=/usr/local/bin/notify-send,readonly",
+  "type=bind,source=${localEnv:HOME}/.local/bin/cartage,target=/usr/local/bin/yad,readonly"
+  "type=bind,source=${localEnv:HOME}/.local/bin/cartage,target=/usr/local/bin/xdg-open,readonly"
+  "type=bind,source=${localEnv:HOME}/.local/bin/cartage,target=/usr/local/bin/pbpaste,readonly"
+  "type=bind,source=${localEnv:HOME}/.local/bin/cartage,target=/usr/local/bin/pbcopy,readonly"
+]
