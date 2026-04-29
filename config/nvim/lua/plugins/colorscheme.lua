@@ -27,15 +27,22 @@ local function apply_theme()
 end
 
 -- Snacks links PathHidden/PathIgnored to NonText, which on base16/tinted is
--- base03 and unreadable in the explorer tree. Pull a brighter fg from Comment
--- (or fall back to Normal) and italicize so hidden entries stay distinct.
+-- base03 and unreadable in the explorer tree. Blend Comment toward Normal to
+-- land between them (still dim, still distinct, actually readable) and
+-- italicize so hidden entries remain visually marked.
+local HIDDEN_BLEND = 0.55 -- 0 = Comment, 1 = Normal
 local function patch_snacks_hidden()
   local function fg(name)
     local hl = vim.api.nvim_get_hl(0, { name = name, link = false })
     return hl and hl.fg
   end
-  local color = fg("Comment") or fg("Normal")
-  if not color then return end
+  local dim, bright = fg("Comment"), fg("Normal")
+  if not dim or not bright then return end
+  local function lerp(a, b) return math.floor(a + (b - a) * HIDDEN_BLEND + 0.5) end
+  local r = lerp(math.floor(dim / 65536) % 256, math.floor(bright / 65536) % 256)
+  local g = lerp(math.floor(dim / 256) % 256, math.floor(bright / 256) % 256)
+  local b = lerp(dim % 256, bright % 256)
+  local color = r * 65536 + g * 256 + b
   for _, group in ipairs({ "SnacksPickerPathHidden", "SnacksPickerPathIgnored" }) do
     vim.api.nvim_set_hl(0, group, { fg = color, italic = true })
   end
