@@ -16,9 +16,21 @@
 
 TINTY_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/tinted-theming/tinty"
 WINDOW_THEME_DIR="${XDG_RUNTIME_DIR:-/tmp}/theme"
+CUSTOM_THEME_DIR="$HOME/.config/alacritty/themes"
 GLOBAL=0
 
+_custom_file() {
+  # Print the custom theme file for $1 if one exists; nothing otherwise.
+  [ -f "$CUSTOM_THEME_DIR/$1.toml" ] && printf '%s\n' "$CUSTOM_THEME_DIR/$1.toml"
+}
+
 _resolve() {
+  # Custom themes (~/.config/alacritty/themes/*.toml) keep their bare name so
+  # tinty never sees them. Everything else is normalized to a base16-* scheme.
+  if [ -n "$(_custom_file "$1")" ]; then
+    printf '%s' "$1"
+    return
+  fi
   case "$1" in
     gruvbox)      printf 'base16-gruvbox-dark-hard' ;;
     dracula)      printf 'base16-dracula' ;;
@@ -31,9 +43,22 @@ _resolve() {
   esac
 }
 
+_colors_file() {
+  # Resolve a scheme name to its alacritty colors file (custom or tinty repo).
+  local scheme="$1"
+  local custom
+  custom=$(_custom_file "$scheme")
+  if [ -n "$custom" ]; then
+    printf '%s\n' "$custom"
+  else
+    printf '%s/repos/tinted-alacritty/colors/%s.toml\n' "$TINTY_DATA" "$scheme"
+  fi
+}
+
 _apply_window() {
   local scheme="$1"
-  local colors_file="$TINTY_DATA/repos/tinted-alacritty/colors/${scheme}.toml"
+  local colors_file
+  colors_file=$(_colors_file "$scheme")
 
   if [ ! -f "$colors_file" ]; then
     printf 'error: no theme file for %s (run: tinty install)\n' "$scheme" >&2
@@ -51,6 +76,23 @@ _apply_window() {
   printf 'Applied %s (this window)\n' "$scheme"
 }
 
+_apply_global_custom() {
+  # tinty doesn't know custom themes, so reuse the same hook directly.
+  local scheme="$1"
+  local colors_file
+  colors_file=$(_custom_file "$scheme")
+  if [ -z "$colors_file" ]; then
+    printf 'error: no custom theme file for %s\n' "$scheme" >&2
+    return 1
+  fi
+  # The global hook reads the active scheme name from tinty's current_scheme
+  # file; write it ourselves so theme-read reports the right thing.
+  mkdir -p "$TINTY_DATA"
+  printf '%s\n' "$scheme" >"$TINTY_DATA/current_scheme"
+  "$HOME/.local/bin/theme-apply-global" "$colors_file"
+  printf 'Applied %s (global)\n' "$scheme"
+}
+
 # Strip leading -g / --global flags
 while [ "${1:-}" = "-g" ] || [ "${1:-}" = "--global" ]; do
   GLOBAL=1
@@ -60,19 +102,32 @@ done
 CMD="${1:-}"
 case "$CMD" in
   list)
-    tinty list
+    {
+      tinty list
+      if [ -d "$CUSTOM_THEME_DIR" ]; then
+        for f in "$CUSTOM_THEME_DIR"/*.toml; do
+          [ -f "$f" ] || continue
+          basename "$f" .toml
+        done
+      fi
+    } | sort -u
     ;;
   pick)
     if ! command -v fzf >/dev/null 2>&1; then
       printf 'error: fzf not installed\n' >&2
       exit 1
     fi
-    SCHEME=$(tinty list | fzf --height=40% --layout=reverse)
+    SCHEME=$("$0" list | fzf --height=40% --layout=reverse)
     [ -z "$SCHEME" ] && exit 0
+    RESOLVED=$(_resolve "$SCHEME")
     if [ "$GLOBAL" = 1 ]; then
-      tinty apply "$SCHEME"
+      if [ -n "$(_custom_file "$RESOLVED")" ]; then
+        _apply_global_custom "$RESOLVED"
+      else
+        tinty apply "$RESOLVED"
+      fi
     else
-      _apply_window "$(_resolve "$SCHEME")"
+      _apply_window "$RESOLVED"
     fi
     ;;
   current)
@@ -95,7 +150,11 @@ case "$CMD" in
   *)
     SCHEME=$(_resolve "$CMD")
     if [ "$GLOBAL" = 1 ]; then
-      tinty apply "$SCHEME"
+      if [ -n "$(_custom_file "$SCHEME")" ]; then
+        _apply_global_custom "$SCHEME"
+      else
+        tinty apply "$SCHEME"
+      fi
     else
       _apply_window "$SCHEME"
     fi

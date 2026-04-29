@@ -22,7 +22,22 @@ end
 local function apply_theme()
   local scheme = read_theme()
   if vim.g.colors_name ~= scheme then
-    vim.cmd.colorscheme(scheme)
+    pcall(vim.cmd.colorscheme, scheme)
+  end
+end
+
+-- Snacks links PathHidden/PathIgnored to NonText, which on base16/tinted is
+-- base03 and unreadable in the explorer tree. Pull a brighter fg from Comment
+-- (or fall back to Normal) and italicize so hidden entries stay distinct.
+local function patch_snacks_hidden()
+  local function fg(name)
+    local hl = vim.api.nvim_get_hl(0, { name = name, link = false })
+    return hl and hl.fg
+  end
+  local color = fg("Comment") or fg("Normal")
+  if not color then return end
+  for _, group in ipairs({ "SnacksPickerPathHidden", "SnacksPickerPathIgnored" }) do
+    vim.api.nvim_set_hl(0, group, { fg = color, italic = true })
   end
 end
 
@@ -43,10 +58,18 @@ return {
     config = function(_, opts)
       require("tinted-nvim").setup(opts)
       -- Deferred so it runs after LazyVim applies its (builtin) colorscheme
-      vim.schedule(apply_theme)
+      vim.schedule(function()
+        apply_theme()
+        patch_snacks_hidden()
+      end)
+      local group = vim.api.nvim_create_augroup("tinted_theme_sync", { clear = true })
       vim.api.nvim_create_autocmd("FocusGained", {
-        group = vim.api.nvim_create_augroup("tinted_theme_sync", { clear = true }),
+        group = group,
         callback = apply_theme,
+      })
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = group,
+        callback = patch_snacks_hidden,
       })
     end,
   },
