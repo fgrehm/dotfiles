@@ -14,6 +14,9 @@ if command -v nvim >/dev/null 2>&1; then
   alias vim='nvim'
 fi
 
+# --- Telemetry opt-out ---
+export DO_NOT_TRACK=true
+
 # --- History ---
 export HISTSIZE=32768
 export HISTFILESIZE="${HISTSIZE}"
