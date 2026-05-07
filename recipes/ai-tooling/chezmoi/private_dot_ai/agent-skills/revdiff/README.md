@@ -1,3 +1,3 @@
 # revdiff
 
-Source: https://github.com/umputun/revdiff/tree/e70c9c47f32a462a58a34f82578c23fc22fd9919/.claude-plugin/skills/revdiff
+Source: https://github.com/umputun/revdiff/tree/331e14e7e7759b8d391de13cbec21a2e5e2d6d7a/.claude-plugin/skills/revdiff

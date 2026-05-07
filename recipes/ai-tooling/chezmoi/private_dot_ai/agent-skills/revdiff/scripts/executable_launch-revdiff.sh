@@ -29,6 +29,23 @@ REVDIFF_CMD="$REVDIFF_CMD $(sq "--output=$OUTPUT_FILE")"
 for arg in "$@"; do
     REVDIFF_CMD="$REVDIFF_CMD $(sq "$arg")"
 done
+
+# overlay backends (kitty @ launch, tmux display-popup, zellij run, etc.) spawn
+# children from a server/app process whose env predates user shell rc files,
+# so EDITOR/VISUAL exports from .zshrc/.bashrc are otherwise lost. prepend
+# `env KEY=VAL` so revdiff itself starts with the caller's editor env, which
+# its multi-line annotation flow passes to the spawned editor child.
+ENV_PREFIX=""
+for _name in EDITOR VISUAL; do
+    if [ "${!_name+x}" = x ]; then
+        ENV_PREFIX="$ENV_PREFIX $(sq "${_name}=${!_name}")"
+    fi
+done
+unset _name
+if [ -n "$ENV_PREFIX" ]; then
+    REVDIFF_CMD="/usr/bin/env$ENV_PREFIX $REVDIFF_CMD"
+fi
+
 CWD="$(pwd)"
 
 # build descriptive title: "rd: dirname [ref]"
@@ -70,11 +87,11 @@ if [ -n "${ZELLIJ:-}" ] && command -v zellij >/dev/null 2>&1; then
     SENTINEL=$(mktemp "$TMPBASE/revdiff-done-XXXXXX")
     rm -f "$SENTINEL"
 
-    LAUNCH_SCRIPT=$(mktemp "$TMPBASE/revdiff-launch-XXXXXX.sh")
+    LAUNCH_SCRIPT=$(mktemp "$TMPBASE/revdiff-launch-XXXXXX")
     trap 'rm -f "$OUTPUT_FILE" "$SENTINEL" "$LAUNCH_SCRIPT"' EXIT
     cat > "$LAUNCH_SCRIPT" <<LAUNCHER
 #!/bin/sh
-$REVDIFF_CMD; touch '$SENTINEL'
+$REVDIFF_CMD; touch $(sq "$SENTINEL")
 LAUNCHER
     chmod +x "$LAUNCH_SCRIPT"
 
@@ -99,11 +116,11 @@ if [ -n "$KITTY_SOCK" ] && command -v kitty >/dev/null 2>&1; then
     SENTINEL=$(mktemp "$TMPBASE/revdiff-done-XXXXXX")
     rm -f "$SENTINEL"
 
-    KITTY_ARGS=(kitty @ --to "$KITTY_SOCK" launch --type=overlay --title="$OVERLAY_TITLE" --cwd="$CWD")
+    KITTY_ARGS=(kitty @ --to "$KITTY_SOCK" launch --type=overlay --title="$OVERLAY_TITLE" --cwd=current)
     if [ -n "${KITTY_WINDOW_ID:-}" ]; then
         KITTY_ARGS+=(--match "window_id:${KITTY_WINDOW_ID}")
     fi
-    KITTY_ARGS+=(sh -c "$REVDIFF_CMD; touch $(sq "$SENTINEL")")
+    KITTY_ARGS+=(sh -c "cd $(sq "$CWD") && $REVDIFF_CMD; touch $(sq "$SENTINEL")")
 
     "${KITTY_ARGS[@]}" >/dev/null 2>&1
 
@@ -147,7 +164,7 @@ if [ -n "${CMUX_SURFACE_ID:-}" ] && command -v cmux >/dev/null 2>&1; then
     SENTINEL=$(mktemp "$TMPBASE/revdiff-done-XXXXXX")
     rm -f "$SENTINEL"
 
-    LAUNCH_SCRIPT=$(mktemp "$TMPBASE/revdiff-launch-XXXXXX.sh")
+    LAUNCH_SCRIPT=$(mktemp "$TMPBASE/revdiff-launch-XXXXXX")
     trap 'rm -f "$OUTPUT_FILE" "$SENTINEL" "$LAUNCH_SCRIPT"' EXIT
     cat > "$LAUNCH_SCRIPT" <<LAUNCHER
 #!/bin/sh
@@ -157,23 +174,25 @@ LAUNCHER
 
     # capture new surface ref from "OK surface:N ..." output
     CMUX_NEW=$(cmux new-split down 2>&1) || true
-    CMUX_SURF=$(echo "$CMUX_NEW" | grep -o 'surface:[0-9]*' | head -1)
+    CMUX_SURF=$(echo "$CMUX_NEW" | grep -o 'surface:[0-9]*' | head -1 || true)
+
+    # bail explicitly when we can't identify the new surface — otherwise
+    # `cmux send` without --surface would target the caller's pane and
+    # replace the user's interactive shell via `exec ...`
+    if [ -z "$CMUX_SURF" ]; then
+        echo "error: cmux new-split did not return a surface id: $CMUX_NEW" >&2
+        exit 1
+    fi
 
     # send exec command immediately — the pty input buffer holds the text
     # until the new pane's shell finishes initializing and reads it
-    if [ -n "$CMUX_SURF" ]; then
-        cmux send --surface "$CMUX_SURF" "exec $(sq "$LAUNCH_SCRIPT")\n" >/dev/null 2>&1
-    else
-        cmux send "exec $(sq "$LAUNCH_SCRIPT")\n" >/dev/null 2>&1
-    fi
+    cmux send --surface "$CMUX_SURF" "exec $(sq "$LAUNCH_SCRIPT")\n" >/dev/null 2>&1
 
     while [ ! -f "$SENTINEL" ]; do
         sleep 0.3
     done
     # close the split pane
-    if [ -n "$CMUX_SURF" ]; then
-        cmux close-surface --surface "$CMUX_SURF" 2>/dev/null || true
-    fi
+    cmux close-surface --surface "$CMUX_SURF" 2>/dev/null || true
     rm -f "$SENTINEL" "$LAUNCH_SCRIPT"
     cat "$OUTPUT_FILE"
     exit 0
@@ -185,7 +204,7 @@ if [ "${TERM_PROGRAM:-}" = "ghostty" ] && command -v osascript >/dev/null 2>&1; 
     SENTINEL=$(mktemp "$TMPBASE/revdiff-done-XXXXXX")
     rm -f "$SENTINEL"
 
-    LAUNCH_SCRIPT=$(mktemp "$TMPBASE/revdiff-launch-XXXXXX.sh")
+    LAUNCH_SCRIPT=$(mktemp "$TMPBASE/revdiff-launch-XXXXXX")
     trap 'rm -f "$OUTPUT_FILE" "$SENTINEL" "$LAUNCH_SCRIPT"' EXIT
     cat > "$LAUNCH_SCRIPT" <<LAUNCHER
 #!/bin/sh
@@ -193,7 +212,7 @@ $REVDIFF_CMD; touch $(sq "$SENTINEL")
 LAUNCHER
     chmod +x "$LAUNCH_SCRIPT"
 
-    GHOSTTY_TERM_ID=$(osascript - "$LAUNCH_SCRIPT" "$CWD" <<'APPLESCRIPT'
+    if ! GHOSTTY_TERM_ID=$(osascript - "$LAUNCH_SCRIPT" "$CWD" <<'APPLESCRIPT'
 on run argv
     set launchScript to item 1 of argv
     set cwd to item 2 of argv
@@ -209,8 +228,7 @@ on run argv
     end tell
 end run
 APPLESCRIPT
-    )
-    if [ $? -ne 0 ]; then
+    ); then
         rm -f "$SENTINEL" "$LAUNCH_SCRIPT"
         exit 1
     fi
@@ -235,7 +253,7 @@ if [ -n "${ITERM_SESSION_ID:-}" ] && command -v osascript >/dev/null 2>&1; then
     rm -f "$SENTINEL"
 
     # use launcher script to avoid single-quote injection in paths
-    LAUNCH_SCRIPT=$(mktemp "$TMPBASE/revdiff-launch-XXXXXX.sh")
+    LAUNCH_SCRIPT=$(mktemp "$TMPBASE/revdiff-launch-XXXXXX")
     trap 'rm -f "$OUTPUT_FILE" "$SENTINEL" "$LAUNCH_SCRIPT"' EXIT
     cat > "$LAUNCH_SCRIPT" <<LAUNCHER
 #!/bin/sh
@@ -316,7 +334,7 @@ if [ "${INSIDE_EMACS:-}" = "vterm" ] && command -v emacsclient >/dev/null 2>&1; 
 
     # use launcher script to avoid shell interpolation issues in elisp strings;
     # embed all paths directly so vterm-shell needs no arguments
-    LAUNCH_SCRIPT=$(mktemp "$TMPBASE/revdiff-launch-XXXXXX.sh")
+    LAUNCH_SCRIPT=$(mktemp "$TMPBASE/revdiff-launch-XXXXXX")
     trap 'rm -f "$OUTPUT_FILE" "$SENTINEL" "$LAUNCH_SCRIPT"' EXIT
     cat > "$LAUNCH_SCRIPT" <<LAUNCHER
 #!/bin/sh

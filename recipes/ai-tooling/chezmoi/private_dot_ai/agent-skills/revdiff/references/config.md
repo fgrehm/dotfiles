@@ -24,10 +24,16 @@ Then uncomment and edit the values you want to change.
 | `--no-colors` | `REVDIFF_NO_COLORS` | Disable all colors including syntax highlighting | `false` |
 | `--no-status-bar` | `REVDIFF_NO_STATUS_BAR` | Hide the status bar | `false` |
 | `--wrap` | `REVDIFF_WRAP` | Enable line wrapping in diff view | `false` |
+| `--wrap-indent` | `REVDIFF_WRAP_INDENT` | Indent wrap continuation rows by N columns so they hang under the first row's content (helps when reviewing markdown lists where unindented continuation can be misread as a new bullet) | `0` |
 | `--collapsed` | `REVDIFF_COLLAPSED` | Start in collapsed diff mode | `false` |
+| `--compact` | `REVDIFF_COMPACT` | Start in compact diff mode (small context around changes) | `false` |
+| `--compact-context` | `REVDIFF_COMPACT_CONTEXT` | Number of context lines around changes when in compact mode | `5` |
 | `--line-numbers` | `REVDIFF_LINE_NUMBERS` | Show line numbers in diff gutter | `false` |
-| `--blame` | `REVDIFF_BLAME` | Show git blame gutter on startup | `false` |
+| `--blame` | `REVDIFF_BLAME` | Show blame gutter on startup | `false` |
+| `--word-diff` | `REVDIFF_WORD_DIFF` | Highlight intra-line word-level changes in paired add/remove lines | `false` |
 | `--no-confirm-discard` | `REVDIFF_NO_CONFIRM_DISCARD` | Skip confirmation when discarding annotations with Q | `false` |
+| `--no-mouse` | `REVDIFF_NO_MOUSE` | Disable mouse support (scroll wheel, click) | `false` |
+| `--vim-motion` | `REVDIFF_VIM_MOTION` | Enable vim-style motion preset (counts, `gg`, `G`, `zz`/`zt`/`zb`, `ZZ`/`ZQ`) | `false` |
 | `--chroma-style` | `REVDIFF_CHROMA_STYLE` | Chroma color theme for syntax highlighting | `catppuccin-macchiato` |
 | `--theme` | `REVDIFF_THEME` | Load color theme from `~/.config/revdiff/themes/` | |
 | `--dump-theme` | | Print currently resolved colors as theme file and exit | |
@@ -35,7 +41,10 @@ Then uncomment and edit the values you want to change.
 | `--init-themes` | | Write bundled theme files to themes dir and exit | |
 | `--init-all-themes` | | Write all gallery themes (bundled + community) to themes dir and exit | |
 | `--install-theme` | | Install theme(s) from gallery or local file (repeatable) | |
-| `-A`, `--all-files` | | Browse all git-tracked files, not just diffs (CLI-only, not saved in config) | `false` |
+| `-A`, `--all-files` | | Browse all tracked files (git and jj only), not just diffs (CLI-only, not saved in config) | `false` |
+| `--description` | | Prose context shown in the info popup (markdown; CLI-only, not saved in config) | |
+| `--description-file` | | Read the info-popup description from this file (markdown; CLI-only, not saved in config) | |
+| `-I`, `--include` | `REVDIFF_INCLUDE` | Include only files matching prefix (may be repeated; comma-separated in env) | |
 | `-X`, `--exclude` | `REVDIFF_EXCLUDE` | Exclude files matching prefix (may be repeated; comma-separated in env) | |
 | `-F`, `--only` | | Show only matching files (may be repeated, matches by path or suffix) | |
 | `-o`, `--output` | `REVDIFF_OUTPUT` | Write annotations to file instead of stdout | |
@@ -56,7 +65,7 @@ When launched via the Claude Code plugin skill, revdiff opens in a terminal over
 
 ## Themes
 
-Seven bundled themes: **catppuccin-latte**, **catppuccin-mocha**, **dracula**, **gruvbox**, **nord**, **revdiff**, **solarized-dark**. Stored in `~/.config/revdiff/themes/`, auto-created on first run.
+Eight bundled themes: **basic**, **catppuccin-latte**, **catppuccin-mocha**, **dracula**, **gruvbox**, **nord**, **revdiff**, **solarized-dark**. Stored in `~/.config/revdiff/themes/`, auto-created on first run.
 
 Press `T` inside revdiff to open the interactive theme selector with live preview — browse themes, see colors applied instantly, and persist your choice on confirm.
 
@@ -71,7 +80,7 @@ revdiff --dump-theme > ~/.config/revdiff/themes/my-custom  # export current colo
 
 Set default theme in config: `theme = dracula`. Or env: `REVDIFF_THEME=dracula`.
 
-**Custom themes:** customize colors in config or via `--color-*` flags, then `revdiff --dump-theme > ~/.config/revdiff/themes/my-custom`. Or copy a bundled theme file and edit directly — each has all 21 color keys + `chroma-style`.
+**Custom themes:** customize colors in config or via `--color-*` flags, then `revdiff --dump-theme > ~/.config/revdiff/themes/my-custom`. Or copy a bundled theme file and edit directly — each has all 23 color keys + `chroma-style`.
 
 Precedence: `--theme` takes over completely — overwrites all color fields, ignoring `--color-*` flags and env vars. Without `--theme`: built-in defaults → config file → env vars → CLI flags. `--theme` + `--no-colors` prints warning and applies theme.
 
@@ -94,6 +103,8 @@ All color options accept hex values (`#rrggbb`) and have corresponding `REVDIFF_
 | `--color-add-bg` | Added line background | `#123800` |
 | `--color-remove-fg` | Removed line text | `#ff8787` |
 | `--color-remove-bg` | Removed line background | `#4D1100` |
+| `--color-word-add-bg` | Intra-line word-diff add background | auto-derived from add-bg |
+| `--color-word-remove-bg` | Intra-line word-diff remove background | auto-derived from remove-bg |
 | `--color-modify-fg` | Modified line text (collapsed mode) | `#f5c542` |
 | `--color-modify-bg` | Modified line background (collapsed mode) | `#3D2E00` |
 | `--color-tree-bg` | File tree pane background | terminal default |
@@ -128,6 +139,6 @@ unmap q
 map ctrl+d half_page_down
 ```
 
-Available actions: `down`, `up`, `page_down`, `page_up`, `half_page_down`, `half_page_up`, `home`, `end`, `scroll_left`, `scroll_right`, `next_item`, `prev_item`, `next_hunk`, `prev_hunk`, `toggle_pane`, `focus_tree`, `focus_diff`, `search`, `confirm`, `annotate_file`, `delete_annotation`, `annot_list`, `toggle_collapsed`, `toggle_wrap`, `toggle_tree`, `toggle_line_numbers`, `toggle_hunk`, `theme_select`, `filter`, `quit`, `discard_quit`, `help`, `dismiss`
+Available actions: `down`, `up`, `page_down`, `page_up`, `half_page_down`, `half_page_up`, `home`, `end`, `scroll_left`, `scroll_right`, `scroll_center`, `scroll_top`, `scroll_bottom`, `next_item`, `prev_item`, `next_hunk`, `prev_hunk`, `toggle_pane`, `focus_tree`, `focus_diff`, `search`, `confirm`, `annotate_file`, `delete_annotation`, `annot_list`, `toggle_collapsed`, `toggle_compact`, `toggle_wrap`, `toggle_tree`, `toggle_line_numbers`, `toggle_blame`, `toggle_hunk`, `toggle_untracked`, `mark_reviewed`, `theme_select`, `filter`, `info`, `quit`, `discard_quit`, `help`, `dismiss`
 
 Modal keys (annotation input, search input, confirm discard) are not remappable.
