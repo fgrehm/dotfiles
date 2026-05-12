@@ -26,11 +26,10 @@ local function apply_theme()
   end
 end
 
--- Snacks links PathHidden/PathIgnored/Dir to NonText, which on base16/tinted
--- is base03 and unreadable in the picker. Blend Comment toward Normal to land
--- between them (still dim, still distinct, actually readable). Italicize the
--- hidden/ignored groups so those rows stay visually marked; leave Dir upright
--- since it's just the path prefix on every entry.
+-- Snacks links several picker groups (PathHidden/PathIgnored/Dir and
+-- GitStatusUntracked/GitStatusIgnored) to NonText, which on base16/tinted is
+-- base03 and unreadable. Blend Comment toward Normal for the dim-but-present
+-- groups; route Untracked to Added so new files read as "new" (green-ish).
 local HIDDEN_BLEND = 0.55 -- 0 = Comment, 1 = Normal
 local function patch_snacks_hidden()
   local function fg(name)
@@ -47,6 +46,8 @@ local function patch_snacks_hidden()
   vim.api.nvim_set_hl(0, "SnacksPickerPathHidden", { fg = color, italic = true })
   vim.api.nvim_set_hl(0, "SnacksPickerPathIgnored", { fg = color, italic = true })
   vim.api.nvim_set_hl(0, "SnacksPickerDir", { fg = color })
+  vim.api.nvim_set_hl(0, "SnacksPickerGitStatusIgnored", { fg = color, italic = true })
+  vim.api.nvim_set_hl(0, "SnacksPickerGitStatusUntracked", { link = "Added" })
 end
 
 return {
