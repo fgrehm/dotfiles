@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+#
+# zellicat - run a command in a stacked zellij pane and capture its output.
+#
+# Usage:
+#   zellicat [zellij-run options] -- COMMAND [ARGS...]
+#   zellicat COMMAND [ARGS...]
+#
+# Runs COMMAND in a new stacked zellij pane so you can watch it live, while
+# also capturing its merged stdout+stderr. When the command exits, zellicat
+# prints everything to its own stdout and exits with the command's exit code.
+#
+# Why this exists: zellij can run a command in a pane, but it cannot hand that
+# command's output back to the caller. Until that lands upstream, zellicat
+# fakes it. See: https://github.com/zellij-org/zellij/pull/4630
+#
+# Copied from https://github.com/fgrehm/slop-collabs/blob/main/zellicat/zellicat
+
+set -euo pipefail
+
+die() {
+	printf 'zellicat: %s\n' "$*" >&2
+	exit 1
+}
+
+[ -n "${ZELLIJ:-}" ] || die "not inside a zellij session"
+
+# --- split args at `--` -----------------------------------------------------
+# Everything before `--` is forwarded to `zellij run`; everything after is the
+# command. With no `--`, all args are treated as the command.
+runopts=()
+cmd=()
+seen_sep=0
+for arg in "$@"; do
+	if [ "$seen_sep" -eq 0 ] && [ "$arg" = "--" ]; then
+		seen_sep=1
+		continue
+	fi
+	if [ "$seen_sep" -eq 1 ]; then
+		cmd+=("$arg")
+	else
+		runopts+=("$arg")
+	fi
+done
+
+if [ "$seen_sep" -eq 0 ]; then
+	cmd=("${runopts[@]+"${runopts[@]}"}")
+	runopts=()
+fi
+
+[ "${#cmd[@]}" -gt 0 ] || die "no command given"
+
+# --- inject defaults --------------------------------------------------------
+# Only add an option if the caller did not already pass an equivalent.
+has_opt() {
+	local needle want
+	for want in "$@"; do
+		for needle in "${runopts[@]+"${runopts[@]}"}"; do
+			[ "$needle" = "$want" ] && return 0
+		done
+	done
+	return 1
+}
+
+# Blocking options make `zellij run` block and suppress the pane id on stdout,
+# which zellicat needs. zellicat does its own waiting, so reject them outright.
+has_opt --block-until-exit --block-until-exit-failure \
+	--block-until-exit-success --blocking &&
+	die "blocking options conflict with zellicat; it waits for the command itself"
+
+has_opt --stacked --floating -f --in-place -i -d --direction || runopts+=(--stacked)
+has_opt -c --close-on-exit || runopts+=(-c)
+has_opt -n --name || runopts+=(-n "zellicat: ${cmd[*]}")
+
+# --- workspace --------------------------------------------------------------
+workdir=$(mktemp -d "${TMPDIR:-/tmp}/zellicat.XXXXXX")
+trap 'rm -rf "$workdir"' EXIT
+out="$workdir/out"
+rc="$workdir/rc"
+: >"$out"
+
+# The pane runs the command, tees its merged output to $out for capture, and
+# records the exit code in $rc. tee is part of the pipeline, so the shell waits
+# for it to flush before writing $rc -- that file appearing is how zellicat
+# knows the capture is complete.
+pane_script="\"\$@\" 2>&1 | tee -- $(printf %q "$out"); echo \"\${PIPESTATUS[0]}\" > $(printf %q "$rc")"
+
+# `zellij run` prints the new pane id, but zellicat does not need it: it waits
+# on the $rc file the pane writes. The id is also suppressed when -c closes a
+# fast pane before `zellij run` reports back, so we just ignore stdout here.
+zellij run "${runopts[@]}" -- bash -c "$pane_script" zellicat "${cmd[@]}" >/dev/null ||
+	die "zellij run failed"
+
+# --- wait for completion ----------------------------------------------------
+# ZELLICAT_TIMEOUT (seconds) guards against a pane that is force-closed before
+# the command finishes. 0 (default) waits forever.
+timeout="${ZELLICAT_TIMEOUT:-0}"
+waited=0
+while [ ! -f "$rc" ]; do
+	sleep 0.1
+	if [ "$timeout" != 0 ]; then
+		waited=$((waited + 1))
+		[ "$waited" -lt $((timeout * 10)) ] || die "timed out after ${timeout}s"
+	fi
+done
+
+cat -- "$out"
+exit "$(cat -- "$rc")"
