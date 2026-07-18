@@ -4,7 +4,6 @@
 .DS_Store
 .ai/
 .bundle/
-.claude/clotilde
 .claude/settings.local.json
 .pi/extensions/aitap.ts
 .svn
