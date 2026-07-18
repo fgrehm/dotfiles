@@ -3,7 +3,6 @@
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 # Re-run when external definitions change:
 # lazygit-hash: # {{ include ".chezmoiexternals/lazygit.toml" | sha256sum }}
-# worktrunk-hash: # {{ include ".chezmoiexternals/worktrunk.toml" | sha256sum }}
 # gh-hash: # {{ include ".chezmoiexternals/gh.toml" | sha256sum }}
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
@@ -23,18 +22,6 @@ if command -v lazygit &>/dev/null; then
   fi
 else
   log_skip "lazygit not found, skipping completions"
-fi
-
-if command -v wt &>/dev/null; then
-  log_info "Generating wt completions..."
-  if ! COMPLETE=bash wt >"$BASH_DIR/wt"; then
-    log_error "Failed to generate wt bash completions (non-fatal)"
-  fi
-  if ! COMPLETE=zsh wt >"$ZSH_DIR/_wt"; then
-    log_error "Failed to generate wt zsh completions (non-fatal)"
-  fi
-else
-  log_skip "wt not found, skipping completions"
 fi
 
 if command -v gh &>/dev/null; then

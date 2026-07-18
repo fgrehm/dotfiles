@@ -1,8 +1,8 @@
-{{- $version := "2.91.0" -}}
+{{- $version := "2.96.0" -}}
 [".local/bin/gh"]
   type = "archive-file"
   url = "https://github.com/cli/cli/releases/download/v{{ $version }}/gh_{{ $version }}_linux_amd64.tar.gz"
   path = "gh_{{ $version }}_linux_amd64/bin/gh"
   executable = true
-  checksum.sha256 = "304a0d2460f4a8847d2f192bad4e2a32cd9420d28716e7ae32198181b65b5f9c"
+  checksum.sha256 = "83d5c2ccad5498f58bf6368acb1ab32588cf43ab3a4b1c301bf36328b1c8bd60"
 # vim: ft=toml.gotmpl

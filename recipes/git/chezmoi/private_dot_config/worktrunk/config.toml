@@ -1,8 +1,0 @@
-# worktrunk user config — https://worktrunk.dev/config/
-
-worktree-path = "{{ repo_path }}/.worktrees/{{ branch | sanitize }}"
-skip-commit-generation-prompt = true
-skip-shell-integration-prompt = true
-
-[merge]
-squash = false
