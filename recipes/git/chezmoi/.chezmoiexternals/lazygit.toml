@@ -1,3 +1,4 @@
+{{- if not .isOmarchy -}}
 {{- $version := "0.63.1" -}}
 [".local/bin/lazygit"]
   type = "archive-file"
@@ -5,4 +6,5 @@
   executable = true
   path = "lazygit"
   checksum.sha256 = "8e033bc78c8e192dee9510e951f6c9e154289b7198d22c924ed1d0a951b0dac1"
+{{- end -}}
 # vim: ft=toml.gotmpl

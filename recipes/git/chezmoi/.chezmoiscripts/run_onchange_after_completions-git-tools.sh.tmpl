@@ -12,6 +12,7 @@ BASH_DIR="$HOME/.local/share/bash-completion/completions"
 ZSH_DIR="$HOME/.zsh/completions"
 mkdir -p "$BASH_DIR" "$ZSH_DIR"
 
+# {{ if not .isOmarchy }}
 if command -v lazygit &>/dev/null; then
   log_info "Generating lazygit completions..."
   if ! lazygit completion bash >"$BASH_DIR/lazygit"; then
@@ -23,7 +24,9 @@ if command -v lazygit &>/dev/null; then
 else
   log_skip "lazygit not found, skipping completions"
 fi
+# {{ end }}
 
+# {{ if not .isOmarchy }}
 if command -v gh &>/dev/null; then
   log_info "Generating gh completions..."
   if ! gh completion -s bash >"$BASH_DIR/gh"; then
@@ -35,3 +38,4 @@ if command -v gh &>/dev/null; then
 else
   log_skip "gh not found, skipping completions"
 fi
+# {{ end }}

@@ -1,3 +1,4 @@
+{{- if not .isOmarchy -}}
 {{- $version := "2.96.0" -}}
 [".local/bin/gh"]
   type = "archive-file"
@@ -5,4 +6,5 @@
   path = "gh_{{ $version }}_linux_amd64/bin/gh"
   executable = true
   checksum.sha256 = "83d5c2ccad5498f58bf6368acb1ab32588cf43ab3a4b1c301bf36328b1c8bd60"
+{{- end -}}
 # vim: ft=toml.gotmpl

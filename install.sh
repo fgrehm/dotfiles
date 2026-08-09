@@ -22,8 +22,23 @@ _die() {
   exit 1
 }
 
+# Download a URL to stdout (wget preferred, curl fallback)
+_download() {
+  if command -v wget >/dev/null 2>&1; then
+    wget -qO- "$1"
+  else
+    curl -fsSL "$1"
+  fi
+}
+
 [ "$(uname -s)" = "Linux" ] || _die "only Linux is supported"
-command -v git >/dev/null 2>&1 || _die "git is required but not installed (apt-get install git)"
+if ! command -v git >/dev/null 2>&1; then
+  if command -v pacman >/dev/null 2>&1; then
+    _die "git is required but not installed (pacman -S git)"
+  else
+    _die "git is required but not installed (apt-get install git)"
+  fi
+fi
 
 case "$(uname -m)" in
 x86_64) ARCH=amd64 ;;
@@ -39,7 +54,7 @@ if ! command -v chezmoi >/dev/null 2>&1; then
   _log "Installing chezmoi"
   tmp=$(mktemp) || _die "failed to create temp file"
   trap 'rm -f "$tmp"' EXIT
-  wget -qO "$tmp" "https://get.chezmoi.io" || _die "failed to download chezmoi installer"
+  _download "https://get.chezmoi.io" > "$tmp" || _die "failed to download chezmoi installer"
   BINDIR="$BIN_DIR" sh "$tmp"
   rm -f "$tmp"
   trap - EXIT
@@ -48,7 +63,7 @@ fi
 # Install chezmoi-recipes
 if ! command -v chezmoi-recipes >/dev/null 2>&1; then
   _log "Installing chezmoi-recipes"
-  wget -qO- "https://github.com/fgrehm/chezmoi-recipes/releases/latest/download/chezmoi-recipes_linux_${ARCH}.tar.gz" |
+  _download "https://github.com/fgrehm/chezmoi-recipes/releases/latest/download/chezmoi-recipes_linux_${ARCH}.tar.gz" |
     tar xz -C "$BIN_DIR"
 fi
 

@@ -4,10 +4,16 @@ Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and
 [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes), built for Debian
 13 (Trixie). Also works in devcontainers/Codespaces.
 
+> **Omarchy support is a work in progress.** The current system is Omarchy
+> (Arch-based). Detection (`isOmarchy`) and a guard that skips all recipes on
+> Omarchy are in place; recipes are being adapted one at a time. Debian support
+> is kept alongside it.
+
 ## Supported Platforms
 
 - **Debian 13** (laptop)
 - **Debian-based containers** (Ubuntu, Debian, etc. for devcontainers/CI)
+- **Omarchy** (Arch-based, Hyprland) -- in progress
 
 ## Quick Start
 
@@ -62,7 +68,7 @@ make check      # lint shell scripts (shfmt + shellcheck)
 
 `.chezmoi.toml.tmpl` auto-detects containers via `/.dockerenv`, env vars, etc.
 Template data available: `.name`, `.email`, `.isContainer`, `.isDebian`,
-`.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
+`.isOmarchy`, `.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
 
 ## License
 

@@ -4,3 +4,16 @@ laptop
 terminal
 kde
 {{- end }}
+{{- if .isOmarchy }}
+1password
+ai-tooling
+base
+cartage
+kde
+laptop
+mise
+nvim
+shell
+terminal
+zellij
+{{- end }}

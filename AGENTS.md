@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 Project context for AI assistants working on this repo.
 
@@ -7,6 +7,11 @@ Project context for AI assistants working on this repo.
 A chezmoi dotfiles repo organized with
 [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Target: Debian 13
 (Trixie) laptops running KDE Plasma 6, and devcontainers/Codespaces.
+
+> **Omarchy support is a work in progress.** The current system is Omarchy
+> (Arch-based, Hyprland). Detection (`isOmarchy`) and a guard that skips all
+> recipes on Omarchy are in place; recipes are being adapted one at a time.
+> Debian support is kept alongside it.
 
 chezmoi-recipes adds a recipe layer on top of chezmoi: related config files and
 install scripts are grouped into self-contained directories under `recipes/`.
@@ -65,6 +70,7 @@ application state and is private by convention. Mixing `dot_config` and
 | `.onepasswordSshItem` | Prompted at `chezmoi init` (laptop only; empty string in containers) |
 | `.isContainer` | `/.dockerenv`, `/run/.containerenv`, `CODESPACES`, etc. |
 | `.isDebian` | `.chezmoi.osRelease.id == "debian"` |
+| `.isOmarchy` | `omarchy` on PATH or `~/.local/share/omarchy` exists |
 | `.hasNvidiaGPU` | `lspci` output (skipped in containers) |
 
 Use `{{ if .isContainer }}` in templates and `.chezmoiignore` for conditional

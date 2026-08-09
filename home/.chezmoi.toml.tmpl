@@ -1,6 +1,7 @@
 {{- /* Auto-detect environment */ -}}
 {{- $isContainer := or (stat "/.dockerenv") (stat "/run/.containerenv") (stat "/var/devcontainer") (env "CODESPACES") (env "REMOTE_CONTAINERS") (env "container") | not | not -}}
 {{- $isDebian := eq .chezmoi.osRelease.id "debian" -}}
+{{- $isOmarchy := or (lookPath "omarchy") (stat (joinPath .chezmoi.homeDir ".local/share/omarchy")) | not | not -}}
 {{- $hasNvidiaGPU := false -}}
 {{- if and (not $isContainer) (lookPath "lspci") -}}
 {{-   $hasNvidiaGPU = output "lspci" | lower | contains "nvidia" -}}
@@ -62,4 +63,5 @@ sourceDir = "{{ .chezmoi.workingTree }}"
     {{- end }}
     isContainer = {{ $isContainer }}
     isDebian = {{ $isDebian }}
+    isOmarchy = {{ $isOmarchy }}
     hasNvidiaGPU = {{ $hasNvidiaGPU }}
