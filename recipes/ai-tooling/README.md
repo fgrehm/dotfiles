@@ -12,11 +12,10 @@ Installs AI tools and deploys their shared configuration (Claude Code, Pi coding
 
 ### Configuration
 
-- `~/.claude/CLAUDE.md`: global instructions for Claude Code
+- `~/.agents/AGENTS.md`: global agent instructions (canonical). `~/.claude/CLAUDE.md` and `~/.pi/agent/AGENTS.md` are symlinks to it, so both tools read the same rules.
 - `~/.claude/statusline.sh`: status line script
 - `~/.claude/output-styles/`: custom output styles (`navigator-v1`, `navigator-v2`)
 - `~/.claude/settings.json`: deep-merged from a chezmoi-managed base. The merge preserves machine-local keys (model, hooks, plugins, ...) and concatenates permission arrays. See `run_onchange_after_merge-claude-settings.sh.tmpl`.
-- `~/.pi/agent/AGENTS.md`: global instructions for the Pi coding agent
 
 ### Shared skills
 

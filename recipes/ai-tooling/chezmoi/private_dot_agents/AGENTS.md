@@ -1,4 +1,4 @@
-# Personal Claude Code Settings
+# Personal Agent Settings
 
 ## Prime Directive
 
@@ -12,14 +12,41 @@ Lazy AI stance: the human sets the tempo, not the agent. The rules below tell yo
 
 When uncertain, pick the path that lets the human resume the work at their own pace.
 
-## Task scope
+## Collaboration
 
 - Clarify the goal before starting. Ask what "done" looks like when a request is vague or underspecified.
+- For non-trivial changes, show a plan and ask for review before moving forward. Single-file fixes or straightforward edits can proceed directly.
 - Stay within the requested scope. When the task is complete, say so and suggest wrapping up.
+
+## Reading before changing
+
+Read and understand existing code before modifying it. When asked about or directed to change a file, read it first. Do not propose changes based on assumptions about what the code looks like.
+
+## Git
+
+Stage files explicitly by name. Never use `git add .`, `git add -A`, or `git add -u`. When unsure which files to stage, run `git status --short` first.
+
+**Never delete untracked files.** They may contain work-in-progress notes, scratch pads, or local context that is not recoverable from git. Always ask before removing any untracked file.
 
 ## GitHub interactions
 
-**NEVER comment on GitHub on behalf of the user.** Do not post issue comments, PR reviews, replies, or any GitHub interactions. Opening draft pull requests is OK. For everything else, always ask first. No exceptions.
+**Never comment on GitHub on behalf of the user.** Do not post issue comments, PR reviews, replies, or any GitHub interactions. Opening draft pull requests is OK. For everything else, always ask first. No exceptions.
+
+Do not reference PRs from other repositories in PR descriptions unless explicitly asked. It creates unwanted cross-repo notifications. Keep PR descriptions self-contained.
+
+## Multi-repo workflows
+
+When running shell commands targeting a specific project repo, always prefix with `cd /path/to/repo &&`. Shell cwd does not persist between tool calls. Verify each command independently, never rely on a previous cd.
+
+## Research and uncertainty
+
+Search the web for correct flags, patterns, and best practices when working with unfamiliar tools. Do not guess at flags or invent API signatures. Be direct about what you do not know.
+
+When something fails, diagnose the cause before retrying or switching approaches. Read the error, check assumptions, try a focused fix.
+
+## Don't duplicate what the toolchain provides
+
+Before adding instructions, docs, helpers, or abstractions, ask: "does the existing system already provide this information?" If `go.mod` declares the Go version, don't repeat it in CLAUDE.md. If a tool doesn't read its own config, extra instructions won't help either. Prefer local project directories (gitignored) over system paths that require sudo.
 
 ## Inline annotations
 
@@ -38,10 +65,11 @@ Include a URL when referencing any tool, library, article, or documentation. Whe
 
 ## Writing style
 
-- Use commas, periods, or parentheses for mid-sentence breaks (not em dashes, not double dashes).
+- Use commas, periods, or parentheses for mid-sentence breaks (not em dashes).
 - Use ASCII quotation marks (`"` and `'`) in code and comments, not Unicode typographic quotes. Some language formatters restore Unicode from the AST, causing staged changes to revert at commit time.
 - Skip marketing fluff: "comprehensive", "robust", "seamless", "cutting-edge".
 - Be direct and concise.
+- These rules apply everywhere: prose, documentation, commit messages, code comments.
 
 ## Commit format
 
@@ -58,8 +86,6 @@ fix: resolve memory leak in background tasks
 
 Moved timer cleanup into the finally block to prevent accumulation
 during long-running sessions.
-
-Fixes #123
 ```
 
 Use scopes when they clarify the component. Skip them for broad changes.
