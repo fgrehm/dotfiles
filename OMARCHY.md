@@ -17,16 +17,17 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | nvim | Enabled | omarchy goodies merged into `config/nvim/` (theme hot-reload, all-themes, transparency, remote_clipboard), guarded by `vim.fn.executable("omarchy")`; ruby-lsp dropped; neo-tree extra added (shows hidden files) |
 | mise | Skipped | low risk; distro-agnostic, already installed; tools now node/go/ruby/bun (rust dropped); needs `shell` recipe for activation |
 | shell | Skipped | bash-only on Omarchy; `useZsh` variable (false on Omarchy) guards zsh install/completions; bashrc preserves omarchy's `default/bash/rc` |
-| terminal | Skipped | high risk; Debian/KDE-specific (apt, update-alternatives, tinty theming conflicts with omarchy); consider ghostty |
-| zellij | Skipped | low risk; distro-agnostic; needs `shell` recipe for shellrc fragment |
+| terminal | Skipped | Debian/KDE-specific (alacritty, tinty). Ghostty handled via the `omarchy` recipe. May be dropped once fully on Omarchy |
+| zellij | Skipped | low risk; distro-agnostic; needs `shell` recipe for shellrc fragment. PUNTED — user may skip zellij in favor of tmux or herdr.dev |
 | (others) | Skipped | not yet adapted |
 
 ## Follow-ups
 
 - [ ] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos) + obsidian. Webapps share the main browser profile.
+- [ ] **zellij** — PUNTED: user may skip zellij and stick with tmux or move to herdr.dev. Revisit later.
 - [ ] **Browser → brave** — switch default browser to brave (backlog).
 - [ ] **Install slack** — later (deferred).
-- [ ] **Terminal: ghostty** — user willing to try ghostty on omarchy; rework the `terminal` recipe accordingly (currently Debian/KDE-specific).
+- [ ] **Terminal: ghostty** — installed + set as default via `run_once_install-ghostty.sh` in the `omarchy` recipe. The `terminal` recipe (alacritty/tinty) may be dropped once fully on Omarchy on both laptops.
 - [ ] **Shell: zsh/ohmyzsh** — user would go zsh but could live without it; adapt the `shell` recipe (pacman+curl) if pursued. It's the foundation for other recipes' shellrc fragments.
 - [ ] **SSH agent** — stock `ssh-agent.service` enabled via `run_once_enable-ssh-agent.sh` in the `omarchy` recipe; `SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}/ssh-agent.socket` set via `environment.d/ssh-agent.conf` (needs re-login to take effect). `AddKeysToAgent yes` already lives in the `shell` recipe (not duplicated). Pending: optionally mask `gpg-agent-ssh.socket` (GnuPG SSH emulation) to prevent it from overriding `SSH_AUTH_SOCK`; verify once per boot.
 - [x] **Caps Lock → Ctrl** — done via the `omarchy` recipe (`~/.config/hypr/input.conf`, `kb_options = compose:paus,ctrl:nocaps`).
@@ -41,6 +42,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 
 - Omarchy uses `pacman` (via `omarchy pkg`), not `apt`. Install scripts that call `apt-get` need a pacman branch guarded by `{{ if .isOmarchy }}`.
 - Omarchy manages its own desktop/WM config (hypr, waybar, walker, terminals, mako) — recipes like `kde`/`terminal` are likely candidates to skip or rework.
+- **Config philosophy:** only track a config in the repo when there's a need to customize it. Otherwise let omarchy manage it (e.g. ghostty config is omarchy's default; we only handle install + default terminal).
 
 ## Learnings
 
@@ -61,3 +63,4 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 - **`useZsh` template variable** — `useZsh = {{ not $isOmarchy }}` (true on Debian, false on Omarchy). Decouples zsh from omarchy: guards zsh/ohmyzsh install, default-shell setup, `.zshrc` deploy, and zsh completion generation. Requires re-running `chezmoi init` to re-render the config.
 - **Omarchy's `~/.bashrc` sources `~/.local/share/omarchy/default/bash/rc`** (envs, shell, aliases, functions, init, inputrc). The shell recipe's `dot_bashrc` must preserve this on omarchy (it's now a template that sources omarchy's rc + `~/.shellrc` on omarchy, the Debian bashrc elsewhere).
 - **`omarchy-webapp-remove` takes multiple names and restarts the app launcher once** — pass all apps in one call to avoid systemd start-limit on rapid restarts. Webapps share the main browser profile (launched via `browser --app=<url>`).
+- **Bash git-alias completion** — use git's `__git_complete <alias> _git_<subcommand>` (not `complete -F _git_<subcommand>`, which breaks because the functions expect `$1=git`). Source the git completion file first (it's lazy-loaded), then wire each alias. This restores the autocomplete that zsh's `compdef` gave.
