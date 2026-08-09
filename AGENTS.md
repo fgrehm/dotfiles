@@ -6,7 +6,9 @@ Project context for AI assistants working on this repo.
 
 A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Target: Debian 13 (Trixie) laptops running KDE Plasma 6, and devcontainers/Codespaces.
 
-> **Omarchy support is a work in progress.** The current system is Omarchy (Arch-based, Hyprland). Detection (`isOmarchy`) and a guard that skips all recipes on Omarchy are in place; recipes are being adapted one at a time. Debian support is kept alongside it.
+> **Omarchy support is a work in progress.** The current system is Omarchy (Arch-based, Hyprland). Detection (`isOmarchy`) and a guard that skips all recipes on Omarchy are in place; recipes are being adapted one at a time. Debian support is kept alongside it. See `OMARCHY.md` for the living status, follow-ups, and learnings.
+>
+> **Config philosophy:** only track a config in the repo when there's a need to customize it; otherwise let omarchy manage it (e.g. ghostty config is omarchy's default — we only handle install + default terminal).
 
 chezmoi-recipes adds a recipe layer on top of chezmoi: related config files and install scripts are grouped into self-contained directories under `recipes/`. Running `chezmoi-recipes overlay` merges `home/` and all `recipes/*/chezmoi/` fragments into `compiled-home/`, which chezmoi reads as its source state (via `.chezmoiroot`). A `read-source-state.pre` hook runs the overlay automatically before any chezmoi command. Each file must belong to exactly one recipe or `home/`, never both (overlapping files are an error). See the [chezmoi-recipes README](https://github.com/fgrehm/chezmoi-recipes) for more.
 
@@ -51,6 +53,7 @@ chezmoi: .config: inconsistent state (...dot_config, ...private_dot_config)
 | `.isContainer` | `/.dockerenv`, `/run/.containerenv`, `CODESPACES`, etc. |
 | `.isDebian` | `.chezmoi.osRelease.id == "debian"` |
 | `.isOmarchy` | `omarchy` on PATH or `~/.local/share/omarchy` exists |
+| `.useZsh` | `not .isOmarchy` (true on Debian, false on Omarchy); gates zsh install/completions |
 | `.hasNvidiaGPU` | `lspci` output (skipped in containers) |
 
 Use `{{ if .isContainer }}` in templates and `.chezmoiignore` for conditional deployment.
