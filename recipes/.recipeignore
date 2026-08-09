@@ -14,8 +14,6 @@ base
 cartage
 kde
 laptop
-mise
-shell
 terminal
 zellij
 {{- end }}
