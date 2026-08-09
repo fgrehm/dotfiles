@@ -7,6 +7,7 @@ Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, 
 - Deploys `~/.config/hypr/input.conf` with Caps Lock remapped to Control (`kb_options = compose:paus,ctrl:nocaps`).
 - Sets `SSH_AUTH_SOCK` to the stock OpenSSH agent socket via `~/.config/environment.d/ssh-agent.conf` (`SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}/ssh-agent.socket`).
 - Enables the stock `ssh-agent.service` user unit via `run_once_enable-ssh-agent.sh` (idempotent; skips if already enabled).
+- Removes unwanted apps via `run_once_remove-unwanted-apps.sh` (webapps: Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos; plus obsidian).
 
 ## Notes
 
