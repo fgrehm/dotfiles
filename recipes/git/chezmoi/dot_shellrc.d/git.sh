@@ -47,3 +47,39 @@ if [ -n "$ZSH_VERSION" ]; then
   compdef _git gr=git-reset
   compdef _git gs=git-status
 fi
+
+# --- Bash completions for git aliases ---
+# git's __git_complete wires an alias to a subcommand completion function.
+# The git completion is lazy-loaded by bash-completion, so source it here to
+# make __git_complete available.
+if [ -n "$BASH_VERSION" ]; then
+  # git completion is lazy-loaded by bash-completion; only source it if
+  # __git_complete isn't already available.
+  if ! declare -F __git_complete >/dev/null 2>&1; then
+    if [ -f /usr/share/bash-completion/completions/git ]; then
+      . /usr/share/bash-completion/completions/git
+    elif [ -f /etc/bash_completion.d/git ]; then
+      . /etc/bash_completion.d/git
+    fi
+  fi
+  if declare -F __git_complete >/dev/null 2>&1; then
+    __git_complete ga _git_add
+    __git_complete gap _git_add
+    __git_complete gc _git_commit
+    __git_complete gcA _git_commit
+    __git_complete gca _git_commit
+    __git_complete gci _git_commit
+    __git_complete gco _git_checkout
+    __git_complete gd _git_diff
+    __git_complete gdc _git_diff
+    __git_complete gdn _git_diff
+    __git_complete gdnc _git_diff
+    __git_complete gdm _git_diff
+    __git_complete gsh _git_show
+    __git_complete gp _git_push
+    __git_complete gplr _git_pull
+    __git_complete gpl _git_pull
+    __git_complete gr _git_reset
+    __git_complete gs _git_status
+  fi
+fi
