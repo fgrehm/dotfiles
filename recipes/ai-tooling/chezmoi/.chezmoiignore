@@ -1,5 +1,4 @@
-# Skipped in containers (no systemd for ollama service)
+# Skipped in containers
 {{ if .isContainer }}
-.chezmoiscripts/install-ollama.sh
 .chezmoiscripts/install-pi-agent.sh
 {{ end }}

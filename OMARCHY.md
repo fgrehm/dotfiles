@@ -18,13 +18,13 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | mise | Enabled | distro-agnostic, already installed; tools now node/go/ruby/bun (rust dropped); needs `shell` recipe for activation |
 | shell | Enabled | bash-only on Omarchy; `useZsh` variable (false on Omarchy) guards zsh install/completions; bashrc preserves omarchy's `default/bash/rc` |
 | terminal | Skipped | Debian/KDE-specific (alacritty, tinty). Ghostty handled via the `omarchy` recipe. May be dropped once fully on Omarchy |
-| ai-tooling | Skipped | NEXT UP: high value (Claude Code, pi, ollama, skills). Claude Code already on Omarchy; config largely distro-agnostic; needs install-script adaptation |
+| ai-tooling | Skipped | NEXT UP: high value (Claude Code, pi, skills). Claude Code already on Omarchy; config largely distro-agnostic; needs install-script adaptation |
 | zellij | Skipped | low risk; distro-agnostic; needs `shell` recipe for shellrc fragment. PUNTED — user may skip zellij in favor of tmux or herdr.dev |
 | (others) | Skipped | not yet adapted |
 
 ## Follow-ups
 
-- [ ] **ai-tooling** — NEXT UP: high value (Claude Code, pi, ollama, skills). Claude Code already on Omarchy; config (skills, settings) largely distro-agnostic; needs install-script adaptation (Claude Code present, pi via npm, ollama).
+- [ ] **ai-tooling** — NEXT UP: high value (Claude Code, pi, skills). Claude Code already on Omarchy; config (skills, settings) largely distro-agnostic; needs install-script adaptation (Claude Code present, pi via npm).
 - [ ] **base** — low priority on Omarchy (jq/unzip/gpg present; wget/fd-find differ).
 - [ ] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos) + obsidian. Webapps share the main browser profile.
 - [ ] **zellij** — PUNTED: user may skip zellij and stick with tmux or move to herdr.dev. Revisit later.
