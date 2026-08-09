@@ -64,4 +64,5 @@ sourceDir = "{{ .chezmoi.workingTree }}"
     isContainer = {{ $isContainer }}
     isDebian = {{ $isDebian }}
     isOmarchy = {{ $isOmarchy }}
+    useZsh = {{ not $isOmarchy }}
     hasNvidiaGPU = {{ $hasNvidiaGPU }}
