@@ -15,8 +15,8 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | git | Enabled | pacman install branch; lazygit/gh externals + completions skipped on Omarchy |
 | omarchy | Enabled | Omarchy-only tweaks; ignored on Debian |
 | nvim | Enabled | omarchy goodies merged into `config/nvim/` (theme hot-reload, all-themes, transparency, remote_clipboard), guarded by `vim.fn.executable("omarchy")`; ruby-lsp dropped; neo-tree extra added (shows hidden files) |
-| mise | Skipped | low risk; distro-agnostic, already installed; needs `shell` recipe for activation |
-| shell | Skipped | high risk (apt/wget); needs pacman+curl; zsh default decision pending (user could live without it) |
+| mise | Skipped | low risk; distro-agnostic, already installed; tools now node/go/ruby/bun (rust dropped); needs `shell` recipe for activation |
+| shell | Skipped | bash-only on Omarchy; `useZsh` variable (false on Omarchy) guards zsh install/completions; bashrc preserves omarchy's `default/bash/rc` |
 | terminal | Skipped | high risk; Debian/KDE-specific (apt, update-alternatives, tinty theming conflicts with omarchy); consider ghostty |
 | zellij | Skipped | low risk; distro-agnostic; needs `shell` recipe for shellrc fragment |
 | (others) | Skipped | not yet adapted |
@@ -24,6 +24,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 ## Follow-ups
 
 - [ ] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos) + obsidian. Webapps share the main browser profile.
+- [ ] **Browser → brave** — switch default browser to brave (backlog).
 - [ ] **Install slack** — later (deferred).
 - [ ] **Terminal: ghostty** — user willing to try ghostty on omarchy; rework the `terminal` recipe accordingly (currently Debian/KDE-specific).
 - [ ] **Shell: zsh/ohmyzsh** — user would go zsh but could live without it; adapt the `shell` recipe (pacman+curl) if pursued. It's the foundation for other recipes' shellrc fragments.
@@ -57,4 +58,6 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 - **Omarchy's nvim `theme.lua` is a dynamic symlink** to `~/.config/omarchy/current/theme/neovim.lua` (which itself points to the current theme's `neovim.lua`). It follows `omarchy theme set`. Don't track it as a static file; create the symlink via a run_once script. A relative symlink won't work because the repo's `config/nvim` is symlinked into `~/.config/nvim` (relative targets resolve against the repo path).
 - **LazyVim has no file explorer by default** — it's opt-in via extras (`neo-tree` or `mini-files`). The repo's Debian config used only the snacks file picker; omarchy added neo-tree. To show hidden files in neo-tree by default: `filesystem.filtered_items = { visible = true, hide_dotfiles = false, hide_gitignored = false }`.
 - **Template directives require `.sh.tmpl`** — a `.sh` script with `# {{ if ... }}` treats the directives as inert comments (e.g. `SUDO` never gets set). For omarchy-only scripts, prefer `id -u` over template conditionals to avoid the `.tmpl` requirement.
+- **`useZsh` template variable** — `useZsh = {{ not $isOmarchy }}` (true on Debian, false on Omarchy). Decouples zsh from omarchy: guards zsh/ohmyzsh install, default-shell setup, `.zshrc` deploy, and zsh completion generation. Requires re-running `chezmoi init` to re-render the config.
+- **Omarchy's `~/.bashrc` sources `~/.local/share/omarchy/default/bash/rc`** (envs, shell, aliases, functions, init, inputrc). The shell recipe's `dot_bashrc` must preserve this on omarchy (it's now a template that sources omarchy's rc + `~/.shellrc` on omarchy, the Debian bashrc elsewhere).
 - **`omarchy-webapp-remove` takes multiple names and restarts the app launcher once** — pass all apps in one call to avoid systemd start-limit on rapid restarts. Webapps share the main browser profile (launched via `browser --app=<url>`).
