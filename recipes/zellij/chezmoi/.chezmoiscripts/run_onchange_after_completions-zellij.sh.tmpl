@@ -13,13 +13,16 @@ if ! command -v zellij &>/dev/null; then
 fi
 
 BASH_DIR="$HOME/.local/share/bash-completion/completions"
-ZSH_DIR="$HOME/.zsh/completions"
-mkdir -p "$BASH_DIR" "$ZSH_DIR"
+mkdir -p "$BASH_DIR"
 
 log_info "Generating zellij completions..."
 if ! zellij setup --generate-completion bash >"$BASH_DIR/zellij"; then
   log_error "Failed to generate zellij bash completions (non-fatal)"
 fi
+# {{ if .useZsh }}
+ZSH_DIR="$HOME/.zsh/completions"
+mkdir -p "$ZSH_DIR"
 if ! zellij setup --generate-completion zsh >"$ZSH_DIR/_zellij"; then
   log_error "Failed to generate zellij zsh completions (non-fatal)"
 fi
+# {{ end }}

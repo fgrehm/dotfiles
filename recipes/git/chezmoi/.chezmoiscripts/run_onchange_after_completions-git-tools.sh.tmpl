@@ -9,8 +9,11 @@ source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 export PATH="$HOME/.local/bin:$PATH"
 
 BASH_DIR="$HOME/.local/share/bash-completion/completions"
+mkdir -p "$BASH_DIR"
+# {{ if .useZsh }}
 ZSH_DIR="$HOME/.zsh/completions"
-mkdir -p "$BASH_DIR" "$ZSH_DIR"
+mkdir -p "$ZSH_DIR"
+# {{ end }}
 
 # {{ if not .isOmarchy }}
 if command -v lazygit &>/dev/null; then
