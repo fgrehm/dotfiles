@@ -11,4 +11,9 @@ set -eo pipefail
 
 log_info "Installing mise..."
 mkdir -p "$HOME/.local/bin"
-wget -qO- https://mise.run | sh
+# wget preferred, curl fallback (omarchy has no wget)
+if command -v wget &>/dev/null; then
+  wget -qO- https://mise.run | sh
+else
+  curl -fsSL https://mise.run | sh
+fi
