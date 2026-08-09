@@ -39,7 +39,7 @@ set -eo pipefail
 if [ ${#packages[@]} -gt 0 ]; then
   log_info "Installing base packages: ${packages[*]}..."
   # {{ if .isOmarchy }}
-  run_quiet $SUDO omarchy pkg add "${packages[@]}"
+  run_quiet omarchy pkg add "${packages[@]}"
   # {{ else }}
   run_quiet $SUDO apt-get update -qq
   run_quiet $SUDO apt-get install -y "${packages[@]}"

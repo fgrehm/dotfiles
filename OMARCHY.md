@@ -59,6 +59,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 - **`gpg-agent-ssh.socket`** (GnuPG SSH emulation) is active by default and can set `SSH_AUTH_SOCK` via `ExecStartPost`, conflicting with a separate ssh-agent. Mask it if it hijacks `SSH_AUTH_SOCK`.
 - **`AddKeysToAgent yes`** in `~/.ssh/config` auto-adds keys to the agent on first use (no manual `ssh-add`).
 - **omarchy has no `wget` by default** — use `curl` fallback in scripts (see `install.sh` `_download`).
+- **`omarchy` commands handle sudo internally** — `omarchy pkg add`, `omarchy install`, etc. declare `requires-sudo=true` and call `sudo` themselves. Don't prefix `$SUDO` (it breaks: sudo can't find `omarchy` in its restricted PATH). Call `omarchy ...` directly.
 - **lazygit/gh are already installed/managed by omarchy** — skip their `.chezmoiexternals` and completions on omarchy to avoid duplicates.
 - **`run_once_` vs `run_once_after_`** — use `run_once_` (before file deployment) for scripts that don't depend on deployed files; `run_once_after_` only when a script needs files in place first.
 - **Omarchy's nvim `theme.lua` is a dynamic symlink** to `~/.config/omarchy/current/theme/neovim.lua` (which itself points to the current theme's `neovim.lua`). It follows `omarchy theme set`. Don't track it as a static file; create the symlink via a run_once script. A relative symlink won't work because the repo's `config/nvim` is symlinked into `~/.config/nvim` (relative targets resolve against the repo path).
