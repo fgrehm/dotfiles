@@ -30,6 +30,15 @@ compiled-home/        generated, gitignored
 
 A recipe is a directory under `recipes/` with a `README.md` and a `chezmoi/` subdirectory. The `chezmoi/` contents use standard chezmoi naming (`dot_`, `private_`, `run_once_`, `.tmpl`, etc.) and get overlaid into `compiled-home/`.
 
+## Agent Config Home (`~/.agents/`)
+
+`~/.agents/` is the canonical cross-client home for agent config (the ecosystem convention). The `ai-tooling` recipe manages it:
+
+- `~/.agents/AGENTS.md` — global agent instructions (canonical). `~/.pi/agent/AGENTS.md` and `~/.claude/CLAUDE.md` are symlinks to it, so both tools read the same rules.
+- `~/.agents/skills/<name>/` — canonical skills home. A `run_onchange_after_link-skills.sh.tmpl` script creates individual per-agent symlinks (`~/.claude/skills/<name>`, `~/.pi/agent/skills/<name>`) and re-runs when the skill set changes (embedded hash). It only creates missing symlinks, so non-chezmoi entries coexist (e.g. the omarchy skill).
+
+Do NOT use whole-directory symlinks for the per-agent skills dirs — that would clobber non-chezmoi entries (like the omarchy skill). Use the individual-symlink script instead.
+
 ## Directory Privacy Must Be Consistent Across Recipes
 
 chezmoi maps `dot_config` and `private_dot_config` to the same target directory (`.config`) but with different permissions. If two recipes in the overlay use different privacy prefixes for the same target directory, chezmoi will refuse to apply with:
@@ -153,6 +162,7 @@ Key points:
 - Guard with `command -v` for idempotency.
 - `set -eo pipefail` at the top level (after guards and variable setup) -- hard fail on any error so chezmoi does not mark the script as completed. This lets `chezmoi apply` retry the script on the next run without needing to manipulate chezmoi state. A script that exits 0 after a failure would be silently marked done and require `chezmoi state delete` to retry.
 - Use unquoted `$SUDO` (not `"$SUDO"`) -- quoting expands to an empty-string command when running as root.
+- **On Omarchy, `omarchy` commands handle sudo internally** (`omarchy pkg add`, `omarchy install`, ... declare `requires-sudo=true` and call `sudo` themselves). Do NOT prefix `$SUDO` -- sudo can't find `omarchy` in its restricted PATH (`~/.local/share/omarchy/bin/` is user-local). Call `omarchy ...` directly.
 
 ## Completion Scripts
 

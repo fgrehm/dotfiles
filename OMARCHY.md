@@ -13,6 +13,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | Recipe | Status | Notes |
 |--------|--------|-------|
 | git | Enabled | pacman install branch; lazygit/gh externals + completions skipped on Omarchy |
+| base | Enabled | per-OS package map (fd-find/fdfind on Debian vs fd on Arch); installs via `omarchy pkg add`; creates `~/.local/bin/fdfind` symlink |
 | omarchy | Enabled | Omarchy-only tweaks; ignored on Debian |
 | nvim | Enabled | omarchy goodies merged into `config/nvim/` (theme hot-reload, all-themes, transparency, remote_clipboard), guarded by `vim.fn.executable("omarchy")`; ruby-lsp dropped; neo-tree extra added (shows hidden files) |
 | mise | Enabled | distro-agnostic, already installed; tools now node/go/ruby/bun (rust dropped); needs `shell` recipe for activation |
