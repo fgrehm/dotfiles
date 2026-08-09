@@ -17,7 +17,6 @@ Installs AI tools and deploys their shared configuration (Claude Code, Pi coding
 - `~/.claude/output-styles/`: custom output styles (`navigator-v1`, `navigator-v2`)
 - `~/.claude/settings.json`: deep-merged from a chezmoi-managed base. The merge preserves machine-local keys (model, hooks, plugins, ...) and concatenates permission arrays. See `run_onchange_after_merge-claude-settings.sh.tmpl`.
 - `~/.pi/agent/AGENTS.md`: global instructions for the Pi coding agent
-- `~/.pi/agent/extensions/venice-provider.ts`: Venice.ai model provider extension
 
 ### Shared skills
 

@@ -1,4 +1,0 @@
-# Skipped in containers
-{{ if .isContainer }}
-.chezmoiscripts/install-pi-agent.sh
-{{ end }}
