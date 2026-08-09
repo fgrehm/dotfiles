@@ -18,13 +18,13 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | mise | Enabled | distro-agnostic, already installed; tools now node/go/ruby/bun (rust dropped); needs `shell` recipe for activation |
 | shell | Enabled | bash-only on Omarchy; `useZsh` variable (false on Omarchy) guards zsh install/completions; bashrc preserves omarchy's `default/bash/rc` |
 | terminal | Skipped | Debian/KDE-specific (alacritty, tinty). Ghostty handled via the `omarchy` recipe. May be dropped once fully on Omarchy |
-| ai-tooling | Skipped | NEXT UP: high value (Claude Code, pi, skills). Claude Code already on Omarchy; config largely distro-agnostic; needs install-script adaptation |
+| ai-tooling | Enabled | Claude Code already on Omarchy (guard skips install); pi via npm (distro-agnostic); curl fallback for wget-less Omarchy; skills/settings distro-agnostic |
 | zellij | Skipped | low risk; distro-agnostic; needs `shell` recipe for shellrc fragment. PUNTED — user may skip zellij in favor of tmux or herdr.dev |
 | (others) | Skipped | not yet adapted |
 
 ## Follow-ups
 
-- [ ] **ai-tooling** — NEXT UP: high value (Claude Code, pi, skills). Claude Code already on Omarchy; config (skills, settings) largely distro-agnostic; needs install-script adaptation (Claude Code present, pi via npm).
+- [x] **ai-tooling** — enabled on Omarchy. Claude Code already present (guard skips install); pi via npm (distro-agnostic); `install-claude-code.sh` got a curl fallback since Omarchy lacks wget; skills/settings are distro-agnostic.
 - [ ] **Extract shared download helper** — several install scripts call `wget`/`curl` directly (e.g. `install-claude-code.sh`, `install-ollama.sh` before it was dropped). Omarchy lacks `wget` by default. Extract a shared `_download` helper (like the one in `dot-ai-private/install.sh`) into `scripts/` and use it across recipes. Backlog — not now.
 - [ ] **base** — low priority on Omarchy (jq/unzip/gpg present; wget/fd-find differ).
 - [ ] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos) + obsidian. Webapps share the main browser profile.

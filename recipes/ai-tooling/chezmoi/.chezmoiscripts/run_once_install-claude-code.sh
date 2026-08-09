@@ -10,4 +10,8 @@ fi
 set -eo pipefail
 
 log_info "Installing Claude Code..."
-wget -qO- https://claude.ai/install.sh | bash
+if command -v wget &>/dev/null; then
+  wget -qO- https://claude.ai/install.sh | bash
+else
+  curl -fsSL https://claude.ai/install.sh | bash
+fi
