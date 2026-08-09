@@ -13,11 +13,12 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | Recipe | Status | Notes |
 |--------|--------|-------|
 | git | Enabled | pacman install branch; lazygit/gh externals + completions skipped on Omarchy |
+| omarchy | Enabled | Omarchy-only tweaks (Caps Lock→Ctrl via hypr input.conf); ignored on Debian |
 | (others) | Skipped | not yet adapted |
 
 ## Follow-ups
 
-- [ ] **Caps Lock → Ctrl** — done via the `omarchy` recipe (`~/.config/hypr/input.conf`, `kb_options = compose:paus,ctrl:nocaps`).
+- [x] **Caps Lock → Ctrl** — done via the `omarchy` recipe (`~/.config/hypr/input.conf`, `kb_options = compose:paus,ctrl:nocaps`).
 - [ ] **neovim** — TOP PRIORITY: merge the existing neovim setup with Omarchy's goodies. Review the `nvim` recipe and reconcile with what Omarchy ships/manages.
 - [ ] **lazygit** — already installed / managed by Omarchy (unknown how). Skip the `.chezmoiexternals/lazygit.toml` and its completions on Omarchy so we don't end up with two copies. (Done in recipe; recipe now enabled.)
 - [ ] **gh** — same as lazygit: already installed / managed by Omarchy. Skip the `.chezmoiexternals/gh.toml` and its completions on Omarchy. (Done in recipe; recipe now enabled.)

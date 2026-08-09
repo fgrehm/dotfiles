@@ -4,6 +4,9 @@ laptop
 terminal
 kde
 {{- end }}
+{{- if not .isOmarchy }}
+omarchy
+{{- end }}
 {{- if .isOmarchy }}
 1password
 ai-tooling
