@@ -4,23 +4,11 @@ Project context for AI assistants working on this repo.
 
 ## What This Is
 
-A chezmoi dotfiles repo organized with
-[chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Target: Debian 13
-(Trixie) laptops running KDE Plasma 6, and devcontainers/Codespaces.
+A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Target: Debian 13 (Trixie) laptops running KDE Plasma 6, and devcontainers/Codespaces.
 
-> **Omarchy support is a work in progress.** The current system is Omarchy
-> (Arch-based, Hyprland). Detection (`isOmarchy`) and a guard that skips all
-> recipes on Omarchy are in place; recipes are being adapted one at a time.
-> Debian support is kept alongside it.
+> **Omarchy support is a work in progress.** The current system is Omarchy (Arch-based, Hyprland). Detection (`isOmarchy`) and a guard that skips all recipes on Omarchy are in place; recipes are being adapted one at a time. Debian support is kept alongside it.
 
-chezmoi-recipes adds a recipe layer on top of chezmoi: related config files and
-install scripts are grouped into self-contained directories under `recipes/`.
-Running `chezmoi-recipes overlay` merges `home/` and all `recipes/*/chezmoi/`
-fragments into `compiled-home/`, which chezmoi reads as its source state (via
-`.chezmoiroot`). A `read-source-state.pre` hook runs the overlay automatically
-before any chezmoi command. Each file must belong to exactly one recipe or
-`home/`, never both (overlapping files are an error). See the
-[chezmoi-recipes README](https://github.com/fgrehm/chezmoi-recipes) for more.
+chezmoi-recipes adds a recipe layer on top of chezmoi: related config files and install scripts are grouped into self-contained directories under `recipes/`. Running `chezmoi-recipes overlay` merges `home/` and all `recipes/*/chezmoi/` fragments into `compiled-home/`, which chezmoi reads as its source state (via `.chezmoiroot`). A `read-source-state.pre` hook runs the overlay automatically before any chezmoi command. Each file must belong to exactly one recipe or `home/`, never both (overlapping files are an error). See the [chezmoi-recipes README](https://github.com/fgrehm/chezmoi-recipes) for more.
 
 ## Repo Layout
 
@@ -38,25 +26,17 @@ compiled-home/        generated, gitignored
 
 ## Recipe Structure
 
-A recipe is a directory under `recipes/` with a `README.md` and a `chezmoi/`
-subdirectory. The `chezmoi/` contents use standard chezmoi naming (`dot_`,
-`private_`, `run_once_`, `.tmpl`, etc.) and get overlaid into `compiled-home/`.
+A recipe is a directory under `recipes/` with a `README.md` and a `chezmoi/` subdirectory. The `chezmoi/` contents use standard chezmoi naming (`dot_`, `private_`, `run_once_`, `.tmpl`, etc.) and get overlaid into `compiled-home/`.
 
 ## Directory Privacy Must Be Consistent Across Recipes
 
-chezmoi maps `dot_config` and `private_dot_config` to the same target directory
-(`.config`) but with different permissions. If two recipes in the overlay use
-different privacy prefixes for the same target directory, chezmoi will refuse to
-apply with:
+chezmoi maps `dot_config` and `private_dot_config` to the same target directory (`.config`) but with different permissions. If two recipes in the overlay use different privacy prefixes for the same target directory, chezmoi will refuse to apply with:
 
 ```
 chezmoi: .config: inconsistent state (...dot_config, ...private_dot_config)
 ```
 
-**Rule: all recipes that write under `.config` must use `private_dot_config`.
-Never use `dot_config` for `.config`.** The `.config` directory holds user
-application state and is private by convention. Mixing `dot_config` and
-`private_dot_config` across recipes is always a bug.
+**Rule: all recipes that write under `.config` must use `private_dot_config`. Never use `dot_config` for `.config`.** The `.config` directory holds user application state and is private by convention. Mixing `dot_config` and `private_dot_config` across recipes is always a bug.
 
 ## Environment Detection
 
@@ -73,22 +53,17 @@ application state and is private by convention. Mixing `dot_config` and
 | `.isOmarchy` | `omarchy` on PATH or `~/.local/share/omarchy` exists |
 | `.hasNvidiaGPU` | `lspci` output (skipped in containers) |
 
-Use `{{ if .isContainer }}` in templates and `.chezmoiignore` for conditional
-deployment.
+Use `{{ if .isContainer }}` in templates and `.chezmoiignore` for conditional deployment.
 
 ## chezmoi-recipes Integration
 
-A `read-source-state.pre` hook runs `chezmoi-recipes overlay` before any chezmoi
-command that reads source state. Guard hooks block `chezmoi add`, `chezmoi edit`,
-etc. to prevent writing to the generated `compiled-home/`.
+A `read-source-state.pre` hook runs `chezmoi-recipes overlay` before any chezmoi command that reads source state. Guard hooks block `chezmoi add`, `chezmoi edit`, etc. to prevent writing to the generated `compiled-home/`.
 
 Edit files in `home/` or `recipes/`, never in `compiled-home/`.
 
 ### Skipping recipes conditionally
 
-`recipes/.recipeignore` lists recipe names to skip during overlay. It is a Go
-template evaluated against chezmoi's rendered config data (the `[data]` section
-from `~/.config/chezmoi/chezmoi.toml`). Example:
+`recipes/.recipeignore` lists recipe names to skip during overlay. It is a Go template evaluated against chezmoi's rendered config data (the `[data]` section from `~/.config/chezmoi/chezmoi.toml`). Example:
 
 ```
 {{- if .isContainer }}
@@ -96,28 +71,18 @@ laptop
 {{- end }}
 ```
 
-Use `.recipeignore` to exclude entire recipes (e.g. laptop-only tools) rather
-than adding `isContainer` guards inside individual scripts.
+Use `.recipeignore` to exclude entire recipes (e.g. laptop-only tools) rather than adding `isContainer` guards inside individual scripts.
 
-**Rule: any script that uses template directives (`# {{ if ... }}`, `# {{
-include ... }}`, template variables) MUST have the `.sh.tmpl` extension.**
-Without `.tmpl`, chezmoi treats the file as a plain script and template
-directives become inert comments, causing guards like `# {{ if .isContainer }}`
-to silently fail (the guarded code always runs). Scripts with no template
-directives should use plain `.sh`.
+**Rule: any script that uses template directives (`# {{ if ... }}`, `# {{ include ... }}`, template variables) MUST have the `.sh.tmpl` extension.** Without `.tmpl`, chezmoi treats the file as a plain script and template directives become inert comments, causing guards like `# {{ if .isContainer }}` to silently fail (the guarded code always runs). Scripts with no template directives should use plain `.sh`.
 
 ## Code Style
 
 - Shell scripts use 2-space indentation (`.editorconfig` / shfmt).
-- `.sh.tmpl` files use custom template delimiters (`# {{` / `}}`) so shfmt and
-  shellcheck can parse them as valid shell.
+- `.sh.tmpl` files use custom template delimiters (`# {{` / `}}`) so shfmt and shellcheck can parse them as valid shell.
 - All `.sh.tmpl` files need: `# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"`.
-- Use `$SUDO` variable (set via template conditional) instead of inline template
-  `sudo` conditionals.
+- Use `$SUDO` variable (set via template conditional) instead of inline template `sudo` conditionals.
 - Run `make check` to lint (shfmt + shellcheck).
-- Vim modelines: `# vim: ft=bash.gotmpl` on `.sh.tmpl` files (line 2, after
-  shebang); `# vim: ft=toml.gotmpl` on `.chezmoiexternals/*.toml` files (last
-  line -- putting it first breaks Go template trimming).
+- Vim modelines: `# vim: ft=bash.gotmpl` on `.sh.tmpl` files (line 2, after shebang); `# vim: ft=toml.gotmpl` on `.chezmoiexternals/*.toml` files (last line -- putting it first breaks Go template trimming).
 
 ## GitHub Binary Installs
 
@@ -148,16 +113,9 @@ For releases where the archive path contains the version:
 # vim: ft=toml.gotmpl
 ```
 
-Pin versions explicitly -- do NOT use `gitHubLatestReleaseAssetURL` or
-`gitHubLatestRelease`. Those make GitHub API calls that may hit rate limits.
+Pin versions explicitly -- do NOT use `gitHubLatestReleaseAssetURL` or `gitHubLatestRelease`. Those make GitHub API calls that may hit rate limits.
 
-Always include `checksum.sha256` with the SHA-256 of the downloaded archive or
-file (amd64 only -- no arch conditionals). Do NOT use `checksum.sha256url`
-pointing at the project's checksums file: an attacker who compromises a release
-can modify both the asset and the checksums file. The hardcoded value in this
-repo is the trust anchor. To get the hash, download the asset and run
-`sha256sum` on it, or find it in the project's `checksums.txt` at release time
-and copy the value here.
+Always include `checksum.sha256` with the SHA-256 of the downloaded archive or file (amd64 only -- no arch conditionals). Do NOT use `checksum.sha256url` pointing at the project's checksums file: an attacker who compromises a release can modify both the asset and the checksums file. The hardcoded value in this repo is the trust anchor. To get the hash, download the asset and run `sha256sum` on it, or find it in the project's `checksums.txt` at release time and copy the value here.
 
 Multiple recipes can each contribute `.chezmoiexternals/*.toml` files without conflict since each file has a unique name. Use a shell install script only for apt packages, tools needing post-install setup, or standalone binaries (not archives).
 
@@ -190,19 +148,12 @@ run_quiet $SUDO apt-get install -y <tool>
 
 Key points:
 - Guard with `command -v` for idempotency.
-- `set -eo pipefail` at the top level (after guards and variable setup) -- hard fail
-  on any error so chezmoi does not mark the script as completed. This lets
-  `chezmoi apply` retry the script on the next run without needing to manipulate
-  chezmoi state. A script that exits 0 after a failure would be silently marked
-  done and require `chezmoi state delete` to retry.
-- Use unquoted `$SUDO` (not `"$SUDO"`) -- quoting expands to an empty-string
-  command when running as root.
+- `set -eo pipefail` at the top level (after guards and variable setup) -- hard fail on any error so chezmoi does not mark the script as completed. This lets `chezmoi apply` retry the script on the next run without needing to manipulate chezmoi state. A script that exits 0 after a failure would be silently marked done and require `chezmoi state delete` to retry.
+- Use unquoted `$SUDO` (not `"$SUDO"`) -- quoting expands to an empty-string command when running as root.
 
 ## Completion Scripts
 
-Completion scripts (`run_onchange_after_completions-*.sh.tmpl`) are non-essential
-and must never block `chezmoi apply`. Do NOT use `set -euo pipefail` at the top
-level. Instead, wrap each generation command in an `if !` block:
+Completion scripts (`run_onchange_after_completions-*.sh.tmpl`) are non-essential and must never block `chezmoi apply`. Do NOT use `set -euo pipefail` at the top level. Instead, wrap each generation command in an `if !` block:
 
 ```bash
 #!/bin/env bash
@@ -230,36 +181,27 @@ if ! <tool> completion zsh >"$ZSH_DIR/_<tool>"; then
 fi
 ```
 
-Key points: prepend `$HOME/.local/bin` to PATH so freshly installed binaries are
-discoverable during `chezmoi apply`; no `set -euo pipefail`; `if !` per command.
+Key points: prepend `$HOME/.local/bin` to PATH so freshly installed binaries are discoverable during `chezmoi apply`; no `set -euo pipefail`; `if !` per command.
 
 ## Script Ordering
 
 chezmoi runs scripts in two phases, sorted lexicographically within each:
 
-1. **Before file deployment**: `run_once_`, `run_onchange_`, `run_once_before_`,
-   `run_onchange_before_` scripts
+1. **Before file deployment**: `run_once_`, `run_onchange_`, `run_once_before_`, `run_onchange_before_` scripts
 2. **After file deployment**: `run_once_after_`, `run_onchange_after_` scripts
 
-Use `run_once_after_` or `run_onchange_after_` when a script depends on files
-deployed by chezmoi (e.g., a tool installed via a config file that lands during
-file deployment).
+Use `run_once_after_` or `run_onchange_after_` when a script depends on files deployed by chezmoi (e.g., a tool installed via a config file that lands during file deployment).
 
 ## Conditional File Skipping
 
 Two mechanisms for environment-conditional deployment:
 
-- **`.chezmoiignore`** in a recipe's `chezmoi/` dir: skip target files by
-  environment. Patterns match target paths (e.g., `.config/mise/config.toml`).
-  Uses chezmoi template syntax (`{{ if .isContainer }}`).
-- **Template guards** inside scripts: early `exit 0` based on template
-  conditionals. Use for `run_onchange_` scripts that can't be skipped via
-  `.chezmoiignore`.
+- **`.chezmoiignore`** in a recipe's `chezmoi/` dir: skip target files by environment. Patterns match target paths (e.g., `.config/mise/config.toml`). Uses chezmoi template syntax (`{{ if .isContainer }}`).
+- **Template guards** inside scripts: early `exit 0` based on template conditionals. Use for `run_onchange_` scripts that can't be skipped via `.chezmoiignore`.
 
 ## Config-Triggered Re-runs
 
-`run_onchange_` scripts re-run when their rendered content changes. To re-trigger
-when a deployed config file changes, embed its hash in a comment:
+`run_onchange_` scripts re-run when their rendered content changes. To re-trigger when a deployed config file changes, embed its hash in a comment:
 
 ```bash
 # config hash: # {{ include "private_dot_config/mise/config.toml" | sha256sum }}
@@ -267,5 +209,4 @@ when a deployed config file changes, embed its hash in a comment:
 
 ## Dangerous Commands
 
-Never run `chezmoi apply` on the host from this assistant. Only run it inside a
-container. Safe on host: `chezmoi diff`, `make check`, `git diff`.
+Never run `chezmoi apply` on the host from this assistant. Only run it inside a container. Safe on host: `chezmoi diff`, `make check`, `git diff`.

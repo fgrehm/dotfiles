@@ -1,13 +1,8 @@
 # dotfiles
 
-Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and
-[chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes), built for Debian
-13 (Trixie). Also works in devcontainers/Codespaces.
+Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes), built for Debian 13 (Trixie). Also works in devcontainers/Codespaces.
 
-> **Omarchy support is a work in progress.** The current system is Omarchy
-> (Arch-based). Detection (`isOmarchy`) and a guard that skips all recipes on
-> Omarchy are in place; recipes are being adapted one at a time. Debian support
-> is kept alongside it.
+> **Omarchy support is a work in progress.** The current system is Omarchy (Arch-based). Detection (`isOmarchy`) and a guard that skips all recipes on Omarchy are in place; recipes are being adapted one at a time. Debian support is kept alongside it.
 
 ## Supported Platforms
 
@@ -23,10 +18,7 @@ sh -c "$(wget -qO- https://raw.githubusercontent.com/fgrehm/dotfiles/main/instal
 
 ## How It Works
 
-Dotfiles are organized into modular **recipes** under `recipes/`. Each recipe
-groups related chezmoi files (configs, install scripts, shell fragments) for a
-single tool. chezmoi-recipes overlays them into a generated `compiled-home/`
-directory, then chezmoi applies as normal.
+Dotfiles are organized into modular **recipes** under `recipes/`. Each recipe groups related chezmoi files (configs, install scripts, shell fragments) for a single tool. chezmoi-recipes overlays them into a generated `compiled-home/` directory, then chezmoi applies as normal.
 
 ```
 home/                         shared chezmoi source files
@@ -48,11 +40,8 @@ See [`recipes/`](recipes/) for the full list. Each recipe has its own README.
 
 On a new laptop, `chezmoi apply` needs to run twice:
 
-1. **First apply** -- installs 1Password and the `op` CLI, then downloads SSH keys
-   from your 1Password vault. Other recipes that need SSH (e.g. private repos) will
-   skip gracefully on this run.
-2. **Second apply** -- SSH keys are now on disk; any recipe that skipped will retry
-   and complete normally.
+1. **First apply** -- installs 1Password and the `op` CLI, then downloads SSH keys from your 1Password vault. Other recipes that need SSH (e.g. private repos) will skip gracefully on this run.
+2. **Second apply** -- SSH keys are now on disk; any recipe that skipped will retry and complete normally.
 
 ## Development
 
@@ -66,9 +55,7 @@ make check      # lint shell scripts (shfmt + shellcheck)
 
 ### Environment Detection
 
-`.chezmoi.toml.tmpl` auto-detects containers via `/.dockerenv`, env vars, etc.
-Template data available: `.name`, `.email`, `.isContainer`, `.isDebian`,
-`.isOmarchy`, `.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
+`.chezmoi.toml.tmpl` auto-detects containers via `/.dockerenv`, env vars, etc. Template data available: `.name`, `.email`, `.isContainer`, `.isDebian`, `.isOmarchy`, `.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
 
 ## License
 
