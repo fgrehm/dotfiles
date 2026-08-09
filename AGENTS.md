@@ -199,7 +199,7 @@ Use `run_once_after_` or `run_onchange_after_` when a script depends on files de
 
 Two mechanisms for environment-conditional deployment:
 
-- **`.chezmoiignore`** in a recipe's `chezmoi/` dir: skip target files by environment. Patterns match target paths (e.g., `.config/mise/config.toml`). Uses chezmoi template syntax (`{{ if .isContainer }}`).
+- **`.chezmoiignore`** in a recipe's `chezmoi/` dir: skip target files by environment. Patterns match target paths (e.g., `.config/mise/config.toml`). Uses chezmoi template syntax (`{{ if .isContainer }}`). For scripts, the pattern matches the target path with the `run_`/`once_`/`onchange_`/`before_`/`after_` attributes stripped. So `run_once_after_install-pi-agent.sh` is matched by `.chezmoiscripts/install-pi-agent.sh` (not by its full source name).
 - **Template guards** inside scripts: early `exit 0` based on template conditionals. Use for `run_onchange_` scripts that can't be skipped via `.chezmoiignore`.
 
 ## Config-Triggered Re-runs

@@ -25,6 +25,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 ## Follow-ups
 
 - [ ] **ai-tooling** — NEXT UP: high value (Claude Code, pi, skills). Claude Code already on Omarchy; config (skills, settings) largely distro-agnostic; needs install-script adaptation (Claude Code present, pi via npm).
+- [ ] **Extract shared download helper** — several install scripts call `wget`/`curl` directly (e.g. `install-claude-code.sh`, `install-ollama.sh` before it was dropped). Omarchy lacks `wget` by default. Extract a shared `_download` helper (like the one in `dot-ai-private/install.sh`) into `scripts/` and use it across recipes. Backlog — not now.
 - [ ] **base** — low priority on Omarchy (jq/unzip/gpg present; wget/fd-find differ).
 - [ ] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos) + obsidian. Webapps share the main browser profile.
 - [ ] **zellij** — PUNTED: user may skip zellij and stick with tmux or move to herdr.dev. Revisit later.
