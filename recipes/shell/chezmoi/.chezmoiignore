@@ -1,0 +1,3 @@
+{{- if not .useZsh }}
+.zshrc
+{{- end }}
