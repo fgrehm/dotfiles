@@ -24,7 +24,7 @@ EOF
 [ "${1:-}" ] || usage
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-SKILLS_DIR="$(cd "$SCRIPT_DIR/../chezmoi/private_dot_ai/agent-skills" && pwd -P)"
+SKILLS_DIR="$(cd "$SCRIPT_DIR/../chezmoi/private_dot_agents/skills" && pwd -P)"
 
 url="$1"
 

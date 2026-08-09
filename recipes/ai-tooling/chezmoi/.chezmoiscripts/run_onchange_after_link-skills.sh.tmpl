@@ -1,0 +1,30 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Re-run when the skill set changes:
+# skills hash: # {{ output "bash" "-c" (printf "find %s -mindepth 1 -maxdepth 1 -type d -printf '%%f\\n' | sort | sha256sum" (joinPath .chezmoi.sourceDir "private_dot_agents/skills")) }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+SKILLS_DIR="$HOME/.agents/skills"
+CLAUDE_DIR="$HOME/.claude/skills"
+PI_DIR="$HOME/.pi/agent/skills"
+
+if [ ! -d "$SKILLS_DIR" ]; then
+  log_skip "no skills dir, skipping"
+  exit 0
+fi
+
+mkdir -p "$CLAUDE_DIR" "$PI_DIR"
+
+# Link each skill in the canonical home into the per-agent skills dirs.
+# Only creates missing symlinks, so non-chezmoi entries are left alone.
+for skill in "$SKILLS_DIR"/*/; do
+  [ -d "$skill" ] || continue
+  name="$(basename "$skill")"
+  for target in "$CLAUDE_DIR" "$PI_DIR"; do
+    if [ ! -e "$target/$name" ]; then
+      ln -s "$skill" "$target/$name"
+      log_info "Linked $name into $target"
+    fi
+  done
+done
