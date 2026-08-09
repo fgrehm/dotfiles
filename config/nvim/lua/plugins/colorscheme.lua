@@ -1,3 +1,7 @@
+if vim.fn.executable("omarchy") == 1 then
+  return {}
+end
+
 local DEFAULT = "base16-gruvbox-dark-hard"
 
 local function read_theme()

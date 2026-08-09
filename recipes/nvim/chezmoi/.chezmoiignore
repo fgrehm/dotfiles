@@ -1,0 +1,3 @@
+{{- if not .isOmarchy }}
+.chezmoiscripts/run_once_after_link-omarchy-theme.sh
+{{- end }}

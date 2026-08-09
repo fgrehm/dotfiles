@@ -11,3 +11,6 @@ CLAUDE.local.md
 .*.swp
 .*.swo
 .DS_Store
+
+# Omarchy theme symlink (created at runtime by run_once_after_link-omarchy-theme.sh)
+config/nvim/lua/plugins/theme.lua
