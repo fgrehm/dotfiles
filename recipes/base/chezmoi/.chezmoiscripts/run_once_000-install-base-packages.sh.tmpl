@@ -9,20 +9,47 @@ SUDO="sudo"
 SUDO=""
 # {{ end }}
 
-packages=()
-command -v jq &>/dev/null || packages+=(jq)
-command -v unzip &>/dev/null || packages+=(unzip)
-command -v wget &>/dev/null || packages+=(wget)
-command -v gpg &>/dev/null || packages+=(gnupg)
-command -v fdfind &>/dev/null || packages+=(fd-find)
+# binary:package pairs. Package names differ per-OS (fd-find vs fd).
+# {{ if .isOmarchy }}
+declare -A pkgs=([jq]=jq [unzip]=unzip [wget]=wget [gpg]=gnupg [fdfind]=fd)
+# {{ else }}
+declare -A pkgs=([jq]=jq [unzip]=unzip [wget]=wget [gpg]=gnupg [fdfind]=fd-find)
+# {{ end }}
 
-if [ ${#packages[@]} -eq 0 ]; then
+packages=()
+for bin in "${!pkgs[@]}"; do
+  command -v "$bin" &>/dev/null || packages+=("${pkgs[$bin]}")
+done
+
+# On Omarchy, fd installs as `fd`; scripts expect `fdfind`, so we symlink it.
+# {{ if .isOmarchy }}
+fdfind_ok=0
+if command -v fdfind &>/dev/null; then
+  fdfind_ok=1
+fi
+# {{ end }}
+
+if [ ${#packages[@]} -eq 0 ] && [ "${fdfind_ok:-1}" -eq 1 ]; then
   log_skip "base packages already installed"
   exit 0
 fi
 
 set -eo pipefail
 
-log_info "Installing base packages: ${packages[*]}..."
-run_quiet $SUDO apt-get update -qq
-run_quiet $SUDO apt-get install -y "${packages[@]}"
+if [ ${#packages[@]} -gt 0 ]; then
+  log_info "Installing base packages: ${packages[*]}..."
+  # {{ if .isOmarchy }}
+  run_quiet $SUDO omarchy pkg add "${packages[@]}"
+  # {{ else }}
+  run_quiet $SUDO apt-get update -qq
+  run_quiet $SUDO apt-get install -y "${packages[@]}"
+  # {{ end }}
+fi
+
+# {{ if .isOmarchy }}
+# Ensure fdfind is available (fd installs as `fd` on Omarchy).
+if command -v fd &>/dev/null && ! command -v fdfind &>/dev/null; then
+  mkdir -p "$HOME/.local/bin"
+  ln -sf "$(command -v fd)" "$HOME/.local/bin/fdfind"
+fi
+# {{ end }}

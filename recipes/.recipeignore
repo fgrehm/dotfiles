@@ -9,7 +9,6 @@ omarchy
 {{- end }}
 {{- if .isOmarchy }}
 1password
-base
 cartage
 kde
 laptop
