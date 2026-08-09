@@ -18,10 +18,6 @@ Git configuration, global gitignore, shell aliases, and TUI tooling.
 - Histogram diff algorithm, colorMoved, fetch prune
 - Git LFS filter configured
 
-## Requirements
-
-- Debian 13 (Trixie)
-
 ## Template variables
 
 | Variable | Description | Source |
