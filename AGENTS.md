@@ -6,7 +6,7 @@ Project context for AI assistants working on this repo.
 
 A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Target: Debian 13 (Trixie) laptops running KDE Plasma 6, and devcontainers/Codespaces.
 
-> **Debian is being dropped as a bare-metal/laptop target** — Omarchy replaces it on laptops. Debian remains supported for devcontainers/Codespaces. Recipes are being adapted to Omarchy one at a time; Debian support is kept alongside it until the transition is complete.
+> **Debian is still a supported bare-metal target** — one laptop still runs Debian 13. The ultimate goal is to migrate fully to Omarchy and drop Debian as bare-metal, keeping it for devcontainers/Codespaces. Recipes are adapted to Omarchy one at a time; Debian support is kept alongside until the transition is complete.
 
 > **Omarchy support is a work in progress.** The current system is Omarchy (Arch-based, Hyprland). Detection (`isOmarchy`) and a guard that skips all recipes on Omarchy are in place; recipes are being adapted one at a time. Debian support is kept alongside it. See `OMARCHY.md` for the living status, follow-ups, and learnings.
 >

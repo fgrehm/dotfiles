@@ -47,7 +47,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 
 ## Notes
 
-- **Ultimate goal: drop Debian as a bare-metal/laptop target** — Omarchy replaces it on laptops. Debian remains supported for devcontainers/Codespaces. Recipes are adapted to Omarchy one at a time; Debian support is kept alongside until the transition is complete.
+- **Debian is still a supported bare-metal target** — one laptop still runs Debian 13. The ultimate goal is to migrate fully to Omarchy and drop Debian as bare-metal, keeping it for devcontainers/Codespaces. Recipes are adapted to Omarchy one at a time; Debian support is kept alongside until the transition is complete.
 - **1password is preinstalled on Omarchy** — the `1password` recipe is skipped on Omarchy (no install needed).
 - Omarchy uses `pacman` (via `omarchy pkg`), not `apt`. Install scripts that call `apt-get` need a pacman branch guarded by `{{ if .isOmarchy }}`.
 - Omarchy manages its own desktop/WM config (hypr, waybar, walker, terminals, mako) — recipes like `kde`/`terminal` are likely candidates to skip or rework.

@@ -2,13 +2,13 @@
 
 Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Primary laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian 13 (Trixie) is kept for devcontainers/Codespaces.
 
-> **Debian is being dropped as a bare-metal/laptop target** — Omarchy replaces it on laptops. Debian remains supported for devcontainers/Codespaces. Recipes are adapted to Omarchy one at a time; Debian support is kept alongside until the transition is complete.
+> **Debian is still a supported bare-metal target** — one laptop still runs Debian 13. The ultimate goal is to migrate fully to Omarchy and drop Debian as bare-metal, keeping it for devcontainers/Codespaces. Recipes are adapted to Omarchy one at a time; Debian support is kept alongside until the transition is complete.
 
 ## Supported Platforms
 
 - **Omarchy** (Arch-based, Hyprland) — primary laptop target
 - **Debian-based containers** (Ubuntu, Debian, etc. for devcontainers/CI)
-- **Debian 13** (laptop) — legacy, being dropped in favor of Omarchy
+- **Debian 13** (laptop) — still supported (one laptop); ultimate goal is to migrate to Omarchy
 
 ## Quick Start
 
