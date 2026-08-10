@@ -13,7 +13,6 @@ wires it up for the current environment.
 
 ## Requirements
 
-- Debian 13 (Trixie)
 - wget
 - Internet access (GitHub releases)
 - **Laptop only**: systemd user session, graphical session target

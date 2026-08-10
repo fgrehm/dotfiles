@@ -22,7 +22,8 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | ai-tooling | Enabled | Claude Code already on Omarchy (guard skips install); pi via npm (distro-agnostic); curl fallback for wget-less Omarchy; skills/settings distro-agnostic |
 | zellij | Enabled | distro-agnostic (GitHub release binary); shellrc fragment needs the `shell` recipe (enabled on Omarchy) |
 | laptop | Enabled | crib CLI (GitHub release) + `~/.config/crib/config.toml`; ttyd/vhs dropped |
-| (others) | Skipped | 1password (preinstalled on Omarchy), cartage, kde — not yet adapted |
+| cartage | Enabled | distro-agnostic (GitHub release binary + systemd user service); container-side symlinks skipped on laptop |
+| (others) | Skipped | 1password (preinstalled on Omarchy), kde — not yet adapted |
 
 ## Follow-ups
 
