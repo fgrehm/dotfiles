@@ -38,12 +38,12 @@ See [`recipes/`](recipes/) for the full list. Each recipe has its own README.
 
 ## Fresh Machine Setup
 
-On a new **Debian** laptop, `chezmoi apply` needs to run twice:
+On a new laptop, `chezmoi apply` needs to run twice:
 
-1. **First apply** -- installs 1Password and the `op` CLI, then downloads SSH keys from your 1Password vault. Other recipes that need SSH (e.g. private repos) will skip gracefully on this run.
+1. **First apply** -- downloads SSH keys from your 1Password vault (on Debian it also installs 1Password and the `op` CLI first). Other recipes that need SSH (e.g. private repos) will skip gracefully on this run.
 2. **Second apply** -- SSH keys are now on disk; any recipe that skipped will retry and complete normally.
 
-On **Omarchy**, 1Password is preinstalled, so this two-pass dance is not needed.
+On **Omarchy**, 1Password is preinstalled, so the first apply only downloads the SSH keys (no 1Password install) — the two-pass flow still applies.
 
 ## Development
 

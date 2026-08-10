@@ -5,7 +5,7 @@ configured 1Password vault/item during `chezmoi apply`.
 
 Skipped in containers (they use SSH agent forwarding).
 
-Skipped on Omarchy (1Password is preinstalled there).
+On Omarchy, 1Password is preinstalled, so only the SSH-key setup runs (the install script is skipped via `.chezmoiignore`).
 
 ## 1Password setup
 

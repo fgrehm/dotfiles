@@ -23,7 +23,8 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | zellij | Enabled | distro-agnostic (GitHub release binary); shellrc fragment needs the `shell` recipe (enabled on Omarchy) |
 | laptop | Enabled | crib CLI (GitHub release) + `~/.config/crib/config.toml`; ttyd/vhs dropped |
 | cartage | Enabled | distro-agnostic (GitHub release binary + systemd user service); container-side symlinks skipped on laptop |
-| (others) | Skipped | 1password (preinstalled on Omarchy), kde — not yet adapted |
+| 1password | Enabled | install skipped on Omarchy (preinstalled); SSH-key setup runs on both |
+| (others) | Skipped | kde — not yet adapted |
 
 ## Follow-ups
 
@@ -48,7 +49,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 ## Notes
 
 - **Debian is still a supported bare-metal target** — one laptop still runs Debian 13. The ultimate goal is to migrate fully to Omarchy and drop Debian as bare-metal, keeping it for devcontainers/Codespaces. Recipes are adapted to Omarchy one at a time; Debian support is kept alongside until the transition is complete.
-- **1password is preinstalled on Omarchy** — the `1password` recipe is skipped on Omarchy (no install needed).
+- **1password is preinstalled on Omarchy** — the install script is skipped (via `.chezmoiignore`), but the SSH-key setup still runs on Omarchy.
 - Omarchy uses `pacman` (via `omarchy pkg`), not `apt`. Install scripts that call `apt-get` need a pacman branch guarded by `{{ if .isOmarchy }}`.
 - Omarchy manages its own desktop/WM config (hypr, waybar, walker, terminals, mako) — recipes like `kde`/`terminal` are likely candidates to skip or rework.
 - **Config philosophy:** only track a config in the repo when there's a need to customize it. Otherwise let omarchy manage it (e.g. ghostty config is omarchy's default; we only handle install + default terminal).

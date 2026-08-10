@@ -8,7 +8,6 @@ kde
 omarchy
 {{- end }}
 {{- if .isOmarchy }}
-1password
 kde
 terminal
 {{- end }}

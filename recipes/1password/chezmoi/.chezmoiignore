@@ -1,0 +1,4 @@
+# 1Password is preinstalled on Omarchy; only the SSH-key setup is needed there.
+{{ if .isOmarchy }}
+.chezmoiscripts/install-1password.sh
+{{ end }}
