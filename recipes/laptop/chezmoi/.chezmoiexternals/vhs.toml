@@ -1,8 +1,0 @@
-{{- $version := "0.11.0" -}}
-[".local/bin/vhs"]
-  type = "archive-file"
-  url = "https://github.com/charmbracelet/vhs/releases/download/v{{ $version }}/vhs_{{ $version }}_Linux_x86_64.tar.gz"
-  path = "vhs_{{ $version }}_Linux_x86_64/vhs"
-  executable = true
-  checksum.sha256 = "99cb634587eaae0473c1ea377db80c3a048c27f99fe0a7febb1a1e8cb7ee5009"
-# vim: ft=toml.gotmpl
