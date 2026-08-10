@@ -10,6 +10,8 @@ Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, 
 - Enables the stock `ssh-agent.service` user unit via `run_once_enable-ssh-agent.sh` (idempotent; skips if already enabled).
 - Removes unwanted apps via `run_once_remove-unwanted-apps.sh` (webapps: Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos; plus obsidian).
 - Installs ghostty and sets it as the default terminal via `run_once_install-ghostty.sh` (idempotent; skips if already installed).
+- Installs brave and sets it as the default browser via `run_once_install-brave.sh` (idempotent; skips if already installed).
+- Installs Slack (`slack-desktop` from the AUR) plus `xdg-desktop-portal-wlr` for Wayland screen sharing via `run_once_install-slack.sh` (idempotent; skips if already installed).
 
 ## Notes
 

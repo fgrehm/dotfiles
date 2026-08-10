@@ -31,7 +31,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 - [ ] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos) + obsidian. Webapps share the main browser profile.
 - [ ] **zellij** — PUNTED: user may skip zellij and stick with tmux or move to herdr.dev. Revisit later.
 - [ ] **Browser → brave** — switch default browser to brave (backlog).
-- [x] **Install slack** — `slack` recipe installs `slack-desktop` via `omarchy pkg aur add` on Omarchy (official `.deb` on Debian).
+- [x] **Install slack** — `run_once_install-slack.sh` in the `omarchy` recipe installs `slack-desktop` via `omarchy pkg aur add` plus `xdg-desktop-portal-wlr` for Wayland screen sharing.
 - [ ] **Terminal: ghostty** — installed + set as default via `run_once_install-ghostty.sh` in the `omarchy` recipe. The `terminal` recipe (alacritty/tinty) may be dropped once fully on Omarchy on both laptops.
 - [ ] **Shell: zsh/ohmyzsh** — user would go zsh but could live without it; adapt the `shell` recipe (pacman+curl) if pursued. It's the foundation for other recipes' shellrc fragments.
 - [ ] **SSH agent** — stock `ssh-agent.service` enabled via `run_once_enable-ssh-agent.sh` in the `omarchy` recipe; `SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}/ssh-agent.socket` set via `environment.d/ssh-agent.conf` (needs re-login to take effect). `AddKeysToAgent yes` already lives in the `shell` recipe (not duplicated). Pending: optionally mask `gpg-agent-ssh.socket` (GnuPG SSH emulation) to prevent it from overriding `SSH_AUTH_SOCK`; verify once per boot.
