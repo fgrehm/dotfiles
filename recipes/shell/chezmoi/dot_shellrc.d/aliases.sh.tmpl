@@ -1,0 +1,41 @@
+# shellcheck shell=bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# General-purpose aliases shared across bash and zsh.
+
+# --- Colors ---
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+# --- ls shortcuts ---
+alias ll='ls -alFh'
+alias la='ls -A'
+alias l='ls -CF'
+
+# --- Project shortcuts (cdp/cdpo) ---
+# cd into ~/projects / ~/projects/oss with tab-completion of subdirectories.
+# Skipped in containers (no ~/projects there).
+# {{ if not .isContainer }}
+cdp() { cd "$HOME/projects/${1:-}" || return; }
+cdpo() { cd "$HOME/projects/oss/${1:-}" || return; }
+
+if [ -n "$BASH_VERSION" ]; then
+  _cdp_complete() {
+    local base="$HOME/projects"
+    [[ "${COMP_WORDS[0]}" == cdpo ]] && base="$HOME/projects/oss"
+    local cur="${COMP_WORDS[COMP_CWORD]}"
+    mapfile -t COMPREPLY < <(compgen -d -- "$base/$cur" | sed "s|^$base/||")
+  }
+  complete -F _cdp_complete cdp cdpo
+elif [ -n "$ZSH_VERSION" ]; then
+  # shellcheck disable=SC1087,SC2154,SC2193 # zsh $words array
+  _cdp() {
+    local base="$HOME/projects"
+    [[ "${words[1]}" == cdpo ]] && base="$HOME/projects/oss"
+    _files -W "$base" -/
+  }
+  compdef _cdp cdp cdpo
+fi
+# {{ end }}

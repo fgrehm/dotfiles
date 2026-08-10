@@ -9,7 +9,7 @@ Core shell infrastructure: bash, zsh (via Oh My Zsh), and the modular
 - Deploys `~/.zshrc` (Oh My Zsh + git prompt extensions + shellrc loader)
 - Deploys `~/.shellrc` (sources `~/.shellrc.d/*.sh` alphabetically, then `~/.shellrc.local`)
 - Deploys `~/.shellrc.d/env.sh` (PATH, editor, history)
-- Deploys `~/.shellrc.d/aliases.sh` (ls, grep color aliases)
+- Deploys `~/.shellrc.d/aliases.sh` (ls, grep color aliases; `cdp`/`cdpo` project shortcuts with tab-completion of subdirectories, skipped in containers)
 - Creates `~/.shellrc.local` for machine-local overrides (not managed by chezmoi)
 - Installs Oh My Zsh (unattended, preserves existing `.zshrc`)
 
