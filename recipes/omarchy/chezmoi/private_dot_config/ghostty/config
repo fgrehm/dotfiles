@@ -1,0 +1,5 @@
+# Include omarchy's default ghostty config, then override the window padding.
+# config-file entries are processed after this file, in order, so padding.conf
+# (loaded last) wins over omarchy's 14px default.
+config-file = ?"~/.local/share/omarchy/config/ghostty/config"
+config-file = ?"~/.config/ghostty/padding.conf"
