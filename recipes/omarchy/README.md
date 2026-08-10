@@ -5,6 +5,7 @@ Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, 
 ## What it does
 
 - Deploys `~/.config/hypr/input.conf` with Caps Lock remapped to Control (`kb_options = compose:paus,ctrl:nocaps`).
+- Deploys `~/.config/hypr/windowrules.conf` with float + center rules for transient dialog toolkits (`yad`, `zenity`, `kdialog`) so they don't get tiled. Tracked `~/.config/hypr/hyprland.conf` adds `source = ~/.config/hypr/windowrules.conf` to omarchy's default `hyprland.conf` (which has no sourced window-rules override file).
 - Deploys `~/.config/starship.toml` — a minimal prompt with a conditional newline: `add_newline = false` plus a `custom.line_break` module (`require_repo = true`) inserts a line break before `❯` only inside git repos (single-line prompt outside them). Nerd Font git-status icons are backlogged (see OMARCHY.md).
 - Uses lowercase `~/projects` instead of omarchy's default `~/Projects` via `~/.config/user-dirs.dirs` (`XDG_PROJECTS_DIR="$HOME/projects"`) and `~/.config/gtk-3.0/bookmarks` (templated home path).
 - Deploys `~/.config/waybar/config.jsonc` (top bar layout; clock shows weekday, date, and time).
@@ -20,7 +21,7 @@ Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, 
 
 ## Notes
 
-- Omarchy manages its own Hyprland configs via `omarchy refresh`. This recipe tracks the user-level overrides so they survive `omarchy refresh`/updates. If a config diverges from omarchy's defaults, re-apply via `chezmoi apply`.
+- Omarchy manages its own Hyprland configs via `omarchy refresh`. This recipe tracks the user-level overrides (`input.conf`, `hyprland.conf`, `windowrules.conf`) so they survive `omarchy refresh`/updates. If a config diverges from omarchy's defaults, re-apply via `chezmoi apply`. `hyprland.conf` is tracked in full, so if omarchy upstream changes its default `hyprland.conf` (new `source` lines, etc.) the tracked copy drifts and needs to be re-synced.
 - Ghostty's shipped config is read-only at `~/.local/share/omarchy/config/ghostty/config`. To override it, `~/.config/ghostty/config` includes it via `config-file`, then loads `padding.conf` last (ghostty processes `config-file` entries after the declaring file, in order, so the last one wins).
 - The `environment.d` SSH_AUTH_SOCK setting only takes effect after re-login (environment.d is read at systemd user manager startup).
 - `AddKeysToAgent yes` is intentionally NOT duplicated here — it lives in the `shell` recipe's `~/.ssh/config`.
