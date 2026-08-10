@@ -14,6 +14,7 @@ Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, 
 - Installs brave and sets it as the default browser via `run_once_install-brave.sh` (idempotent; skips if already installed).
 - Installs Slack (`slack-desktop` from the AUR) plus `xdg-desktop-portal-wlr` for Wayland screen sharing via `run_once_install-slack.sh` (idempotent; skips if already installed).
 - Installs Dropbox and starts the service via `run_once_install-dropbox.sh` (idempotent; skips if already installed). Must then be authenticated via the web.
+- Disables the GNOME filesystem indexer (`localsearch`, formerly `tracker3-miners`) via `run_once_disable-localsearch.sh` (masks `localsearch-3`, `localsearch-control-3`, `localsearch-writeback-3`, and `tinysparql-xdg-portal-3` user services) and deploys `~/.config/autostart/localsearch-3.desktop` with `Hidden=true` as belt-and-suspenders against DBus activation by nautilus. Nothing on Omarchy consumes its index (Walker's file search is self-contained), so it's pure CPU/RAM overhead.
 
 ## Notes
 
