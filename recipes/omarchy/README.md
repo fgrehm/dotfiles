@@ -5,6 +5,7 @@ Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, 
 ## What it does
 
 - Deploys `~/.config/hypr/input.conf` with Caps Lock remapped to Control (`kb_options = compose:paus,ctrl:nocaps`).
+- Deploys `~/.config/starship.toml` — a minimal prompt with a conditional newline: `add_newline = false` plus a `custom.line_break` module (`require_repo = true`) inserts a line break before `❯` only inside git repos (single-line prompt outside them). Nerd Font git-status icons are backlogged (see OMARCHY.md).
 - Deploys `~/.config/waybar/config.jsonc` (top bar layout; clock shows weekday, date, and time).
 - Overrides ghostty's window padding to 2px (omarchy's default is 14px) via `~/.config/ghostty/config` + `padding.conf`. `padding.conf` is loaded last (as a `config-file`), so it wins over omarchy's 14px. `window-padding-balance = true` distributes leftover space (viewport not divisible by cell size) across all edges instead of stacking it at the bottom. Padding changes only affect new terminals.
 - Sets `SSH_AUTH_SOCK` to the stock OpenSSH agent socket via `~/.config/environment.d/ssh-agent.conf` (`SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}/ssh-agent.socket`).

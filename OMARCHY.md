@@ -14,7 +14,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 |--------|--------|-------|
 | git | Enabled | pacman install branch; lazygit/gh externals + completions skipped on Omarchy |
 | base | Enabled | per-OS package map (fd-find/fdfind on Debian vs fd on Arch); installs via `omarchy pkg add`; creates `~/.local/bin/fdfind` symlink |
-| omarchy | Enabled | Omarchy-only tweaks; ignored on Debian |
+| omarchy | Enabled | Omarchy-only tweaks (incl. starship prompt); ignored on Debian |
 | nvim | Enabled | omarchy goodies merged into `config/nvim/` (theme hot-reload, all-themes, transparency, remote_clipboard), guarded by `vim.fn.executable("omarchy")`; ruby-lsp dropped; neo-tree extra added (shows hidden files) |
 | mise | Enabled | distro-agnostic, already installed; tools now node/go/ruby/bun (rust dropped); needs `shell` recipe for activation |
 | shell | Enabled | bash-only on Omarchy; `useZsh` variable (false on Omarchy) guards zsh install/completions; bashrc preserves omarchy's `default/bash/rc` |
@@ -46,6 +46,8 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 - [x] **Completion scripts** — `run_onchange_after_completions-*.sh.tmpl` work on Omarchy: the `shell` recipe (enabled) provides the bash-completion sourcing; `useZsh` gates zsh completions (false on Omarchy).
 - [ ] **git-lfs** — not installed on Omarchy; `config.tmpl` sets an LFS filter. Install `git-lfs` (`omarchy pkg add git-lfs`) if LFS repos are used.
 - [ ] **SSH commit signing** — `config.tmpl` enables `commit.gpgsign` since the signing key exists. Requires the key loaded in the SSH agent; verify on first commit.
+- [x] **Shell prompt: starship conditional newline** — first pass: `~/.config/starship.toml` tracked in the `omarchy` recipe. `add_newline = false` plus a `custom.line_break` module (`require_repo = true`, `format = "\n"`) so a newline appears before `❯` only inside git repos — single-line prompt outside repos, two-line (git info on its own line) inside them. Mirrors the old zsh prompt's `_precmd_prompt_nl`. Validated with `starship prompt` in a repo vs not.
+- [ ] **Shell prompt: Nerd Font git icons (backlog)** — replace the plain `git_status` symbols with monochrome Nerd Font glyphs (e.g. `\uf044` pencil for modified, `\uf128` question for untracked, `\uf01c` inbox for stashed, `\uf0aa`/`\uf0ab` arrows for ahead/behind). All verified present in JetBrainsMono Nerd Font; avoid Unicode color emoji (poor rendering in the font).
 
 ## Notes
 
