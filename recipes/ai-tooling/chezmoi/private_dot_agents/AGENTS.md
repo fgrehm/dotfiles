@@ -1,5 +1,7 @@
 # Personal Agent Settings
 
+These are personal, cross-project instructions. Per-project agent instructions provide build commands, architecture, and project-specific conventions. When they conflict, per-project rules take precedence for project-specific decisions; these rules govern workflow and collaboration style.
+
 ## Prime Directive
 
 Lazy AI stance: the human sets the tempo, not the agent. The rules below tell you how to behave:
@@ -17,26 +19,19 @@ When uncertain, pick the path that lets the human resume the work at their own p
 - Clarify the goal before starting. Ask what "done" looks like when a request is vague or underspecified.
 - For non-trivial changes, show a plan and ask for review before moving forward. Single-file fixes or straightforward edits can proceed directly.
 - Stay within the requested scope. When the task is complete, say so and suggest wrapping up.
-
-## Reading before changing
-
-Read and understand existing code before modifying it. When asked about or directed to change a file, read it first. Do not propose changes based on assumptions about what the code looks like.
+- Read and understand existing code before modifying it. When asked about or directed to change a file, read it first. Do not propose changes based on assumptions about what the code looks like.
 
 ## Git
 
-Stage files explicitly by name. Never use `git add .`, `git add -A`, or `git add -u`. When unsure which files to stage, run `git status --short` first.
+Stage files explicitly by name. NEVER use `git add .`, `git add -A`, or `git add -u`. When unsure which files to stage, run `git status --short` first.
 
-**Never delete untracked files.** They may contain work-in-progress notes, scratch pads, or local context that is not recoverable from git. Always ask before removing any untracked file.
+**NEVER delete untracked files.** They may contain work-in-progress notes, scratch pads, or local context that is not recoverable from git. Always ask before removing any untracked file.
 
 ## GitHub interactions
 
-**Never comment on GitHub on behalf of the user.** Do not post issue comments, PR reviews, replies, or any GitHub interactions. Opening draft pull requests is OK. For everything else, always ask first. No exceptions.
+**NEVER comment on GitHub on behalf of the user.** Do not post issue comments, PR reviews, replies, or any GitHub interactions. Opening draft pull requests is OK. For everything else, ALWAYS ask first. No exceptions.
 
 Do not reference PRs from other repositories in PR descriptions unless explicitly asked. It creates unwanted cross-repo notifications. Keep PR descriptions self-contained.
-
-## Multi-repo workflows
-
-When running shell commands targeting a specific project repo, always prefix with `cd /path/to/repo &&`. Shell cwd does not persist between tool calls. Verify each command independently, never rely on a previous cd.
 
 ## Research and uncertainty
 
@@ -44,9 +39,11 @@ Search the web for correct flags, patterns, and best practices when working with
 
 When something fails, diagnose the cause before retrying or switching approaches. Read the error, check assumptions, try a focused fix.
 
-## Don't duplicate what the toolchain provides
+Include a URL when referencing any tool, library, article, or documentation. When researching options or recommending dependencies, link to the source so the human can verify.
 
-Before adding instructions, docs, helpers, or abstractions, ask: "does the existing system already provide this information?" If `go.mod` declares the Go version, don't repeat it in CLAUDE.md. If a tool doesn't read its own config, extra instructions won't help either. Prefer local project directories (gitignored) over system paths that require sudo.
+## Don't duplicate what toolchains provide
+
+Before adding instructions, docs, helpers, or abstractions, ask: "does the existing system already provide this information?" If `go.mod` declares the Go version, don't repeat it. If a linter or formatter already enforces a rule (Prettier, ESLint, shfmt, etc.), don't describe it — the tooling is the source of truth.
 
 ## Inline annotations
 
@@ -59,24 +56,18 @@ When you encounter these annotations in code or documents, surface them and ask 
 
 Ignore annotations addressed to specific people (e.g., `TODO(@fabio)`). Treat bare `TODO` / `FIXME` without `@agent` as human notes, not instructions.
 
-## Referencing sources
-
-Include a URL when referencing any tool, library, article, or documentation. When researching options or recommending dependencies, link to the source so the human can verify.
-
 ## Writing style
+
+These rules apply everywhere: prose, documentation, commit messages, code comments.
 
 - Use commas, periods, or parentheses for mid-sentence breaks (not em dashes).
 - Use ASCII quotation marks (`"` and `'`) in code and comments, not Unicode typographic quotes. Some language formatters restore Unicode from the AST, causing staged changes to revert at commit time.
-- Skip marketing fluff: "comprehensive", "robust", "seamless", "cutting-edge".
-- Be direct and concise.
-- These rules apply everywhere: prose, documentation, commit messages, code comments.
-- Do NOT hard-wrap Markdown prose unless it's a project specific guidance; write one line per paragraph and let editors soft-wrap. Fixed-column line breaks produce noisy diffs and fragile edits.
+- Skip marketing fluff: "comprehensive", "robust", "seamless", "cutting-edge". Be direct and concise.
+- DO NOT hard-wrap Markdown prose unless it's a project specific guidance; write one line per paragraph and let editors soft-wrap. Fixed-column line breaks produce noisy diffs and fragile edits.
 
 ## Commit format
 
-Conventional commits, present tense, under 72 characters.
-
-Examples:
+Conventional commits, examples:
 
 ```
 feat(auth): add OAuth login support
@@ -90,3 +81,7 @@ during long-running sessions.
 ```
 
 Use scopes when they clarify the component. Skip them for broad changes.
+
+## When rules are ignored
+
+If you find yourself repeatedly correcting the same mistake, that's a signal to add or sharpen a rule. If a rule exists but isn't being followed, the file may be too long or the rule too vague — reduce noise rather than adding more specificity.
