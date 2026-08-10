@@ -21,7 +21,8 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | terminal | Skipped | Debian/KDE-specific (alacritty, tinty). Ghostty handled via the `omarchy` recipe. May be dropped once fully on Omarchy |
 | ai-tooling | Enabled | Claude Code already on Omarchy (guard skips install); pi via npm (distro-agnostic); curl fallback for wget-less Omarchy; skills/settings distro-agnostic |
 | zellij | Enabled | distro-agnostic (GitHub release binary); shellrc fragment needs the `shell` recipe (enabled on Omarchy) |
-| (others) | Skipped | not yet adapted |
+| laptop | Enabled | crib CLI (GitHub release) + `~/.config/crib/config.toml`; ttyd/vhs dropped |
+| (others) | Skipped | 1password (preinstalled on Omarchy), cartage, kde — not yet adapted |
 
 ## Follow-ups
 

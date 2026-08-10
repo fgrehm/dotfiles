@@ -4,7 +4,8 @@ Random terminal tooling for laptop/baremetal use. Skipped in containers via `.re
 
 ## What it does
 
-- Deploys `~/.config/crib/config.toml` ([crib](https://github.com/fgrehm/crib) — "Just Enough Devcontainers": a CLI that reads `.devcontainer/devcontainer.json`, builds the container, and runs it)
+- Installs the [crib](https://github.com/fgrehm/crib) CLI to `~/.local/bin/crib` from GitHub releases ("Just Enough Devcontainers": reads `.devcontainer/devcontainer.json`, builds the container, and runs it)
+- Deploys `~/.config/crib/config.toml`
 
 ## Requirements
 

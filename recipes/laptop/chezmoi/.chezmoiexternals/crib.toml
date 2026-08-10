@@ -1,0 +1,8 @@
+{{- $version := "0.9.1" -}}
+[".local/bin/crib"]
+  type = "archive-file"
+  url = "https://github.com/fgrehm/crib/releases/download/v{{ $version }}/crib_linux_amd64.tar.gz"
+  executable = true
+  path = "crib"
+  checksum.sha256 = "8e52b4725d030861c47821492b79c560688ddd9e0c0fbf5ce9d93a051683dcbc"
+# vim: ft=toml.gotmpl
