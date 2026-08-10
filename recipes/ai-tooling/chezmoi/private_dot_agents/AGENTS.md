@@ -70,6 +70,7 @@ Include a URL when referencing any tool, library, article, or documentation. Whe
 - Skip marketing fluff: "comprehensive", "robust", "seamless", "cutting-edge".
 - Be direct and concise.
 - These rules apply everywhere: prose, documentation, commit messages, code comments.
+- Do NOT hard-wrap Markdown prose unless it's a project specific guidance; write one line per paragraph and let editors soft-wrap. Fixed-column line breaks produce noisy diffs and fragile edits.
 
 ## Commit format
 
