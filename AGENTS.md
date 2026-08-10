@@ -12,6 +12,8 @@ A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgre
 >
 > **Config philosophy:** only track a config in the repo when there's a need to customize it; otherwise let omarchy manage it (e.g. ghostty config is omarchy's default — we only handle install + default terminal).
 
+> **Omarchy skill:** when working on omarchy-specific config, install scripts, or anything touching `~/.config/` on an Omarchy host, always load the `omarchy` skill (at `~/.pi/agent/skills/omarchy/SKILL.md`) if it's available. It covers the safe customization patterns, command discovery, and the read-only `~/.local/share/omarchy/` rule.
+
 chezmoi-recipes adds a recipe layer on top of chezmoi: related config files and install scripts are grouped into self-contained directories under `recipes/`. Running `chezmoi-recipes overlay` merges `home/` and all `recipes/*/chezmoi/` fragments into `compiled-home/`, which chezmoi reads as its source state (via `.chezmoiroot`). A `read-source-state.pre` hook runs the overlay automatically before any chezmoi command. Each file must belong to exactly one recipe or `home/`, never both (overlapping files are an error). See the [chezmoi-recipes README](https://github.com/fgrehm/chezmoi-recipes) for more.
 
 ## Repo Layout
