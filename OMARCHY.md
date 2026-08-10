@@ -5,7 +5,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 ## Status
 
 - **Detection** — `isOmarchy` template data is set when `omarchy` is on PATH or `~/.local/share/omarchy` exists. ✅
-- **Guard** — `recipes/.recipeignore` skips all recipes on Omarchy by default; recipes are re-enabled one at a time as they're adapted. ✅
+- **Guard** — `recipes/.recipeignore` skips recipes on Omarchy by default; recipes are re-enabled one at a time as they're adapted. Most are now enabled (see table). ✅
 - **Baseline** — `home/` shared files apply cleanly on Omarchy. ✅
 
 ## Recipe status
@@ -30,7 +30,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 - [x] **ai-tooling** — enabled on Omarchy. Claude Code already present (guard skips install); pi via npm (distro-agnostic); `install-claude-code.sh` got a curl fallback since Omarchy lacks wget; skills/settings are distro-agnostic.
 - [ ] **Extract shared download helper** — several install scripts call `wget`/`curl` directly (e.g. `install-claude-code.sh`, `install-ollama.sh` before it was dropped). Omarchy lacks `wget` by default. Extract a shared `_download` helper (like the one in `dot-ai-private/install.sh`) into `scripts/` and use it across recipes. Backlog — not now.
 - [x] **base** — enabled on Omarchy. Installs via `omarchy pkg add`; package map differs per-OS (`fd-find`/`fdfind` on Debian vs `fd` on Arch); creates a `~/.local/bin/fdfind` symlink so scripts that call `fdfind` keep working.
-- [ ] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos) + obsidian. Webapps share the main browser profile.
+- [x] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos) + obsidian. Webapps share the main browser profile.
 - [x] **zellij** — enabled on Omarchy. Distro-agnostic (GitHub release binary); shellrc fragment picked up via the `shell` recipe (enabled).
 - [ ] **Browser → brave** — switch default browser to brave (backlog).
 - [x] **Install slack** — `run_once_install-slack.sh` in the `omarchy` recipe installs `slack-desktop` via `omarchy pkg aur add` plus `xdg-desktop-portal-wlr` for Wayland screen sharing.
@@ -39,9 +39,9 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 - [ ] **SSH agent** — stock `ssh-agent.service` enabled via `run_once_enable-ssh-agent.sh` in the `omarchy` recipe; `SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}/ssh-agent.socket` set via `environment.d/ssh-agent.conf` (needs re-login to take effect). `AddKeysToAgent yes` already lives in the `shell` recipe (not duplicated). Pending: optionally mask `gpg-agent-ssh.socket` (GnuPG SSH emulation) to prevent it from overriding `SSH_AUTH_SOCK`; verify once per boot.
 - [x] **Caps Lock → Ctrl** — done via the `omarchy` recipe (`~/.config/hypr/input.conf`, `kb_options = compose:paus,ctrl:nocaps`).
 - [x] **neovim** — TOP PRIORITY: omarchy goodies merged into `config/nvim/` (theme hot-reload, all-themes, transparency, remote_clipboard), guarded by `vim.fn.executable("omarchy")`; ruby-lsp dropped; neo-tree extra added (shows hidden files). `theme.lua` is a dynamic symlink to the Omarchy theme (created by `run_once_after_link-omarchy-theme.sh`, gitignored). Recipe enabled and applied.
-- [ ] **lazygit** — already installed / managed by Omarchy (unknown how). Skip the `.chezmoiexternals/lazygit.toml` and its completions on Omarchy so we don't end up with two copies. (Done in recipe; recipe now enabled.)
-- [ ] **gh** — same as lazygit: already installed / managed by Omarchy. Skip the `.chezmoiexternals/gh.toml` and its completions on Omarchy. (Done in recipe; recipe now enabled.)
-- [ ] **Completion scripts** — will `run_onchange_after_completions-*.sh.tmpl` work without the `shell` recipe? They write to `~/.local/share/bash-completion/completions` and `~/.zsh/completions`, but whether those get sourced depends on the shell setup. Likely the next focus after the caps-lock→ctrl remap.
+- [x] **lazygit** — already installed / managed by Omarchy. Skip the `.chezmoiexternals/lazygit.toml` and its completions on Omarchy so we don't end up with two copies. (Done in recipe; recipe now enabled.)
+- [x] **gh** — same as lazygit: already installed / managed by Omarchy. Skip the `.chezmoiexternals/gh.toml` and its completions on Omarchy. (Done in recipe; recipe now enabled.)
+- [x] **Completion scripts** — `run_onchange_after_completions-*.sh.tmpl` work on Omarchy: the `shell` recipe (enabled) provides the bash-completion sourcing; `useZsh` gates zsh completions (false on Omarchy).
 - [ ] **git-lfs** — not installed on Omarchy; `config.tmpl` sets an LFS filter. Install `git-lfs` (`omarchy pkg add git-lfs`) if LFS repos are used.
 - [ ] **SSH commit signing** — `config.tmpl` enables `commit.gpgsign` since the signing key exists. Requires the key loaded in the SSH agent; verify on first commit.
 

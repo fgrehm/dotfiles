@@ -1,14 +1,14 @@
 # dotfiles
 
-Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes), built for Debian 13 (Trixie). Also works in devcontainers/Codespaces.
+Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Primary laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian 13 (Trixie) is kept for devcontainers/Codespaces.
 
-> **Omarchy support is a work in progress.** The current system is Omarchy (Arch-based). Detection (`isOmarchy`) and a guard that skips all recipes on Omarchy are in place; recipes are being adapted one at a time. Debian support is kept alongside it.
+> **Debian is being dropped as a bare-metal/laptop target** — Omarchy replaces it on laptops. Debian remains supported for devcontainers/Codespaces. Recipes are adapted to Omarchy one at a time; Debian support is kept alongside until the transition is complete.
 
 ## Supported Platforms
 
-- **Debian 13** (laptop)
+- **Omarchy** (Arch-based, Hyprland) — primary laptop target
 - **Debian-based containers** (Ubuntu, Debian, etc. for devcontainers/CI)
-- **Omarchy** (Arch-based, Hyprland) -- in progress
+- **Debian 13** (laptop) — legacy, being dropped in favor of Omarchy
 
 ## Quick Start
 
@@ -38,10 +38,12 @@ See [`recipes/`](recipes/) for the full list. Each recipe has its own README.
 
 ## Fresh Machine Setup
 
-On a new laptop, `chezmoi apply` needs to run twice:
+On a new **Debian** laptop, `chezmoi apply` needs to run twice:
 
 1. **First apply** -- installs 1Password and the `op` CLI, then downloads SSH keys from your 1Password vault. Other recipes that need SSH (e.g. private repos) will skip gracefully on this run.
 2. **Second apply** -- SSH keys are now on disk; any recipe that skipped will retry and complete normally.
+
+On **Omarchy**, 1Password is preinstalled, so this two-pass dance is not needed.
 
 ## Development
 

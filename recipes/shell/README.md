@@ -18,6 +18,10 @@ Core shell infrastructure: bash, zsh (via Oh My Zsh), and the modular
 - Debian 13 (Trixie)
 - wget (for Oh My Zsh install, available by default on Debian)
 
+## Omarchy
+
+On Omarchy the recipe is bash-only: `useZsh` is false, so zsh/Oh My Zsh is not installed and `~/.bashrc` sources omarchy's `default/bash/rc` + the shellrc loader instead of the Debian bashrc.
+
 ## Template variables
 
 | Variable | Description | Source |

@@ -4,7 +4,7 @@ Git configuration, global gitignore, shell aliases, and TUI tooling.
 
 ## What it does
 
-- Installs git via apt (graceful failure, idempotent)
+- Installs git via apt (Debian) / pacman (Omarchy) (graceful failure, idempotent)
 - Installs [worktrunk](https://worktrunk.dev) — git worktree manager (`wt` CLI)
 - Deploys `~/.config/git/config` (XDG location, templated for user identity and SSH signing)
 - Deploys `~/.config/git/ignore` (global ignores for editor swap files, OS cruft, AI tooling)

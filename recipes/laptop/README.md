@@ -9,4 +9,5 @@ Random terminal tooling for laptop/baremetal use. Skipped in containers via `.re
 
 ## Requirements
 
-- Debian 13 (Trixie) or equivalent Linux
+- wget
+- Internet access (GitHub releases)

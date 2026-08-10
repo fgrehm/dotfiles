@@ -6,7 +6,7 @@
 
 - Installs mise to `~/.local/bin/mise` via the official install script
 - Adds `dot_shellrc.d/mise.sh` to activate mise in bash and zsh shells
-- Deploys `~/.config/mise/config.toml` with global tools (node, go, ruby, rust)
+- Deploys `~/.config/mise/config.toml` with global tools (node, go, ruby, bun)
 - Runs `mise install` after config deployment (re-runs when config changes)
 
 ## Requirements

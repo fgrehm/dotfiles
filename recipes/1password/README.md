@@ -5,6 +5,8 @@ configured 1Password vault/item during `chezmoi apply`.
 
 Skipped in containers (they use SSH agent forwarding).
 
+Skipped on Omarchy (1Password is preinstalled there).
+
 ## 1Password setup
 
 SSH keys must be stored as file attachments on a Secure Note in 1Password:
