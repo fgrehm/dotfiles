@@ -13,5 +13,4 @@ cartage
 kde
 laptop
 terminal
-zellij
 {{- end }}

@@ -20,7 +20,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | shell | Enabled | bash-only on Omarchy; `useZsh` variable (false on Omarchy) guards zsh install/completions; bashrc preserves omarchy's `default/bash/rc` |
 | terminal | Skipped | Debian/KDE-specific (alacritty, tinty). Ghostty handled via the `omarchy` recipe. May be dropped once fully on Omarchy |
 | ai-tooling | Enabled | Claude Code already on Omarchy (guard skips install); pi via npm (distro-agnostic); curl fallback for wget-less Omarchy; skills/settings distro-agnostic |
-| zellij | Skipped | low risk; distro-agnostic; needs `shell` recipe for shellrc fragment. PUNTED — user may skip zellij in favor of tmux or herdr.dev |
+| zellij | Enabled | distro-agnostic (GitHub release binary); shellrc fragment needs the `shell` recipe (enabled on Omarchy) |
 | (others) | Skipped | not yet adapted |
 
 ## Follow-ups
@@ -29,7 +29,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 - [ ] **Extract shared download helper** — several install scripts call `wget`/`curl` directly (e.g. `install-claude-code.sh`, `install-ollama.sh` before it was dropped). Omarchy lacks `wget` by default. Extract a shared `_download` helper (like the one in `dot-ai-private/install.sh`) into `scripts/` and use it across recipes. Backlog — not now.
 - [x] **base** — enabled on Omarchy. Installs via `omarchy pkg add`; package map differs per-OS (`fd-find`/`fdfind` on Debian vs `fd` on Arch); creates a `~/.local/bin/fdfind` symlink so scripts that call `fdfind` keep working.
 - [ ] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos) + obsidian. Webapps share the main browser profile.
-- [ ] **zellij** — PUNTED: user may skip zellij and stick with tmux or move to herdr.dev. Revisit later.
+- [x] **zellij** — enabled on Omarchy. Distro-agnostic (GitHub release binary); shellrc fragment picked up via the `shell` recipe (enabled).
 - [ ] **Browser → brave** — switch default browser to brave (backlog).
 - [x] **Install slack** — `run_once_install-slack.sh` in the `omarchy` recipe installs `slack-desktop` via `omarchy pkg aur add` plus `xdg-desktop-portal-wlr` for Wayland screen sharing.
 - [ ] **Terminal: ghostty** — installed + set as default via `run_once_install-ghostty.sh` in the `omarchy` recipe. The `terminal` recipe (alacritty/tinty) may be dropped once fully on Omarchy on both laptops.
