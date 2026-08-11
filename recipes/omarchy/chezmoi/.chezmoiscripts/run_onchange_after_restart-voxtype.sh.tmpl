@@ -1,0 +1,16 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# config hash: # {{ include "private_dot_config/voxtype/config.toml" | sha256sum }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if ! command -v voxtype &>/dev/null; then
+  log_skip "voxtype not installed, skipping restart"
+  exit 0
+fi
+
+set -eo pipefail
+
+log_info "Restarting voxtype service to apply config changes..."
+systemctl --user restart voxtype.service
+omarchy restart waybar
