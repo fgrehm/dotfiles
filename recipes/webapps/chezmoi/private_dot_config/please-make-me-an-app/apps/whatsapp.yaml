@@ -14,7 +14,7 @@ navigator:
 notifications: true
 tray:
   enabled: true
-  minimize_to_tray: false
+  minimize_to_tray: true
 allowed_domains:
   - whatsapp.com
   - whatsapp.net
