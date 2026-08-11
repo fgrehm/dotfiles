@@ -9,6 +9,11 @@ fi
 
 set -eo pipefail
 
+SUDO=""
+if [[ $EUID -ne 0 ]]; then
+  SUDO="sudo"
+fi
+
 log_info "Installing Voxtype dictation..."
 omarchy pkg add wtype voxtype-bin
 
@@ -22,7 +27,8 @@ voxtype setup --download --no-post-install
 # it would enable GPU on machines with no dedicated card. A discrete GPU shows up
 # as a second display controller in lspci (same heuristic as omarchy-hw-hybrid-gpu).
 if (($(lspci 2>/dev/null | grep -cE 'VGA|3D|Display') >= 2)); then
-  voxtype setup gpu --enable || true
+  # Replaces /usr/bin/voxtype, so it needs root.
+  $SUDO voxtype setup gpu --enable || true
 fi
 voxtype setup systemd
 
