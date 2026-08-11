@@ -1,13 +1,9 @@
-# Include omarchy's default ghostty config, then override the window padding.
-# config-file entries are processed after this file, in order, so padding.conf
-# (loaded last) wins over omarchy's 14px default.
+# Include omarchy's default ghostty config, then apply overrides.
 #
-# Shift+Enter sends a literal newline so Claude Code (and other TUIs) insert a
-# line break instead of submitting. Mirrors the alacritty `chars = "\n"`
-# binding in the terminal recipe. Ghostty otherwise sends `[27;2;13~`, which
-# Claude Code only recognizes when it detects the host terminal directly
-# (broken inside zellij / devcontainers).
-keybind = shift+enter=text:\n
-
+# IMPORTANT: ghostty processes every `config-file` entry AFTER the main file,
+# so anything set here is overridden by omarchy's default config. Overrides
+# that must win over omarchy live in keybinds.conf (the last config-file),
+# which loads after omarchy's config.
 config-file = ?"~/.local/share/omarchy/config/ghostty/config"
 config-file = ?"~/.config/ghostty/padding.conf"
+config-file = ?"~/.config/ghostty/keybinds.conf"
