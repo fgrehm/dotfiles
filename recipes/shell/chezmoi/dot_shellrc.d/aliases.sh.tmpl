@@ -26,7 +26,23 @@ if [ -n "$BASH_VERSION" ]; then
     local base="$HOME/projects"
     [[ "${COMP_WORDS[0]}" == cdpo ]] && base="$HOME/projects/oss"
     local cur="${COMP_WORDS[COMP_CWORD]}"
-    mapfile -t COMPREPLY < <(compgen -d -- "$base/$cur" | sed "s|^$base/||")
+    # Complete dirs under $base, allowing descent into subfolders. Every match
+    # ends with "/" and nospace is set, so Tab keeps drilling into nested dirs
+    # instead of only offering top-level projects.
+    local dir="$base" prefix="" word="${cur##*/}" d name
+    if [[ "$cur" == */* ]]; then
+      dir="$base/${cur%/*}"
+      prefix="${cur%/*}/"
+    fi
+    COMPREPLY=()
+    for d in "$dir"/*/; do
+      [[ -d "$d" ]] || continue
+      name="${d%/}"
+      name="${name##*/}"
+      [[ "$name" == "$word"* ]] || continue
+      COMPREPLY+=("$prefix$name/")
+    done
+    compopt -o nospace
   }
   complete -F _cdp_complete cdp cdpo
 elif [ -n "$ZSH_VERSION" ]; then
