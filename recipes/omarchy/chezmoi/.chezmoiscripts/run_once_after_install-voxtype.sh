@@ -30,6 +30,10 @@ if (($(lspci 2>/dev/null | grep -cE 'VGA|3D|Display') >= 2)); then
   # Replaces /usr/bin/voxtype, so it needs root.
   $SUDO voxtype setup gpu --enable || true
 fi
-voxtype setup systemd
+
+# Service file + gpu.conf drop-in are deployed by chezmoi
+# (private_dot_config/systemd/user/voxtype.service*), so just enable/start them.
+systemctl --user daemon-reload
+systemctl --user enable --now voxtype.service
 
 omarchy restart waybar
