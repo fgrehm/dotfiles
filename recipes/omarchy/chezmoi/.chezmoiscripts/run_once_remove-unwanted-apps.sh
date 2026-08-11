@@ -15,7 +15,7 @@ set -eo pipefail
 # omarchy-webapp-remove restarts the app launcher once (not per app), avoiding
 # systemd's start-limit on rapid restarts.
 APPS_TO_REMOVE=()
-for app in "Basecamp" "Discord" "Fizzy" "Google Contacts" "Zoom" "HEY" "Google Messages" "Google Photos"; do
+for app in "Basecamp" "Discord" "Fizzy" "Google Contacts" "Zoom" "HEY" "Google Messages" "Google Photos" "WhatsApp"; do
   if [ -f "$HOME/.local/share/applications/$app.desktop" ]; then
     APPS_TO_REMOVE+=("$app")
   else

@@ -1,0 +1,21 @@
+name: whatsapp
+url: https://web.whatsapp.com
+url_schemes:
+  - whatsapp
+window:
+  title: WhatsApp
+  width: 1100
+  height: 750
+user_agent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36"
+navigator:
+  vendor: "Google Inc."
+  platform: "Linux x86_64"
+  chrome: true
+notifications: true
+tray:
+  enabled: true
+  minimize_to_tray: false
+allowed_domains:
+  - whatsapp.com
+  - whatsapp.net
+  - wa.me

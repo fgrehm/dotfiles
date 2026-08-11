@@ -5,6 +5,7 @@ terminal
 kde
 cli-tools
 omarchy
+webapps
 {{- end }}
 {{- if not .isOmarchy }}
 omarchy

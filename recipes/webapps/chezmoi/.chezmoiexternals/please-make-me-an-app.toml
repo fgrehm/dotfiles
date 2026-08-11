@@ -1,0 +1,8 @@
+{{- $version := "0.5.0" -}}
+[".local/bin/please-make-me-an-app"]
+  type = "archive-file"
+  url = "https://github.com/fgrehm/please-make-me-an-app/releases/download/v{{ $version }}/please-make-me-an-app-x86_64-linux.tar.gz"
+  executable = true
+  path = "please-make-me-an-app"
+  checksum.sha256 = "480053a2c201f209a885d5b525cc11ea74c38a7ddf6cdd5cf262117889d5261e"
+# vim: ft=toml.gotmpl
