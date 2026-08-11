@@ -67,10 +67,11 @@ chezmoi: .config: inconsistent state (...dot_config, ...private_dot_config)
 | `.isDebian` | `.chezmoi.osRelease.id == "debian"` |
 | `.isOmarchy` | `omarchy` on PATH or `~/.local/share/omarchy` exists |
 | `.useZsh` | `not .isOmarchy` (true on Debian, false on Omarchy); gates zsh install/completions |
+| `.hasNvidiaGPU` | `lspci` output (skipped in containers); gates the voxtype NVIDIA GPU drop-in |
 
 Use `{{ if .isContainer }}` in templates and `.chezmoiignore` for conditional deployment.
 
-> **GPU detection is runtime, not template data.** The voxtype install script checks for a discrete GPU via `lspci` at runtime (2+ display controllers), so there is no GPU template variable. If more GPU-related config is added later (e.g. per-GPU tweaks), consider reintroducing a data variable (e.g. `hasDiscreteGPU`) alongside the runtime check.
+> **GPU detection is split between runtime and template data.** The voxtype install script checks for a discrete GPU via `lspci` at runtime (2+ display controllers) to decide whether to enable the GPU backend. But the NVIDIA-specific systemd drop-in (`VOXTYPE_VULKAN_DEVICE=nvidia`) is gated by the `hasNvidiaGPU` template variable via `.chezmoiignore`, since it only makes sense on machines with an NVIDIA GPU.
 
 ## chezmoi-recipes Integration
 

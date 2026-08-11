@@ -1,0 +1,5 @@
+# The voxtype GPU drop-in pins VOXTYPE_VULKAN_DEVICE=nvidia, which only makes
+# sense on machines with an NVIDIA GPU. Skip it otherwise.
+{{ if not .hasNvidiaGPU }}
+.config/systemd/user/voxtype.service.d/gpu.conf
+{{ end }}
