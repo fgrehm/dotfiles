@@ -224,6 +224,12 @@ Two mechanisms for environment-conditional deployment:
 # config hash: # {{ include "private_dot_config/mise/config.toml" | sha256sum }}
 ```
 
+The `include` path is **relative to the chezmoi source dir (`compiled-home/`)** and uses the **source file name**, not the target path:
+
+- Use the chezmoi source prefix (`private_dot_config/...`), NOT the target path (`~/.config/...` or `.config/...`).
+- The path must match the file's actual location in `compiled-home/` after the overlay. That means the recipe owning the file must be active on the current host (not skipped via `.recipeignore`); if it is ignored, the `include` fails to resolve and the hash comment renders empty, silently breaking the re-run trigger.
+- For a config deployed to `~/.config/<app>/<file>`, the source path is `private_dot_config/<app>/<file>` (see the `mise` and `tinty` recipes for working examples).
+
 ## Dangerous Commands
 
 Never run `chezmoi apply` on the host from this assistant. Only run it inside a container. Safe on host: `chezmoi diff`, `make check`, `git diff`.
