@@ -3,6 +3,8 @@ laptop
 1password
 terminal
 kde
+cli-tools
+omarchy
 {{- end }}
 {{- if not .isOmarchy }}
 omarchy

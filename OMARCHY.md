@@ -18,11 +18,12 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 | nvim | Enabled | omarchy goodies merged into `config/nvim/` (theme hot-reload, all-themes, transparency, remote_clipboard), guarded by `vim.fn.executable("omarchy")`; ruby-lsp dropped; neo-tree extra added (shows hidden files) |
 | mise | Enabled | distro-agnostic, already installed; tools now node/go/ruby/bun (rust dropped); needs `shell` recipe for activation |
 | shell | Enabled | bash-only on Omarchy; `useZsh` variable (false on Omarchy) guards zsh install/completions; bashrc preserves omarchy's `default/bash/rc` |
-| terminal | Skipped | Debian/KDE-specific (alacritty, tinty). Ghostty handled via the `omarchy` recipe. May be dropped once fully on Omarchy |
+| terminal | Skipped | Debian/KDE-specific (alacritty, tinty). Ghostty handled via the `omarchy` recipe. May be dropped once fully on Omarchy. lmk/timr-tui split out into `cli-tools` (enabled) |
 | ai-tooling | Enabled | Claude Code already on Omarchy (guard skips install); pi via npm (distro-agnostic); curl fallback for wget-less Omarchy; skills/settings distro-agnostic |
 | zellij | Enabled | distro-agnostic (GitHub release binary); shellrc fragment needs the `shell` recipe (enabled on Omarchy) |
 | laptop | Enabled | crib CLI (GitHub release) + `~/.config/crib/config.toml`; ttyd/vhs dropped |
 | cartage | Enabled | distro-agnostic (GitHub release binary + systemd user service); container-side symlinks skipped on laptop |
+| cli-tools | Enabled | distro-agnostic GitHub release binaries (lmk, timr-tui); split out of `terminal` so they can run on Omarchy |
 | 1password | Enabled | install skipped on Omarchy (preinstalled); SSH-key setup runs on both |
 | (others) | Skipped | kde — not yet adapted |
 
