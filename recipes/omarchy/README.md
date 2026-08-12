@@ -1,13 +1,14 @@
 # omarchy
 
-Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, Hyprland); ignored on Debian and in containers.
+Omarchy-specific configuration and tweaks: the bare-metal/laptop target recipe. Only applied on Omarchy (Arch-based, Hyprland); ignored in containers and on non-Omarchy hosts.
 
 ## What it does
 
 - Deploys `~/.config/hypr/bindings.conf` (application + webapp bindings) and overrides omarchy's default `Super+/` monitor scaling cycle to toggle between 1x and 1.5x via `~/.local/bin/my-monitor-scaling-cycle` (a copy of `omarchy-hyprland-monitor-scaling-cycle` with `SCALES=(1 1.5)`). `Super+Alt+/` cycles backwards. The custom script lives in `~/.local/bin` so it survives `omarchy update` (omarchy's own script is read-only).
 - Deploys `~/.config/hypr/input.conf` with Caps Lock remapped to Control (`kb_options = compose:paus,ctrl:nocaps`).
 - Deploys `~/.config/hypr/windowrules.conf` with float + center rules for transient dialog toolkits (`yad`, `zenity`, `kdialog`) so they don't get tiled. Tracked `~/.config/hypr/hyprland.conf` adds `source = ~/.config/hypr/windowrules.conf` to omarchy's default `hyprland.conf` (which has no sourced window-rules override file).
-- Deploys `~/.config/starship.toml` — a minimal prompt with a conditional newline: `add_newline = false` plus a `custom.line_break` module (`require_repo = true`) inserts a line break before `❯` only inside git repos (single-line prompt outside them). Nerd Font git-status icons are backlogged (see OMARCHY.md).
+- Seeds `~/.config/hypr/local.conf` (via chezmoi's `create_` attribute, so it's created once and local edits are preserved across `chezmoi apply`). Tracked `~/.config/hypr/hyprland.conf` sources it **last**, after omarchy defaults and tracked user config, so machine-specific overrides (keybindings, window rules, etc.) win. Use it for per-machine tweaks you don't want in the repo; the file itself is not managed by chezmoi after creation.
+- Deploys `~/.config/starship.toml` — a minimal prompt with a conditional newline: `add_newline = false` plus a `custom.line_break` module (`require_repo = true`) inserts a line break before `❯` only inside git repos (single-line prompt outside them). Nerd Font git-status icons are backlogged (see BACKLOG.md).
 - Uses lowercase `~/projects` instead of omarchy's default `~/Projects` via `~/.config/user-dirs.dirs` (`XDG_PROJECTS_DIR="$HOME/projects"`) and `~/.config/gtk-3.0/bookmarks` (templated home path).
 - Deploys `~/.config/waybar/config.jsonc` (top bar layout; clock shows weekday, date, and time). A `run_onchange_after_restart-waybar.sh.tmpl` script restarts waybar whenever this config changes (waybar does not auto-reload).
 - Overrides ghostty's window padding to 2px (omarchy's default is 14px) via `~/.config/ghostty/config` + `padding.conf`. `padding.conf` is loaded last (as a `config-file`), so it wins over omarchy's 14px. `window-padding-balance = true` distributes leftover space (viewport not divisible by cell size) across all edges instead of stacking it at the bottom. Padding changes only affect new terminals.
@@ -23,6 +24,7 @@ Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, 
 - Restarts the voxtype daemon and waybar when the config changes via `run_onchange_after_restart-voxtype.sh.tmpl` (embeds the config, service, and gpu drop-in hashes, so it re-runs whenever any of them change; skips if voxtype isn't installed).
 - Tracks the voxtype systemd user service (`~/.config/systemd/user/voxtype.service`) and a `gpu.conf` drop-in that pins voxtype to the NVIDIA GPU (`VOXTYPE_VULKAN_DEVICE=nvidia`) on hybrid-GPU laptops. The drop-in is skipped via `.chezmoiignore` when there's no NVIDIA GPU (`hasNvidiaGPU`). The install script enables/starts the deployed service instead of regenerating it with `voxtype setup systemd` (which would clobber the tracked files).
 - Disables the GNOME filesystem indexer (`localsearch`, formerly `tracker3-miners`) via `run_once_disable-localsearch.sh` (masks `localsearch-3`, `localsearch-control-3`, `localsearch-writeback-3`, and `tinysparql-xdg-portal-3` user services) and deploys `~/.config/autostart/localsearch-3.desktop` with `Hidden=true` as belt-and-suspenders against DBus activation by nautilus. Nothing on Omarchy consumes its index (Walker's file search is self-contained), so it's pure CPU/RAM overhead.
+- Installs the [crib](https://github.com/fgrehm/crib) CLI to `~/.local/bin/crib` ("Just Enough Devcontainers": reads `.devcontainer/devcontainer.json`, builds the container, runs it) and deploys `~/.config/crib/config.toml`. Crib is bare-metal-only; it lives here because Omarchy is the only bare-metal target. (Was its own `laptop` recipe.)
 
 ## Notes
 
@@ -30,3 +32,4 @@ Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, 
 - Ghostty's shipped config is read-only at `~/.local/share/omarchy/config/ghostty/config`. To override it, `~/.config/ghostty/config` includes it via `config-file`, then loads `padding.conf` last (ghostty processes `config-file` entries after the declaring file, in order, so the last one wins).
 - The `environment.d` SSH_AUTH_SOCK setting only takes effect after re-login (environment.d is read at systemd user manager startup).
 - `AddKeysToAgent yes` is intentionally NOT duplicated here — it lives in the `shell` recipe's `~/.ssh/config`.
+- `gpg-agent-ssh.socket` (GnuPG SSH emulation) is active by default and can override `SSH_AUTH_SOCK` via `ExecStartPost`; mask it if it hijacks the socket (see BACKLOG.md).
