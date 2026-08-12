@@ -12,7 +12,7 @@ Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, 
 - Overrides ghostty's window padding to 2px (omarchy's default is 14px) via `~/.config/ghostty/config` + `padding.conf`. `padding.conf` is loaded last (as a `config-file`), so it wins over omarchy's 14px. `window-padding-balance = true` distributes leftover space (viewport not divisible by cell size) across all edges instead of stacking it at the bottom. Padding changes only affect new terminals.
 - Sets `SSH_AUTH_SOCK` to the stock OpenSSH agent socket via `~/.config/environment.d/ssh-agent.conf` (`SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}/ssh-agent.socket`).
 - Enables the stock `ssh-agent.service` user unit via `run_once_enable-ssh-agent.sh` (idempotent; skips if already enabled).
-- Removes unwanted apps via `run_once_remove-unwanted-apps.sh` (webapps: Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos; plus obsidian).
+- Removes unwanted apps via `run_once_remove-unwanted-apps.sh` (webapps: Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos).
 - Installs ghostty and sets it as the default terminal via `run_once_install-ghostty.sh` (idempotent; skips if already installed).
 - Installs brave and sets it as the default browser via `run_once_install-brave.sh` (idempotent; skips if already installed).
 - Installs Slack (`slack-desktop` from the AUR) plus `xdg-desktop-portal-wlr` for Wayland screen sharing via `run_once_install-slack.sh` (idempotent; skips if already installed).

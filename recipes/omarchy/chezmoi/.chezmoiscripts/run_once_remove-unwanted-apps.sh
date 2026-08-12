@@ -31,13 +31,3 @@ if [ "${#APPS_TO_REMOVE[@]}" -gt 0 ]; then
 else
   log_skip "no webapps to remove"
 fi
-
-# Remove obsidian (system app)
-if pacman -Q obsidian &>/dev/null; then
-  log_info "Removing obsidian..."
-  if ! run_quiet $SUDO pacman -Rns --noconfirm obsidian; then
-    log_error "Failed to remove obsidian (non-fatal)"
-  fi
-else
-  log_skip "obsidian not installed"
-fi

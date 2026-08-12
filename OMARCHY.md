@@ -32,7 +32,7 @@ Living document tracking the adaptation of this dotfiles repo to [Omarchy](https
 - [x] **ai-tooling** — enabled on Omarchy. Claude Code already present (guard skips install); pi via npm (distro-agnostic); `install-claude-code.sh` got a curl fallback since Omarchy lacks wget; skills/settings are distro-agnostic.
 - [ ] **Extract shared download helper** — several install scripts call `wget`/`curl` directly (e.g. `install-claude-code.sh`, `install-ollama.sh` before it was dropped). Omarchy lacks `wget` by default. Extract a shared `_download` helper (like the one in `dot-ai-private/install.sh`) into `scripts/` and use it across recipes. Backlog — not now.
 - [x] **base** — enabled on Omarchy. Installs via `omarchy pkg add`; package map differs per-OS (`fd-find`/`fdfind` on Debian vs `fd` on Arch); creates a `~/.local/bin/fdfind` symlink so scripts that call `fdfind` keep working.
-- [x] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos) + obsidian. Webapps share the main browser profile.
+- [x] **Remove unwanted apps** — `run_once_remove-unwanted-apps.sh` in the `omarchy` recipe removes webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos). Webapps share the main browser profile.
 - [x] **zellij** — enabled on Omarchy. Distro-agnostic (GitHub release binary); shellrc fragment picked up via the `shell` recipe (enabled).
 - [ ] **Browser → brave** — switch default browser to brave (backlog).
 - [x] **Install slack** — `run_once_install-slack.sh` in the `omarchy` recipe installs `slack-desktop` via `omarchy pkg aur add` plus `xdg-desktop-portal-wlr` for Wayland screen sharing.
