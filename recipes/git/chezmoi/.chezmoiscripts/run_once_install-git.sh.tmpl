@@ -17,6 +17,7 @@ SUDO=""
 set -eo pipefail
 
 log_info "Installing git..."
+# Omarchy: pacman. Containers: apt.
 # {{ if .isOmarchy }}
 run_quiet $SUDO pacman -S --noconfirm --needed git
 # {{ else }}

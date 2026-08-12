@@ -9,7 +9,8 @@ SUDO="sudo"
 SUDO=""
 # {{ end }}
 
-# binary:package pairs. Package names differ per-OS (fd-find vs fd).
+# binary:package pairs. Package names differ per-OS: `fd` on Omarchy (Arch),
+# `fd-find` on Debian-based containers (binary ships as `fdfind`).
 # {{ if .isOmarchy }}
 declare -A pkgs=([jq]=jq [unzip]=unzip [wget]=wget [gpg]=gnupg [fdfind]=fd)
 # {{ else }}
@@ -38,6 +39,7 @@ set -eo pipefail
 
 if [ ${#packages[@]} -gt 0 ]; then
   log_info "Installing base packages: ${packages[*]}..."
+  # Omarchy: pacman via omarchy pkg. Containers: apt.
   # {{ if .isOmarchy }}
   run_quiet omarchy pkg add "${packages[@]}"
   # {{ else }}

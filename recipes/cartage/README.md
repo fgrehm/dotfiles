@@ -8,14 +8,14 @@ wires it up for the current environment.
 - Installs the cartage binary to `~/.local/bin/cartage` from GitHub releases
 - **Container**: creates symlinks in `~/.local/bin/` so `pbcopy`, `pbpaste`, `notify-send`, `yad`,
   and `xdg-open` all resolve to cartage (which forwards the intent to the host daemon over a socket)
-- **Laptop**: deploys `~/.config/systemd/user/cartage.service` and enables it via systemd so the
+- **Bare metal (Omarchy)**: deploys `~/.config/systemd/user/cartage.service` and enables it via systemd so the
   daemon starts with the graphical session
 
 ## Requirements
 
 - wget
 - Internet access (GitHub releases)
-- **Laptop only**: systemd user session, graphical session target
+- **Bare metal only**: systemd user session, graphical session target
 
 ## Template variables
 

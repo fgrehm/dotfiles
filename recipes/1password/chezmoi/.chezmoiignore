@@ -1,4 +1,3 @@
-# 1Password is preinstalled on Omarchy; only the SSH-key setup is needed there.
-{{ if .isOmarchy }}
-.chezmoiscripts/install-1password.sh
-{{ end }}
+# On Omarchy 1Password is preinstalled; only the SSH-key setup runs there.
+# (The apt install script that used to run on the Debian laptop was removed;
+# containers skip the whole recipe via recipes/.recipeignore.)

@@ -59,7 +59,9 @@ Key points for reviews:
   transient failure doesn't block `chezmoi apply`. Always prepend
   `export PATH="$HOME/.local/bin:$PATH"` so freshly installed binaries are
   discoverable during apply.
-- Use `wget` instead of `curl` (curl not guaranteed on Debian).
+- Use `wget` instead of `curl` (curl not guaranteed on Debian-based containers).
+  On Omarchy the inverse is true (no `wget` by default) — prefer `curl` or a
+  shared download helper there.
 
 ## Script Ordering
 
@@ -70,7 +72,7 @@ Key points for reviews:
 
 ## Environment
 
-- `.isContainer` distinguishes containers from laptops.
+- `.isContainer` distinguishes containers from bare metal (Omarchy).
 - Use `.chezmoiignore` or `.recipeignore` to skip files/recipes by environment.
 - camelCase for template variables.
 

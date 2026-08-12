@@ -1,16 +1,9 @@
 {{- if .isContainer }}
-laptop
 1password
-terminal
-kde
 cli-tools
 omarchy
 webapps
 {{- end }}
 {{- if not .isOmarchy }}
 omarchy
-{{- end }}
-{{- if .isOmarchy }}
-kde
-terminal
 {{- end }}

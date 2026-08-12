@@ -14,11 +14,11 @@ The actual Neovim config lives at `config/nvim/` in the repo root, not inside th
 
 - `lua/plugins/omarchy-theme-hotreload.lua` — hot-reloads the colorscheme when the Omarchy theme changes
 - `lua/plugins/all-themes.lua` — loads all theme plugins for hot-reloading
-- `lua/plugins/theme.lua` — symlink to the current Omarchy theme's `neovim.lua`, created by `run_once_after_link-omarchy-theme.sh` (so it follows `omarchy theme set`)
+- `lua/plugins/theme.lua` — symlink to the current Omarchy theme's `neovim.lua`, created by `run_once_after_link-omarchy-theme.sh` (so it follows `omarchy theme set`). It's a dynamic symlink, not a tracked static file: a relative symlink won't work because `~/.config/nvim` is itself a symlink into the repo (relative targets would resolve against the repo path). Don't track it as a static file.
 - `lua/config/remote_clipboard.lua` — OSC 52 clipboard with Wayland support (loaded from `options.lua` on Omarchy)
 - `plugin/after/transparency.lua` — transparent highlight groups
 
-On non-Omarchy (Debian), `lua/plugins/colorscheme.lua` handles theming via tinted-nvim/alacritty instead.
+On non-Omarchy (containers), `lua/plugins/colorscheme.lua` handles theming via tinted-nvim instead.
 
 ## Requirements
 

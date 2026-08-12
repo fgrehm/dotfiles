@@ -6,6 +6,7 @@
 [[ $- != *i* ]] && return
 source ~/.local/share/omarchy/default/bash/rc
 {{ else }}
+# Container/fallback bashrc (non-Omarchy): standard Debian skeleton + shellrc loader.
 # If not running interactively, don't do anything
 case $- in
   *i*) ;;

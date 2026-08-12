@@ -24,6 +24,7 @@ set -eo pipefail
 
 if ! command -v zsh &>/dev/null; then
   log_info "Installing zsh..."
+  # Omarchy: pacman. Containers: apt.
   # {{ if .isOmarchy }}
   run_quiet $SUDO pacman -S --noconfirm --needed zsh
   # {{ else }}
@@ -36,7 +37,7 @@ log_info "Installing Oh My Zsh..."
 # Unset ZSH so the installer defaults to $HOME/.oh-my-zsh.
 export KEEP_ZSHRC=yes
 unset ZSH
-# wget preferred, curl fallback (omarchy has no wget)
+# wget preferred, curl fallback (Omarchy has no wget by default)
 if command -v wget &>/dev/null; then
   sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 else

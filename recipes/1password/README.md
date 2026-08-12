@@ -5,7 +5,7 @@ configured 1Password vault/item during `chezmoi apply`.
 
 Skipped in containers (they use SSH agent forwarding).
 
-On Omarchy, 1Password is preinstalled, so only the SSH-key setup runs (the install script is skipped via `.chezmoiignore`).
+On Omarchy, 1Password is preinstalled, so only the SSH-key setup runs (no install step). The apt install script that used to run on the Debian laptop was removed when Debian-as-bare-metal was dropped.
 
 ## 1Password setup
 

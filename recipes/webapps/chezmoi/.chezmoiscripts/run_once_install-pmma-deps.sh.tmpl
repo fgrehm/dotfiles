@@ -11,6 +11,7 @@ SUDO=""
 
 set -eo pipefail
 
+# Omarchy: pacman via omarchy pkg. Containers: apt.
 # {{ if .isOmarchy }}
 log_info "Installing pmma runtime dependencies (webkit2gtk, gtk3, libayatana-appindicator)..."
 run_quiet omarchy pkg add webkit2gtk-4.1 gtk3 libayatana-appindicator

@@ -5,7 +5,7 @@ Core shell infrastructure: bash, zsh (via Oh My Zsh), and the modular
 
 ## What it does
 
-- Deploys `~/.bashrc` (standard Debian defaults + shellrc loader)
+- Deploys `~/.bashrc` (on Omarchy: omarchy's `default/bash/rc` + shellrc loader; on containers: standard Debian skeleton + shellrc loader)
 - Deploys `~/.zshrc` (Oh My Zsh + git prompt extensions + shellrc loader)
 - Deploys `~/.shellrc` (sources `~/.shellrc.d/*.sh` alphabetically, then `~/.shellrc.local`)
 - Deploys `~/.shellrc.d/env.sh` (PATH, editor, history)
@@ -15,12 +15,12 @@ Core shell infrastructure: bash, zsh (via Oh My Zsh), and the modular
 
 ## Requirements
 
-- Debian 13 (Trixie)
-- wget (for Oh My Zsh install, available by default on Debian)
+- Containers: Debian 13 (Trixie); `wget` (for Oh My Zsh install, available by default)
+- Omarchy: bash (zsh/Oh My Zsh are not installed -- `useZsh` is false there)
 
 ## Omarchy
 
-On Omarchy the recipe is bash-only: `useZsh` is false, so zsh/Oh My Zsh is not installed and `~/.bashrc` sources omarchy's `default/bash/rc` + the shellrc loader instead of the Debian bashrc.
+On Omarchy the recipe is bash-only: `useZsh` is false, so zsh/Oh My Zsh is not installed and `~/.bashrc` sources omarchy's `default/bash/rc` + the shellrc loader instead of the Debian skeleton bashrc.
 
 ## Template variables
 
@@ -49,3 +49,7 @@ if ! command -v git &>/dev/null; then
 fi
 alias g='git status'
 ```
+
+## Bash git-alias completion
+
+Git aliases defined in `dot_shellrc.d/git.sh` need explicit completion wiring on bash (zsh gets it via `compdef`). Use git's `__git_complete <alias> _git_<subcommand>` (NOT `complete -F _git_<subcommand>`, which breaks because the completion functions expect `$1=git`). Source the git completion file first (it's lazy-loaded), then wire each alias. See `dot_shellrc.d/git.sh` for the working pattern.

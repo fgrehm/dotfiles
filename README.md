@@ -1,14 +1,13 @@
 # dotfiles
 
-Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Primary laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian 13 (Trixie) is kept for devcontainers/Codespaces.
-
-> **Debian is still a supported bare-metal target** — one laptop still runs Debian 13. The ultimate goal is to migrate fully to Omarchy and drop Debian as bare-metal, keeping it for devcontainers/Codespaces. Recipes are adapted to Omarchy one at a time; Debian support is kept alongside until the transition is complete.
+Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Bare-metal/laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian-based images are used for devcontainers/Codespaces.
 
 ## Supported Platforms
 
-- **Omarchy** (Arch-based, Hyprland) — primary laptop target
-- **Debian-based containers** (Ubuntu, Debian, etc. for devcontainers/CI)
-- **Debian 13** (laptop) — still supported (one laptop); ultimate goal is to migrate to Omarchy
+- **Omarchy** (Arch-based, Hyprland) — the bare-metal/laptop target
+- **Debian-based containers** (Debian 13, Ubuntu, etc.) — devcontainers/Codespaces/CI
+
+Omarchy is the only bare-metal target. The `apt` branches in install scripts exist for the container path; on Omarchy the equivalent steps go through `omarchy pkg add` / `pacman`.
 
 ## Quick Start
 
@@ -40,10 +39,8 @@ See [`recipes/`](recipes/) for the full list. Each recipe has its own README.
 
 On a new laptop, `chezmoi apply` needs to run twice:
 
-1. **First apply** -- downloads SSH keys from your 1Password vault (on Debian it also installs 1Password and the `op` CLI first). Other recipes that need SSH (e.g. private repos) will skip gracefully on this run.
+1. **First apply** -- downloads SSH keys from your 1Password vault (on Omarchy, 1Password is preinstalled so only the key download runs). Other recipes that need SSH (e.g. private repos) will skip gracefully on this run.
 2. **Second apply** -- SSH keys are now on disk; any recipe that skipped will retry and complete normally.
-
-On **Omarchy**, 1Password is preinstalled, so the first apply only downloads the SSH keys (no 1Password install) — the two-pass flow still applies.
 
 ## Development
 
@@ -57,7 +54,7 @@ make check      # lint shell scripts (shfmt + shellcheck)
 
 ### Environment Detection
 
-`.chezmoi.toml.tmpl` auto-detects containers via `/.dockerenv`, env vars, etc. Template data available: `.name`, `.email`, `.isContainer`, `.isDebian`, `.isOmarchy`, `.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
+`.chezmoi.toml.tmpl` auto-detects the environment via `/.dockerenv`, env vars, `omarchy` on PATH, etc. Template data available: `.name`, `.email`, `.isContainer`, `.isOmarchy`, `.useZsh`, `.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
 
 ## License
 

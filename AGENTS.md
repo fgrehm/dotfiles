@@ -4,15 +4,11 @@ Project context for AI assistants working on this repo.
 
 ## What This Is
 
-A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Target: Debian 13 (Trixie) laptops running KDE Plasma 6, and devcontainers/Codespaces.
+A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Bare-metal/laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian-based images are used for devcontainers/Codespaces. Omarchy is the only bare-metal target -- the `apt` branches in install scripts exist for the container path.
 
-> **Debian is still a supported bare-metal target** — one laptop still runs Debian 13. The ultimate goal is to migrate fully to Omarchy and drop Debian as bare-metal, keeping it for devcontainers/Codespaces. Recipes are adapted to Omarchy one at a time; Debian support is kept alongside until the transition is complete.
+> **Config philosophy:** only track a config in the repo when there's a need to customize it; otherwise let omarchy manage it (e.g. ghostty config is omarchy's default -- we only handle install + default terminal).
 
-> **Omarchy support is a work in progress.** The current system is Omarchy (Arch-based, Hyprland). Detection (`isOmarchy`) and a guard that skips all recipes on Omarchy are in place; recipes are being adapted one at a time. Debian support is kept alongside it. See `OMARCHY.md` for the living status, follow-ups, and learnings.
->
-> **Config philosophy:** only track a config in the repo when there's a need to customize it; otherwise let omarchy manage it (e.g. ghostty config is omarchy's default — we only handle install + default terminal).
-
-> **Omarchy skill:** when working on omarchy-specific config, install scripts, or anything touching `~/.config/` on an Omarchy host, always load the `omarchy` skill (at `~/.pi/agent/skills/omarchy/SKILL.md`) if it's available. It covers the safe customization patterns, command discovery, and the read-only `~/.local/share/omarchy/` rule.
+> **Omarchy skill:** when working on omarchy-specific config, install scripts, or anything touching `~/.config/` on an Omarchy host, always load the `omarchy` skill (at `~/.pi/agent/skills/omarchy/SKILL.md`) if it's available. It covers the safe customization patterns, command discovery, `hyprctl reload`/`configerrors` validation, waybar no-autoreload, and the read-only `~/.local/share/omarchy/` rule. The notes below are repo-specific things the skill does NOT cover.
 
 chezmoi-recipes adds a recipe layer on top of chezmoi: related config files and install scripts are grouped into self-contained directories under `recipes/`. Running `chezmoi-recipes overlay` merges `home/` and all `recipes/*/chezmoi/` fragments into `compiled-home/`, which chezmoi reads as its source state (via `.chezmoiroot`). A `read-source-state.pre` hook runs the overlay automatically before any chezmoi command. Each file must belong to exactly one recipe or `home/`, never both (overlapping files are an error). See the [chezmoi-recipes README](https://github.com/fgrehm/chezmoi-recipes) for more.
 
@@ -61,12 +57,11 @@ chezmoi: .config: inconsistent state (...dot_config, ...private_dot_config)
 |----------|--------|
 | `.name` | Prompted via `promptStringOnce` at `chezmoi init` |
 | `.email` | Prompted via `promptStringOnce` at `chezmoi init` |
-| `.onepasswordSshVault` | Prompted at `chezmoi init` (laptop only; empty string in containers) |
-| `.onepasswordSshItem` | Prompted at `chezmoi init` (laptop only; empty string in containers) |
+| `.onepasswordSshVault` | Prompted at `chezmoi init` (bare metal only; empty string in containers) |
+| `.onepasswordSshItem` | Prompted at `chezmoi init` (bare metal only; empty string in containers) |
 | `.isContainer` | `/.dockerenv`, `/run/.containerenv`, `CODESPACES`, etc. |
-| `.isDebian` | `.chezmoi.osRelease.id == "debian"` |
 | `.isOmarchy` | `omarchy` on PATH or `~/.local/share/omarchy` exists |
-| `.useZsh` | `not .isOmarchy` (true on Debian, false on Omarchy); gates zsh install/completions |
+| `.useZsh` | `not .isOmarchy` (true in containers, false on Omarchy); gates zsh install/completions |
 | `.hasNvidiaGPU` | `lspci` output (skipped in containers); gates the voxtype NVIDIA GPU drop-in |
 
 Use `{{ if .isContainer }}` in templates and `.chezmoiignore` for conditional deployment.
@@ -85,11 +80,11 @@ Edit files in `home/` or `recipes/`, never in `compiled-home/`.
 
 ```
 {{- if .isContainer }}
-laptop
+omarchy
 {{- end }}
 ```
 
-Use `.recipeignore` to exclude entire recipes (e.g. laptop-only tools) rather than adding `isContainer` guards inside individual scripts.
+Use `.recipeignore` to exclude entire recipes (e.g. bare-metal-only tools) rather than adding `isContainer` guards inside individual scripts.
 
 **Rule: any script that uses template directives (`# {{ if ... }}`, `# {{ include ... }}`, template variables) MUST have the `.sh.tmpl` extension.** Without `.tmpl`, chezmoi treats the file as a plain script and template directives become inert comments, causing guards like `# {{ if .isContainer }}` to silently fail (the guarded code always runs). Scripts with no template directives should use plain `.sh`.
 
@@ -252,3 +247,15 @@ The `include` path is **relative to the chezmoi source dir (`compiled-home/`)** 
 ## Dangerous Commands
 
 Never run `chezmoi apply` on the host from this assistant. Only run it inside a container. Safe on host: `chezmoi diff`, `make check`, `git diff`.
+
+## Omarchy (repo-specific notes)
+
+These are dotfiles-repo-specific facts the `omarchy` skill does not cover.
+
+- **`omarchy` commands handle sudo internally** (`omarchy pkg add`, `omarchy install`, ... declare `requires-sudo=true` and call `sudo` themselves). Do NOT prefix `$SUDO` -- sudo can't find `omarchy` in its restricted PATH (`~/.local/share/omarchy/bin/` is user-local). Call `omarchy ...` directly. (Also stated in Script Patterns.)
+- **Omarchy has no `wget` by default.** Use `curl` in install scripts (or a shared download helper).
+- **lazygit and gh are preinstalled/managed by Omarchy.** Skip their `.chezmoiexternals` and completion scripts on Omarchy (`{{ if not .isOmarchy }}`) to avoid two copies.
+- **Ghostty `config-file` ordering:** entries are processed *after* the file that declares them, in order, so the **last** `config-file` wins. To override omarchy's read-only shipped config (`~/.local/share/omarchy/config/ghostty/config`), track `~/.config/ghostty/config` that includes it first, then load override files (`padding.conf`, etc.) last. Verify with a value `+show-config` does print (e.g. `font-size`); it does not print `window-padding-*`.
+- **`environment.d`** (`~/.config/environment.d/*.conf`) vars are read at systemd user manager startup, so they need a re-login to take effect.
+- **`omarchy-webapp-remove` takes multiple names** and restarts the app launcher once -- pass all apps in one call to avoid the systemd start-limit on rapid restarts. Webapps share the main browser profile.
+- **Stock `ssh-agent.service`/`.socket`** user unit is enabled by the `omarchy` recipe; `SSH_AUTH_SOCK` points at `$XDG_RUNTIME_DIR/ssh-agent.socket`. `gpg-agent-ssh.socket` (GnuPG SSH emulation) is active by default and can hijack `SSH_AUTH_SOCK` via `ExecStartPost` -- mask it if it does.
