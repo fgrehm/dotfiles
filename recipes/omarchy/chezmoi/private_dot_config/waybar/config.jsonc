@@ -1,3 +1,4 @@
+// Overrides omarchy's default: ~/.local/share/omarchy/config/waybar/config.jsonc
 {
   "reload_style_on_change": true,
   "layer": "top",

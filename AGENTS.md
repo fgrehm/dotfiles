@@ -102,6 +102,23 @@ Use `.recipeignore` to exclude entire recipes (e.g. laptop-only tools) rather th
 - Run `make check` to lint (shfmt + shellcheck).
 - Vim modelines: `# vim: ft=bash.gotmpl` on `.sh.tmpl` files (line 2, after shebang); `# vim: ft=toml.gotmpl` on `.chezmoiexternals/*.toml` files (last line -- putting it first breaks Go template trimming).
 
+## Documenting Overridden Source Files
+
+When a tracked file overrides an omarchy default (or copies an omarchy script), add a comment at the top of the file pointing to the original source path, so future us can diff against upstream and spot drift. Use the omarchy source path, not the deployed target path.
+
+```
+# Overrides omarchy's default: ~/.local/share/omarchy/default/hypr/hyprland.conf
+```
+
+```
+# Personal monitor scaling cycle. Overrides omarchy's default:
+# ~/.local/share/omarchy/bin/omarchy-hyprland-monitor-scaling-cycle
+```
+
+- Use the comment syntax of the file's format (`#` for shell/TOML/Hyprland, `//` for JSONC).
+- If a file overrides more than one upstream source (e.g. `bindings.conf` pulls the scaling binding from `tiling-v2.conf`), list each relevant path.
+- Do this for every file that overrides or copies an omarchy default, not just new ones. If a file is a brand-new addition with no omarchy counterpart (e.g. `windowrules.conf`, `voxtype/config.toml`), no comment is needed.
+
 ## GitHub Binary Installs
 
 For tools distributed as GitHub release tarballs, use chezmoi's `.chezmoiexternals/` directory instead of a shell install script. Each recipe places a `<tool>.toml` file in `chezmoi/.chezmoiexternals/`. Files in this directory are always rendered as templates (no `.tmpl` extension needed).

@@ -4,6 +4,7 @@ Omarchy-specific configuration and tweaks. Only applied on Omarchy (Arch-based, 
 
 ## What it does
 
+- Deploys `~/.config/hypr/bindings.conf` (application + webapp bindings) and overrides omarchy's default `Super+/` monitor scaling cycle to toggle between 1x and 1.5x via `~/.local/bin/my-monitor-scaling-cycle` (a copy of `omarchy-hyprland-monitor-scaling-cycle` with `SCALES=(1 1.5)`). `Super+Alt+/` cycles backwards. The custom script lives in `~/.local/bin` so it survives `omarchy update` (omarchy's own script is read-only).
 - Deploys `~/.config/hypr/input.conf` with Caps Lock remapped to Control (`kb_options = compose:paus,ctrl:nocaps`).
 - Deploys `~/.config/hypr/windowrules.conf` with float + center rules for transient dialog toolkits (`yad`, `zenity`, `kdialog`) so they don't get tiled. Tracked `~/.config/hypr/hyprland.conf` adds `source = ~/.config/hypr/windowrules.conf` to omarchy's default `hyprland.conf` (which has no sourced window-rules override file).
 - Deploys `~/.config/starship.toml` — a minimal prompt with a conditional newline: `add_newline = false` plus a `custom.line_break` module (`require_repo = true`) inserts a line break before `❯` only inside git repos (single-line prompt outside them). Nerd Font git-status icons are backlogged (see OMARCHY.md).

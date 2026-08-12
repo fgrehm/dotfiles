@@ -3,8 +3,6 @@ test-results/
 
 # Local session notes and memory (machine-specific, never share)
 .ai/
-MEMORY.local.md
-CLAUDE.local.md
 
 # Editor and OS
 *~

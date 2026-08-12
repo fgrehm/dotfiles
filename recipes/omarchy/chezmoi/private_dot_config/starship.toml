@@ -1,3 +1,4 @@
+# Overrides omarchy's default: ~/.local/share/omarchy/config/starship.toml
 add_newline = false
 format = "[$directory$git_branch$git_status]($style)${custom.line_break}$character"
 

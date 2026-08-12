@@ -1,3 +1,5 @@
+# Overrides omarchy's default: ~/.local/share/omarchy/config/ghostty/config
+#
 # Include omarchy's default ghostty config, then apply overrides.
 #
 # IMPORTANT: ghostty processes every `config-file` entry AFTER the main file,

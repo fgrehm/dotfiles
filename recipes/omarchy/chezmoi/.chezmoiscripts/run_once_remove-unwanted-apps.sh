@@ -2,12 +2,6 @@
 # vim: ft=bash
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
-if [ "$(id -u)" -ne 0 ]; then
-  SUDO="sudo"
-else
-  SUDO=""
-fi
-
 set -eo pipefail
 
 # Remove unwanted omarchy webapps (they share the main browser profile).
