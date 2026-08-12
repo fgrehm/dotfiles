@@ -1,0 +1,48 @@
+#!/bin/env bash
+# Launch timr-tui in pomodoro mode with a red terminal background.
+#
+# timr-tui does not paint its own background (ratatui Color::Reset), so the
+# terminal's default bg/fg colors control the look. We set them via OSC 11/10
+# escape sequences (supported by ghostty, alacritty, kitty, foot) and reset to
+# configured defaults (OSC 110/111) on exit.
+#
+# ghostty does not answer OSC 11;? color queries, so we can't capture the
+# previous color to restore it exactly. OSC 110/111 resets to the terminal's
+# configured defaults (your theme colors), which is the right restore on a
+# fresh terminal. If you'd want exact capture-and-restore, that needs a
+# terminal that answers OSC 11;? (alacritty/kitty/foot do).
+#
+# Tweak the colors and the timr-tui flags below.
+set -uo pipefail
+
+# NOTE: there is no `--auto-switch off` flag (it's a boolean switch: present = on,
+# absent = off), so we simply never pass it. Caveat: if auto-switch is toggled on
+# in-app (key `a`) it persists to app.data and a later launch won't turn it back
+# off. Same applies to vim motions below.
+
+# --- config ---
+BG="${TIMR_BG:-#5c1f1f}"   # dark red background
+FG="${TIMR_FG:-#f5f5f5}"   # near-white foreground for contrast
+ARGS=(
+  --mode pomodoro
+  --notification on
+  --blink on
+)
+ARGS+=("$@")
+
+TTY=/dev/tty
+
+# --- set terminal default colors ---
+printf '\033]11;%s\007' "$BG"   # default background
+printf '\033]10;%s\007' "$FG"   # default foreground
+
+# --- reset to configured defaults on exit ---
+reset_colors() {
+  local rc=$?
+  printf '\033]110\007\033]111\007' >"$TTY" 2>/dev/null || true
+  exit "$rc"
+}
+trap reset_colors EXIT
+
+# run without exec so the trap can fire after timr-tui exits
+timr-tui "${ARGS[@]}"
