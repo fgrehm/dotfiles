@@ -1,0 +1,47 @@
+#!/bin/env bash
+# Quick-note shortcut for the Obsidian "Main" vault.
+# Ensures Obsidian is running and focused, then creates a timestamped note in
+# inbox/ via the obsidian://new URI and opens it in a new tab.
+set -euo pipefail
+
+VAULT="Main"
+INBOX="inbox"
+WINDOW_CLASS="^obsidian$"
+
+stamp() { date +"%Y%m%d-%H%M%S"; }
+title() { date +"%Y-%m-%d %H:%M"; }
+
+window_address() {
+	hyprctl clients -j 2>/dev/null |
+		jq -r --arg p "$WINDOW_CLASS" '.[]|select(.class|test($p;"i"))|.address' |
+		head -n1
+}
+
+# Ensure Obsidian is running and focused.
+addr="$(window_address || true)"
+if [[ -n "$addr" ]]; then
+	hyprctl dispatch focuswindow "address:$addr" >/dev/null
+else
+	setsid uwsm-app -- obsidian >/dev/null 2>&1 &
+	# Wait for the window to appear (up to 15s).
+	for _ in $(seq 1 30); do
+		sleep 0.5
+		addr="$(window_address || true)"
+		[[ -n "$addr" ]] && break
+	done
+	if [[ -z "$addr" ]]; then
+		notify-send "Quick note" "Obsidian did not start, aborting" 2>/dev/null || true
+		exit 1
+	fi
+	hyprctl dispatch focuswindow "address:$addr" >/dev/null
+fi
+
+# Give the window a beat to actually receive focus before firing the URI.
+sleep 0.3
+
+name="$(stamp)"
+file="$(printf '%s/%s' "$INBOX" "$name" | jq -sRr @uri)"
+content=$(printf '# Quick note \u2014 %s\n\n' "$(title)")
+content_enc="$(printf '%s' "$content" | jq -sRr @uri)"
+uri="obsidian://new?vault=${VAULT}&file=${file}&content=${content_enc}&paneType=tab"
+xdg-open "$uri" >/dev/null 2>&1

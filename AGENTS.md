@@ -41,13 +41,15 @@ Do NOT use whole-directory symlinks for the per-agent skills dirs — that would
 
 ## Directory Privacy Must Be Consistent Across Recipes
 
-chezmoi maps `dot_config` and `private_dot_config` to the same target directory (`.config`) but with different permissions. If two recipes in the overlay use different privacy prefixes for the same target directory, chezmoi will refuse to apply with:
+chezmoi maps `dot_<dir>` and `private_dot_<dir>` to the same target directory (`~/.<dir>`) but with different permissions. The privacy prefix applies to the first path segment after `dot_`, and every recipe writing under the same target directory must use the same prefix. If two recipes in the overlay use different privacy prefixes for the same target directory, chezmoi will refuse to apply with:
 
 ```
 chezmoi: .config: inconsistent state (...dot_config, ...private_dot_config)
 ```
 
-**Rule: all recipes that write under `.config` must use `private_dot_config`. Never use `dot_config` for `.config`.** The `.config` directory holds user application state and is private by convention. Mixing `dot_config` and `private_dot_config` across recipes is always a bug.
+This bites at any nesting level, not just the top. `dot_pi/private_agent/...` and `dot_pi/agent/...` both deploy under `~/.pi/agent` and so must share the prefix on `agent` -- the existing `private_agent` entry means any new file there is `dot_pi/private_agent/<file>`, never `dot_pi/agent/<file>`.
+
+**Rule: before adding a file under a `dot_`/`private_dot_` directory, check what prefix every other recipe already uses for that same target directory and match it.** Concretely: all recipes writing under `.config` use `private_dot_config` (the `.config` directory holds user application state and is private by convention); all files under `~/.pi/agent` use `dot_pi/private_agent`. Mixing prefixes for the same target across recipes is always a bug.
 
 ## Environment Detection
 
