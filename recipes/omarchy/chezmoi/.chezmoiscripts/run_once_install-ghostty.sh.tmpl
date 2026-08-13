@@ -1,7 +1,15 @@
 #!/bin/env bash
-# vim: ft=bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
+# {{ if .isOmarchy4 }}
+# Omarchy 4.0 ships foot as the default terminal, which supports images via
+# sixel (ghostty's draw was the image use case on 3.8). Skip installing ghostty
+# and setting it as the default; let omarchy manage the terminal on 4.0.
+log_skip "ghostty install skipped on Omarchy 4 (foot is the default terminal)"
+exit 0
+# {{ else }}
 if command -v ghostty &>/dev/null; then
   log_skip "ghostty already installed"
   # still ensure it's the default terminal for xdg-terminal-exec
@@ -13,3 +21,4 @@ set -eo pipefail
 
 log_info "Installing ghostty and setting as default terminal..."
 omarchy install terminal ghostty
+# {{ end }}

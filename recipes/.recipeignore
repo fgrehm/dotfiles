@@ -1,9 +1,16 @@
 {{- if .isContainer }}
 1password
 cli-tools
-omarchy
 webapps
 {{- end }}
 {{- if not .isOmarchy }}
 omarchy
+omarchy3
+omarchy4
+{{- end }}
+{{- if and .isOmarchy (not .isOmarchy4) }}
+omarchy4
+{{- end }}
+{{- if .isOmarchy4 }}
+omarchy3
 {{- end }}

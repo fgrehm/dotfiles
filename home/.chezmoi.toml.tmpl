@@ -1,6 +1,12 @@
 {{- /* Auto-detect environment */ -}}
 {{- $isContainer := or (stat "/.dockerenv") (stat "/run/.containerenv") (stat "/var/devcontainer") (env "CODESPACES") (env "REMOTE_CONTAINERS") (env "container") | not | not -}}
 {{- $isOmarchy := or (lookPath "omarchy") (stat (joinPath .chezmoi.homeDir ".local/share/omarchy")) | not | not -}}
+{{- $omarchyVersion := "" -}}
+{{- $isOmarchy4 := false -}}
+{{- if $isOmarchy -}}
+{{-   $omarchyVersion = output "omarchy" "version" | trim -}}
+{{-   $isOmarchy4 = $omarchyVersion | hasPrefix "4." -}}
+{{- end -}}
 {{- $hasNvidiaGPU := false -}}
 {{- if and (not $isContainer) (lookPath "lspci") -}}
 {{-   $hasNvidiaGPU = output "lspci" | lower | contains "nvidia" -}}
@@ -62,5 +68,7 @@ sourceDir = "{{ .chezmoi.workingTree }}"
     {{- end }}
     isContainer = {{ $isContainer }}
     isOmarchy = {{ $isOmarchy }}
+    omarchyVersion = {{ $omarchyVersion | quote }}
+    isOmarchy4 = {{ $isOmarchy4 }}
     useZsh = {{ not $isOmarchy }}
     hasNvidiaGPU = {{ $hasNvidiaGPU }}

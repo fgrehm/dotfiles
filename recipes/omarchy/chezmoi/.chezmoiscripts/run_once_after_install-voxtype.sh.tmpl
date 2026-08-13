@@ -1,5 +1,6 @@
 #!/bin/env bash
-# vim: ft=bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 if command -v voxtype &>/dev/null; then
@@ -36,4 +37,8 @@ fi
 systemctl --user daemon-reload
 systemctl --user enable --now voxtype.service
 
+# {{ if .isOmarchy4 }}
+omarchy restart shell
+# {{ else }}
 omarchy restart waybar
+# {{ end }}

@@ -1,5 +1,6 @@
 #!/bin/env bash
-# vim: ft=bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 if command -v dropbox &>/dev/null; then
@@ -10,4 +11,8 @@ fi
 set -eo pipefail
 
 log_info "Installing Dropbox and starting the service..."
+# {{ if .isOmarchy4 }}
+omarchy install service dropbox
+# {{ else }}
 omarchy install dropbox
+# {{ end }}

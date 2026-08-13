@@ -1,5 +1,6 @@
 #!/bin/env bash
-# vim: ft=bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 # theme.lua is a symlink to the current Omarchy theme's neovim.lua, so it
@@ -8,7 +9,13 @@ source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 # config/nvim is symlinked into ~/.config/nvim, so relative targets resolve
 # against the repo path). Create the absolute symlink here instead.
 THEME_LINK="$HOME/.config/nvim/lua/plugins/theme.lua"
+# {{ if .isOmarchy4 }}
+# Omarchy 4.0 moved the current theme from ~/.config/omarchy/current to
+# ~/.local/state/omarchy/current (XDG state dir).
+THEME_TARGET="$HOME/.local/state/omarchy/current/theme/neovim.lua"
+# {{ else }}
 THEME_TARGET="$HOME/.config/omarchy/current/theme/neovim.lua"
+# {{ end }}
 
 if [ -L "$THEME_LINK" ]; then
   log_skip "theme.lua symlink already exists"

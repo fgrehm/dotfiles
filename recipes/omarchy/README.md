@@ -1,35 +1,42 @@
 # omarchy
 
-Omarchy-specific configuration and tweaks: the bare-metal/laptop target recipe. Only applied on Omarchy (Arch-based, Hyprland); ignored in containers and on non-Omarchy hosts.
+Version-neutral Omarchy configuration and tweaks: install scripts and configs that work identically on Omarchy 3.8 and 4.0. Always applied on Omarchy hosts (bare-metal/laptop target). Version-specific Hyprland/bar config lives in [`omarchy3`](../omarchy3) and [`omarchy4`](../omarchy4); this recipe is gated to Omarchy by `recipes/.recipeignore` (skipped in containers and on non-Omarchy hosts).
 
-## What it does
+## What does what
 
-- Deploys `~/.config/hypr/bindings.conf` (application + webapp bindings) and overrides omarchy's default `Super+/` monitor scaling cycle to toggle between 1x and 1.5x via `~/.local/bin/my-monitor-scaling-cycle` (a copy of `omarchy-hyprland-monitor-scaling-cycle` with `SCALES=(1 1.5)`). `Super+Alt+/` cycles backwards. The custom script lives in `~/.local/bin` so it survives `omarchy update` (omarchy's own script is read-only).
-- Deploys `~/.config/hypr/input.conf` with Caps Lock remapped to Control (`kb_options = compose:paus,ctrl:nocaps`).
-- Deploys `~/.config/hypr/windowrules.conf` with float + center rules for transient dialog toolkits (`yad`, `zenity`, `kdialog`) so they don't get tiled. Tracked `~/.config/hypr/hyprland.conf` adds `source = ~/.config/hypr/windowrules.conf` to omarchy's default `hyprland.conf` (which has no sourced window-rules override file).
-- Seeds `~/.config/hypr/local.conf` (via chezmoi's `create_` attribute, so it's created once and local edits are preserved across `chezmoi apply`). Tracked `~/.config/hypr/hyprland.conf` sources it **last**, after omarchy defaults and tracked user config, so machine-specific overrides (keybindings, window rules, etc.) win. Use it for per-machine tweaks you don't want in the repo; the file itself is not managed by chezmoi after creation.
-- Deploys `~/.config/starship.toml` — a minimal prompt with a conditional newline: `add_newline = false` plus a `custom.line_break` module (`require_repo = true`) inserts a line break before `❯` only inside git repos (single-line prompt outside them). Nerd Font git-status icons are backlogged (see BACKLOG.md).
-- Uses lowercase `~/projects` instead of omarchy's default `~/Projects` via `~/.config/user-dirs.dirs` (`XDG_PROJECTS_DIR="$HOME/projects"`) and `~/.config/gtk-3.0/bookmarks` (templated home path).
-- Deploys `~/.config/waybar/config.jsonc` (top bar layout; clock shows weekday, date, and time). A `run_onchange_after_restart-waybar.sh.tmpl` script restarts waybar whenever this config changes (waybar does not auto-reload).
-- Overrides ghostty's window padding to 2px (omarchy's default is 14px) via `~/.config/ghostty/config` + `padding.conf`. `padding.conf` is loaded last (as a `config-file`), so it wins over omarchy's 14px. `window-padding-balance = true` distributes leftover space (viewport not divisible by cell size) across all edges instead of stacking it at the bottom. Padding changes only affect new terminals.
-- Sets `SSH_AUTH_SOCK` to the stock OpenSSH agent socket via `~/.config/environment.d/ssh-agent.conf` (`SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}/ssh-agent.socket`).
-- Enables the stock `ssh-agent.service` user unit via `run_once_enable-ssh-agent.sh` (idempotent; skips if already enabled).
-- Removes unwanted apps via `run_once_remove-unwanted-apps.sh` (webapps: Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos).
-- Installs ghostty and sets it as the default terminal via `run_once_install-ghostty.sh` (idempotent; skips if already installed).
-- Installs brave and sets it as the default browser via `run_once_install-brave.sh` (idempotent; skips if already installed).
-- Installs Slack (`slack-desktop` from the AUR) plus `xdg-desktop-portal-wlr` for Wayland screen sharing via `run_once_install-slack.sh` (idempotent; skips if already installed).
-- Installs Dropbox and starts the service via `run_once_install-dropbox.sh` (idempotent; skips if already installed). Must then be authenticated via the web.
-- Installs Voxtype dictation via `run_once_after_install-voxtype.sh` (idempotent; skips if already installed). Installs `wtype` + `voxtype-bin`, downloads the AI model (~150MB), sets up the systemd user service, and restarts waybar. GPU acceleration is enabled only when a discrete GPU is present (2+ display controllers in `lspci`, same heuristic as `omarchy-hw-hybrid-gpu`) — not via `omarchy-hw-vulkan`, which is true on integrated-only laptops too. The GPU step replaces `/usr/bin/voxtype`, so it runs with `sudo` (via `$SUDO`). The waybar `custom/voxtype` module is already part of the tracked `config.jsonc`.
-- Tracks `~/.config/voxtype/config.toml` (customized: hotkey `HOME` push-to-talk, whisper `mode = "local"`, output `auto_submit`/`shift_enter_newlines`/`pre_type_delay_ms`, `[text]` section, `engine = "whisper"`). The install script runs as `run_once_after_` so the tracked config is in place before `voxtype setup` runs; it does not copy omarchy's default config (which would clobber these tweaks).
-- Restarts the voxtype daemon and waybar when the config changes via `run_onchange_after_restart-voxtype.sh.tmpl` (embeds the config, service, and gpu drop-in hashes, so it re-runs whenever any of them change; skips if voxtype isn't installed).
-- Tracks the voxtype systemd user service (`~/.config/systemd/user/voxtype.service`) and a `gpu.conf` drop-in that pins voxtype to the NVIDIA GPU (`VOXTYPE_VULKAN_DEVICE=nvidia`) on hybrid-GPU laptops. The drop-in is skipped via `.chezmoiignore` when there's no NVIDIA GPU (`hasNvidiaGPU`). The install script enables/starts the deployed service instead of regenerating it with `voxtype setup systemd` (which would clobber the tracked files).
-- Disables the GNOME filesystem indexer (`localsearch`, formerly `tracker3-miners`) via `run_once_disable-localsearch.sh` (masks `localsearch-3`, `localsearch-control-3`, `localsearch-writeback-3`, and `tinysparql-xdg-portal-3` user services) and deploys `~/.config/autostart/localsearch-3.desktop` with `Hidden=true` as belt-and-suspenders against DBus activation by nautilus. Nothing on Omarchy consumes its index (Walker's file search is self-contained), so it's pure CPU/RAM overhead.
-- Installs the [crib](https://github.com/fgrehm/crib) CLI to `~/.local/bin/crib` ("Just Enough Devcontainers": reads `.devcontainer/devcontainer.json`, builds the container, runs it) and deploys `~/.config/crib/config.toml`. Crib is bare-metal-only; it lives here because Omarchy is the only bare-metal target. (Was its own `laptop` recipe.)
+Shared across both Omarchy versions:
+
+- **Install scripts** (all idempotent, guarded with `command -v`):
+  - `run_once_install-ghostty.sh.tmpl` — installs ghostty and sets it as the default terminal (`omarchy install terminal ghostty` + `omarchy default terminal ghostty`). **Skipped on Omarchy 4.0** (via a template guard), where foot is the default terminal and supports images via sixel — ghostty's image support was the 3.8 use case. The ghostty config files are also skipped on 4.0 via `.chezmoiignore`.
+  - `run_once_install-brave.sh` — installs brave and sets it as the default browser (`omarchy install browser brave` + `omarchy default browser brave`).
+  - `run_once_install-slack.sh` — installs `slack-desktop` (AUR) plus `xdg-desktop-portal-wlr` for Wayland screen sharing.
+  - `run_once_install-dropbox.sh.tmpl` — installs Dropbox and starts the service. Uses `omarchy install service dropbox` on 4.0 (the command changed from 3.8's `omarchy install dropbox`). Must then be authenticated via the web.
+  - `run_once_after_install-voxtype.sh.tmpl` — installs Voxtype dictation (`wtype` + `voxtype-bin`), downloads the AI model (~150MB), enables GPU acceleration only when a discrete GPU is present (2+ display controllers in `lspci`, same heuristic as `omarchy-hw-hybrid-gpu`), and enables/starts the deployed systemd user service. Restarts the bar afterward via a version-guarded command (`omarchy restart shell` on 4.0, `omarchy restart waybar` on 3.8).
+  - `run_once_enable-ssh-agent.sh` — enables the stock `ssh-agent.service` user unit.
+  - `run_once_disable-localsearch.sh` — masks the GNOME filesystem indexer (`localsearch-3` and friends) and deploys `~/.config/autostart/localsearch-3.desktop` with `Hidden=true` as belt-and-suspenders against DBus activation by nautilus.
+  - `run_once_remove-unwanted-apps.sh` — removes unwanted omarchy webapps (Basecamp, Discord, Fizzy, Google Contacts, Zoom, HEY, Google Messages, Google Photos, WhatsApp) in a single `omarchy-webapp-remove` call.
+- `run_onchange_after_restart-voxtype.sh.tmpl` — restarts the voxtype daemon (and the bar, version-guarded) whenever the voxtype config, service, or gpu drop-in changes. Embeds all three hashes.
+- `~/.config/voxtype/config.toml` — customized voxtype config (hotkey `HOME` push-to-talk, whisper `mode = "local"`, output `auto_submit`/`shift_enter_newlines`/`pre_type_delay_ms`, `[text]` section, `engine = "whisper"`). The install script runs as `run_once_after_` so this config is in place before `voxtype setup` runs.
+- `~/.config/systemd/user/voxtype.service` + `voxtype.service.d/gpu.conf` — the tracked voxtype systemd user service and an NVIDIA drop-in (`VOXTYPE_VULKAN_DEVICE=nvidia`) pinned to hybrid-GPU laptops. The drop-in is skipped via `.chezmoiignore` when there's no NVIDIA GPU (`hasNvidiaGPU`).
+- `~/.config/environment.d/ssh-agent.conf` — points `SSH_AUTH_SOCK` at the stock OpenSSH agent socket (`${XDG_RUNTIME_DIR}/ssh-agent.socket`). Takes effect after re-login.
+- `~/.config/starship.toml` — minimal prompt with a conditional newline (`add_newline = false` plus a `custom.line_break` module that inserts a line break before `❯` only inside git repos).
+- `~/.config/user-dirs.dirs` + `~/.config/gtk-3.0/bookmarks.tmpl` — lowercase `~/projects` instead of omarchy's default `~/Projects`.
+- `~/.config/ghostty/config.tmpl` — includes omarchy's default ghostty config then loads `padding.conf` and `keybinds.conf` last (ghostty processes `config-file` entries after the declaring file, in order, so the last one wins). The include path is templated by Omarchy version: `~/.local/share/omarchy/...` on 3.8, `/usr/share/omarchy/...` on 4.0 (Omarchy 4.0 moved its defaults to `OMARCHY_PATH`). **Skipped on 4.0** via `.chezmoiignore` (ghostty isn't installed there).
+- `~/.config/ghostty/padding.conf` — reduces omarchy's 14px window padding to 2px (`window-padding-balance = true`).
+- `~/.config/ghostty/keybinds.conf` — `shift+enter=text:\n` so TUIs insert a newline instead of submitting (mirrors the alacritty binding in the terminal recipe).
+- `~/.local/bin/my-monitor-scaling-cycle` — personal 1x ↔ 1.5x monitor scaling cycle (standalone; calls `hyprctl` directly). Bound by both `omarchy3` (via `bindings.conf`) and `omarchy4` (via `bindings.lua`). Lives here because it's version-neutral.
+- `~/.local/bin/obsidian-quick-note` — quick-note shortcut for the Obsidian "Main" vault (ensures Obsidian is running/focused, then creates a timestamped note via the `obsidian://new` URI). Bound to `Super+N` by both `omarchy3` and `omarchy4`.
+- `~/.local/bin/crib` (via `.chezmoiexternals/crib.toml`) + `~/.config/crib/config.toml` — the [crib](https://github.com/fgrehm/crib) CLI ("Just Enough Devcontainers"). Bare-metal-only; lives here because Omarchy is the only bare-metal target.
+
+## Version-specific recipes
+
+- [`omarchy3`](../omarchy3) — Hyprland `.conf` stack + waybar bar config (3.8 only).
+- [`omarchy4`](../omarchy4) — Hyprland `.lua` overrides (4.0 only).
 
 ## Notes
 
-- Omarchy manages its own Hyprland configs via `omarchy refresh`. This recipe tracks the user-level overrides (`input.conf`, `hyprland.conf`, `windowrules.conf`) so they survive `omarchy refresh`/updates. If a config diverges from omarchy's defaults, re-apply via `chezmoi apply`. `hyprland.conf` is tracked in full, so if omarchy upstream changes its default `hyprland.conf` (new `source` lines, etc.) the tracked copy drifts and needs to be re-synced.
-- Ghostty's shipped config is read-only at `~/.local/share/omarchy/config/ghostty/config`. To override it, `~/.config/ghostty/config` includes it via `config-file`, then loads `padding.conf` last (ghostty processes `config-file` entries after the declaring file, in order, so the last one wins).
+- `omarchy` commands handle sudo internally (`omarchy pkg add`, `omarchy install`, ... declare `requires-sudo=true` and call `sudo` themselves). Do NOT prefix `$SUDO` — call `omarchy ...` directly.
+- Omarchy has no `wget` by default; install scripts use `omarchy`/`pacman` rather than fetching directly.
 - The `environment.d` SSH_AUTH_SOCK setting only takes effect after re-login (environment.d is read at systemd user manager startup).
 - `AddKeysToAgent yes` is intentionally NOT duplicated here — it lives in the `shell` recipe's `~/.ssh/config`.
 - `gpg-agent-ssh.socket` (GnuPG SSH emulation) is active by default and can override `SSH_AUTH_SOCK` via `ExecStartPost`; mask it if it hijacks the socket (see BACKLOG.md).

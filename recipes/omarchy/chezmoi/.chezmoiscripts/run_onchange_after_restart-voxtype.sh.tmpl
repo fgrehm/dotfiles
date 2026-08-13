@@ -16,4 +16,8 @@ set -eo pipefail
 log_info "Restarting voxtype service to apply config changes..."
 systemctl --user daemon-reload
 systemctl --user restart voxtype.service
+# {{ if .isOmarchy4 }}
+omarchy restart shell
+# {{ else }}
 omarchy restart waybar
+# {{ end }}

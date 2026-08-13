@@ -63,10 +63,14 @@ This bites at any nesting level, not just the top. `dot_pi/private_agent/...` an
 | `.onepasswordSshItem` | Prompted at `chezmoi init` (bare metal only; empty string in containers) |
 | `.isContainer` | `/.dockerenv`, `/run/.containerenv`, `CODESPACES`, etc. |
 | `.isOmarchy` | `omarchy` on PATH or `~/.local/share/omarchy` exists |
+| `.omarchyVersion` | `omarchy version` output (e.g. `4.0.0rc2-1`); empty string on non-Omarchy hosts |
+| `.isOmarchy4` | `omarchyVersion` starts with `4.`; gates the `omarchy3`/`omarchy4` recipe split |
 | `.useZsh` | `not .isOmarchy` (true in containers, false on Omarchy); gates zsh install/completions |
 | `.hasNvidiaGPU` | `lspci` output (skipped in containers); gates the voxtype NVIDIA GPU drop-in |
 
 Use `{{ if .isContainer }}` in templates and `.chezmoiignore` for conditional deployment.
+
+> **Omarchy 3.8 vs 4.0 recipe split.** Omarchy 4.0 changed the Hyprland config system from plain `.conf` files (sourced via `source =`) to a Lua module system (`~/.config/hypr/*.lua` loaded via `require()`), dropped waybar for the Quickshell-based Omarchy shell, and moved its defaults from `~/.local/share/omarchy/` to `/usr/share/omarchy/` (`OMARCHY_PATH`). The omarchy config is therefore split into three recipes: `omarchy` (version-neutral: installs, starship, voxtype, ghostty, crib, the standalone `my-monitor-scaling-cycle`/`obsidian-quick-note` scripts), `omarchy3` (3.8-only Hyprland `.conf` stack + waybar), and `omarchy4` (4.0-only Hyprland `.lua` overrides). `recipes/.recipeignore` skips `omarchy4` on 3.8 and `omarchy3` on 4.0. When a script needs a version-specific command (e.g. `omarchy restart waybar` on 3.8 vs `omarchy restart shell` on 4.0), guard it with `# {{ if .isOmarchy4 }}`. The ghostty `config.tmpl` similarly templates its `config-file` include path by version.
 
 > **GPU detection is split between runtime and template data.** The voxtype install script checks for a discrete GPU via `lspci` at runtime (2+ display controllers) to decide whether to enable the GPU backend. But the NVIDIA-specific systemd drop-in (`VOXTYPE_VULKAN_DEVICE=nvidia`) is gated by the `hasNvidiaGPU` template variable via `.chezmoiignore`, since it only makes sense on machines with an NVIDIA GPU.
 
@@ -256,6 +260,11 @@ Never run `chezmoi apply` on the host from this assistant. Only run it inside a 
 These are dotfiles-repo-specific facts the `omarchy` skill does not cover.
 
 - **`omarchy` commands handle sudo internally** (`omarchy pkg add`, `omarchy install`, ... declare `requires-sudo=true` and call `sudo` themselves). Do NOT prefix `$SUDO` -- sudo can't find `omarchy` in its restricted PATH (`~/.local/share/omarchy/bin/` is user-local). Call `omarchy ...` directly. (Also stated in Script Patterns.)
+- **Omarchy 3.8 vs 4.0 path/command differences** (gate with `# {{ if .isOmarchy4 }}`):
+  - Defaults moved from `~/.local/share/omarchy/` (3.8) to `/usr/share/omarchy/` (4.0, `OMARCHY_PATH`). The current theme moved from `~/.config/omarchy/current/` (3.8) to `~/.local/state/omarchy/current/` (4.0, XDG state dir).
+  - `omarchy install dropbox` (3.8) → `omarchy install service dropbox` (4.0; the command moved under the `service` subgroup).
+  - Waybar (3.8) → Quickshell-based Omarchy shell (4.0); `omarchy restart waybar` → `omarchy restart shell`. The bar config moved from `~/.config/waybar/config.jsonc` to `~/.config/omarchy/shell.json`.
+  - Ghostty is the default terminal on 3.8; foot is the default on 4.0 (supports images via sixel). The ghostty install + config are skipped on 4.0 via `.chezmoiignore` and a template guard.
 - **Omarchy has no `wget` by default.** Use `curl` in install scripts (or a shared download helper).
 - **lazygit and gh are preinstalled/managed by Omarchy.** Skip their `.chezmoiexternals` and completion scripts on Omarchy (`{{ if not .isOmarchy }}`) to avoid two copies.
 - **Ghostty `config-file` ordering:** entries are processed *after* the file that declares them, in order, so the **last** `config-file` wins. To override omarchy's read-only shipped config (`~/.local/share/omarchy/config/ghostty/config`), track `~/.config/ghostty/config` that includes it first, then load override files (`padding.conf`, etc.) last. Verify with a value `+show-config` does print (e.g. `font-size`); it does not print `window-padding-*`.

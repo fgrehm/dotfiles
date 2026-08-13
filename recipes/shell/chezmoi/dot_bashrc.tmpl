@@ -4,7 +4,7 @@
 {{ if .isOmarchy }}
 # Omarchy bashrc: load omarchy's defaults, then the shared shellrc loader.
 [[ $- != *i* ]] && return
-source ~/.local/share/omarchy/default/bash/rc
+source "${OMARCHY_PATH:-$HOME/.local/share/omarchy}/default/bash/rc"
 {{ else }}
 # Container/fallback bashrc (non-Omarchy): standard Debian skeleton + shellrc loader.
 # If not running interactively, don't do anything
