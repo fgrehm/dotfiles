@@ -4,5 +4,6 @@
 .bundle/
 .claude/settings.local.json
 .worktrees/
+.pi-subagents/
 vendor/bundle
 CLAUDE.local.md
