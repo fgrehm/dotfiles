@@ -1,6 +1,6 @@
 ---
 name: project-inception
-description: "Structured project inception through interview, documentation, and scaffolding. Use when starting a new project (CLI tools, libraries, web apps, backends, etc.) to conduct a detailed interview about vision/scope/tech, generate foundational documentation (README with philosophy, CLAUDE.md for AI context, ROADMAP for phased plan), and scaffold initial code structure with git setup. Adapts questions and outputs based on project type. Do NOT use for existing projects. Use only when starting from scratch."
+description: "Structured project inception through interview, documentation, and scaffolding. Use when starting a new project (CLI tools, libraries, web apps, backends, etc.) to conduct a detailed interview about vision/scope/tech, generate foundational documentation (README with philosophy, AGENTS.md for AI context, ROADMAP for phased plan), and scaffold initial code structure with git setup. Adapts questions and outputs based on project type. Do NOT use for existing projects. Use only when starting from scratch."
 ---
 
 # Project Inception
@@ -11,7 +11,7 @@ This skill guides the creation of new projects through a structured inception pr
 
 The workflow:
 1. **Interview** - Ask clarifying questions about the project (adapted by type)
-2. **Document** - Generate README (with philosophy), CLAUDE.md (for AI context), and ROADMAP (phased plan)
+2. **Document** - Generate README (with philosophy), AGENTS.md (for AI context), and ROADMAP (phased plan)
 3. **Scaffold** - Create initial directory structure and git setup with commits
 
 ## Quick Start
@@ -103,7 +103,7 @@ Generate three core documents from interview responses:
 
 See [references/documentation_templates.md](references/documentation_templates.md#readme) for full template.
 
-### 2. CLAUDE.md
+### 2. AGENTS.md
 
 **Structure:**
 - "What this is" summary
@@ -117,7 +117,7 @@ See [references/documentation_templates.md](references/documentation_templates.m
 
 See [references/documentation_templates.md](references/documentation_templates.md#claudemd) for full template.
 
-**Key principle:** CLAUDE.md is for future AI assistants. Write it as a context document that helps Claude understand the project without needing to explore the codebase.
+**Key principle:** AGENTS.md is for future AI assistants. Write it as a context document that helps Claude understand the project without needing to explore the codebase.
 
 ### 3. ROADMAP.md
 
@@ -163,8 +163,8 @@ Key ones:
 Initialize git repo and create initial commits:
 
 1. `git init`
-2. Add docs: `git add README.md CLAUDE.md ROADMAP.md`
-3. Commit: `git commit -m "docs: add project README, CLAUDE.md, and ROADMAP with initial spec"`
+2. Add docs: `git add README.md AGENTS.md ROADMAP.md`
+3. Commit: `git commit -m "docs: add project README, AGENTS.md, and ROADMAP with initial spec"`
 4. If scaffolded code: `git add <code files>` and commit with appropriate message
 
 Use Conventional Commits format (feat, fix, chore, docs, etc.) in commit messages.
@@ -181,7 +181,7 @@ START: "Help me inception a new project"
   │   └─ [Personal Tool] → Use Personal Tool interview
   ├─ Run the interview for that type (ask questions, listen for answers)
   ├─ Summarize responses
-  ├─ Generate README, CLAUDE.md, ROADMAP
+  ├─ Generate README, AGENTS.md, ROADMAP
   ├─ Ask: "Should I scaffold initial code?"
   │   ├─ [Yes] → Create code structure
   │   └─ [No] → Skip to git setup
@@ -194,5 +194,5 @@ START: "Help me inception a new project"
 - **Don't over-engineer the interview.** If the user has already decided on tech, scope, and philosophy, skip those questions.
 - **Write docs as if explaining to a future self.** Imagine opening this project 6 months from now with no context - would these docs help?
 - **Philosophy matters.** The README philosophy section captures why the project exists. Spend time on this.
-- **CLAUDE.md is critical.** This is what keeps AI assistants productive in future sessions. Include architecture decisions, not just tech stack.
+- **AGENTS.md is critical.** This is what keeps AI assistants productive in future sessions. Include architecture decisions, not just tech stack.
 - **Roadmap phases should be actionable.** "Phase 1: Foundation" is better than "Phase 1: Setup stuff." Name the actual components being built.
