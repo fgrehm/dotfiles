@@ -10,9 +10,16 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
 # --- ls shortcuts ---
-alias ll='ls -alFh'
-alias la='ls -A'
-alias l='ls -CF'
+if command -v eza &>/dev/null; then
+  alias ls='eza -lh --group-directories-first --icons=auto'
+  alias ll='ls'
+  alias lsa='ls -a'
+  alias lt='eza --tree --level=2 --long --icons --git'
+else
+  alias ll='ls -alFh'
+  alias la='ls -A'
+  alias l='ls -CF'
+fi
 
 # --- ruby stuff ---
 alias be='bundle exec'
