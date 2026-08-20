@@ -6,7 +6,10 @@
 
 - Installs mise to `~/.local/bin/mise` via the official install script
 - Adds `dot_shellrc.d/mise.sh` to activate mise in bash and zsh shells
-- Does not manage the global mise tool list or `~/.config/mise/config.toml`; Omarchy owns that configuration
+- Installs shared command-line tools through mise when they are missing: `shfmt`, `shellcheck`, Worktrunk (`wt`), Hunk (`hunk`), `gh`, and `prek`
+- Uses `omarchy-mise-install` on Omarchy and direct `mise use -g` elsewhere
+- Generates Bash/Zsh completions for `prek`; `gh` completions remain in the Git recipe
+- Does not deploy `~/.config/mise/config.toml`; tools are added to the existing global mise configuration
 
 ## Requirements
 

@@ -1,0 +1,36 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if ! command -v mise &>/dev/null; then
+  log_skip "mise not found, skipping mise-managed tools"
+  exit 0
+fi
+
+set -eo pipefail
+
+install_tool() {
+  local package="$1" command="$2"
+  if command -v "$command" &>/dev/null; then
+    log_skip "$command already available"
+    return
+  fi
+
+  log_info "Installing $command through mise..."
+  # {{ if .isOmarchy }}
+  omarchy-mise-install "$package" "$command"
+  # omarchy-mise-install creates a lazy wrapper; install the tool now.
+  "$command" --version >/dev/null
+  # {{ else }}
+  mise use -g "${package}@latest"
+  "$command" --version >/dev/null
+  # {{ end }}
+}
+
+install_tool shfmt shfmt
+install_tool shellcheck shellcheck
+install_tool worktrunk wt
+install_tool aqua:modem-dev/hunk hunk
+install_tool gh gh
+install_tool prek prek

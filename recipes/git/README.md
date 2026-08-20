@@ -18,7 +18,7 @@ Git configuration, global gitignore, shell aliases, and TUI tooling.
 - Histogram diff algorithm, colorMoved, fetch prune
 - Git LFS filter configured (install `git-lfs` separately before using LFS repositories)
 
-On Omarchy, `gh` and `lazygit` are managed by Omarchy and are not duplicated here. Worktrunk and Hunk are installed through `omarchy-mise-install`.
+On Omarchy, `gh` and `lazygit` are managed by Omarchy and are not duplicated here. Worktrunk and Hunk are installed through the shared mise recipe.
 
 ## Template variables
 
