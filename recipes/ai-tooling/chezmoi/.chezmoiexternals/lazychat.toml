@@ -1,7 +1,0 @@
-{{- $version := "0.0.4" -}}
-[".local/bin/lazychat"]
-  type = "file"
-  url = "https://github.com/fgrehm/lazychat/releases/download/v{{ $version }}/lazychat-linux-x64"
-  executable = true
-  checksum.sha256 = "0009cdd42769c217f75a37813c7b2010cdec2ef53a8e5e38f276aa489e582e81"
-# vim: ft=toml.gotmpl

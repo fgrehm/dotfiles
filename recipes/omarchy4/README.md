@@ -1,6 +1,6 @@
 # omarchy4
 
-Omarchy **4.0**-specific configuration: the Hyprland Lua module overrides. Applies only on Omarchy hosts running the 4.x line (`isOmarchy4` true). Skipped on Omarchy 3.8 (see `omarchy3`) and in containers/non-Omarchy hosts (see `recipes/.recipeignore`).
+Omarchy **4.0**-specific configuration: the Hyprland Lua module overrides. Applies only on Omarchy hosts running the 4.x line (`isOmarchy4` true) and is skipped in containers/non-Omarchy hosts (see `recipes/.recipeignore`).
 
 ## Why a separate recipe
 
@@ -8,13 +8,13 @@ Omarchy 4.0 replaced the plain Hyprland `.conf` config system with a Lua module 
 
 ## What lives here
 
-- `~/.config/hypr/hyprland.lua` — the 4.0 entry point. A near-verbatim copy of Omarchy's default entry with one addition: `require("hypr.windowrules")` to load the tracked window-rules module (the default entry does not require one). Tracked in full, so it drifts from upstream if Omarchy changes the default entry — re-sync by diffing against `/usr/share/omarchy/default/hypr/hyprland.lua` after updates. (Same tradeoff as omarchy3's `hyprland.conf`.)
-- `~/.config/hypr/bindings.lua` — the binding deltas. Omarchy 4.0's defaults already cover nearly every binding from the old 3.8 `bindings.conf` (terminal, browser, file manager, music, docker, signal, obsidian, 1password, and all webapp bindings), so this file only records the differences: `SUPER+SHIFT+W` → Typora (4.0 default is Omawrite), `SUPER+N` → Obsidian quick note (no 4.0 default), and `SUPER+SLASH` / `SUPER+ALT+SLASH` → the personal 1x ↔ 1.5x monitor scaling cycle (4.0 default is up/down).
-- `~/.config/hypr/input.lua` — the one input delta: Caps Lock as Ctrl (`kb_options = compose:paus,ctrl:nocaps`). Omarchy 4.0's default makes Caps a compose key; everything else in the old 3.8 `input.conf` (repeat rate, numlock, touchpad, terminal scroll-touchpad rules) is already the 4.0 default, so only `kb_options` is overridden.
-- `~/.config/hypr/windowrules.lua` — float + center rules for transient dialog toolkits (`yad`, `zenity`, `kdialog`), not in Omarchy 4.0's defaults. Mirrors omarchy3's `windowrules.conf`.
+- `~/.config/hypr/hyprland.lua` — the 4.0 entry point. A near-verbatim copy of Omarchy's default entry with one addition: `require("hypr.windowrules")` to load the tracked window-rules module (the default entry does not require one). Tracked in full, so it drifts from upstream if Omarchy changes the default entry — re-sync by diffing against `/usr/share/omarchy/config/hypr/hyprland.lua` after updates.
+- `~/.config/hypr/bindings.lua` — the binding deltas. Omarchy 4.0's defaults already cover nearly every standard binding (terminal, browser, file manager, music, Docker, Signal, Obsidian, 1Password, and all webapp bindings), so this file only records the Typora override (`SUPER+SHIFT+W`; 4.0 default is Omawrite).
+- `~/.config/hypr/input.lua` — input deltas: Caps Lock as Ctrl (`kb_options = ctrl:nocaps`) and natural touchpad scrolling. Omarchy 4.0's default makes Caps a compose key; the remaining default input settings are preserved. The stock emoji picker remains available via `SUPER + CTRL + E`.
+- `~/.config/hypr/windowrules.lua` — float + center rules for transient dialog toolkits (`yad`, `zenity`, `kdialog`), not in Omarchy 4.0's defaults. Maintained as a Lua module for Omarchy 4.
 
 ## Notes
 
-- The shared `omarchy` recipe owns everything version-neutral: install scripts, starship, voxtype, ghostty (with a templated include path), crib, and `my-monitor-scaling-cycle`. The `my-monitor-scaling-cycle` script is referenced by both this recipe's `bindings.lua` and omarchy3's `bindings.conf`.
+- The shared `omarchy` recipe owns everything version-neutral: install scripts and crib.
 - The Omarchy shell (bar/notifications) is **not** customized here yet — Omarchy 4.0's default `shell.json` is used as-is. See `TODO.md` for the deferred bar-customization work.
 - There is no `create_local.conf` equivalent for machine-local overrides on 4.0 yet. The tracked `.lua` files are overwritten by `chezmoi apply`, so per-machine tweaks need a follow-up (see `TODO.md`).

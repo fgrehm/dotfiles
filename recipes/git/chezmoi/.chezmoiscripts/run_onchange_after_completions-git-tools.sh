@@ -1,21 +1,13 @@
 #!/bin/env bash
-# vim: ft=bash.gotmpl
-# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
-# Re-run when external definitions change:
-# lazygit-hash: # {{ include ".chezmoiexternals/lazygit.toml" | sha256sum }}
-# gh-hash: # {{ include ".chezmoiexternals/gh.toml" | sha256sum }}
+# vim: ft=bash
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 export PATH="$HOME/.local/bin:$PATH"
 
 BASH_DIR="$HOME/.local/share/bash-completion/completions"
-mkdir -p "$BASH_DIR"
-# {{ if .useZsh }}
 ZSH_DIR="$HOME/.zsh/completions"
-mkdir -p "$ZSH_DIR"
-# {{ end }}
+mkdir -p "$BASH_DIR" "$ZSH_DIR"
 
-# {{ if not .isOmarchy }}
 if command -v lazygit &>/dev/null; then
   log_info "Generating lazygit completions..."
   if ! lazygit completion bash >"$BASH_DIR/lazygit"; then
@@ -27,18 +19,22 @@ if command -v lazygit &>/dev/null; then
 else
   log_skip "lazygit not found, skipping completions"
 fi
-# {{ end }}
 
-# {{ if not .isOmarchy }}
 if command -v gh &>/dev/null; then
   log_info "Generating gh completions..."
-  if ! gh completion -s bash >"$BASH_DIR/gh"; then
+  GH_CMD=(gh)
+  # Omarchy's gh command is a mise shim, which prints tool-selection status
+  # unless invoked through quiet mise. That status would corrupt the completion
+  # files written below.
+  if command -v mise &>/dev/null && mise which gh &>/dev/null; then
+    GH_CMD=(mise exec --quiet gh -- gh)
+  fi
+  if ! "${GH_CMD[@]}" completion -s bash >"$BASH_DIR/gh"; then
     log_error "Failed to generate gh bash completions (non-fatal)"
   fi
-  if ! gh completion -s zsh >"$ZSH_DIR/_gh"; then
+  if ! "${GH_CMD[@]}" completion -s zsh >"$ZSH_DIR/_gh"; then
     log_error "Failed to generate gh zsh completions (non-fatal)"
   fi
 else
   log_skip "gh not found, skipping completions"
 fi
-# {{ end }}

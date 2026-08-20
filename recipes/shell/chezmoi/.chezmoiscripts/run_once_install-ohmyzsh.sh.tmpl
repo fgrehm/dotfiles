@@ -3,11 +3,6 @@
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
-# {{ if not .useZsh }}
-log_skip "zsh not enabled (useZsh=false), skipping Oh My Zsh install"
-exit 0
-# {{ end }}
-
 # Check both $HOME/.oh-my-zsh and $ZSH (devcontainers may pre-set $ZSH)
 if [ -d "${ZSH:-$HOME/.oh-my-zsh}" ]; then
   log_skip "Oh My Zsh already installed"
@@ -24,9 +19,9 @@ set -eo pipefail
 
 if ! command -v zsh &>/dev/null; then
   log_info "Installing zsh..."
-  # Omarchy: pacman. Containers: apt.
+  # Omarchy: use omarchy's package wrapper. Containers: apt.
   # {{ if .isOmarchy }}
-  run_quiet $SUDO pacman -S --noconfirm --needed zsh
+  run_quiet omarchy pkg add zsh
   # {{ else }}
   run_quiet $SUDO apt-get update -qq
   run_quiet $SUDO apt-get install -y zsh

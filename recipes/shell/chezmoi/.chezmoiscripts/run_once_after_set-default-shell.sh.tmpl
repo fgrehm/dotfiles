@@ -3,11 +3,6 @@
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
-# {{ if not .useZsh }}
-log_skip "zsh not enabled (useZsh=false), skipping default shell setup"
-exit 0
-# {{ end }}
-
 ZSH_BIN="$(command -v zsh 2>/dev/null || true)"
 if [ -z "$ZSH_BIN" ]; then
   log_skip "zsh not found, skipping default shell setup"

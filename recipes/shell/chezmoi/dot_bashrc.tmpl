@@ -2,7 +2,9 @@
 # ~/.bashrc: executed by bash(1) for non-login shells.
 
 {{ if .isOmarchy }}
-# Omarchy bashrc: load omarchy's defaults, then the shared shellrc loader.
+# Omarchy bashrc: load environment setup even for non-interactive shells,
+# then load the interactive defaults and shared shellrc loader.
+[[ -r /usr/share/omarchy/default/bash/env-bootstrap ]] && source /usr/share/omarchy/default/bash/env-bootstrap
 [[ $- != *i* ]] && return
 source "${OMARCHY_PATH:-$HOME/.local/share/omarchy}/default/bash/rc"
 {{ else }}

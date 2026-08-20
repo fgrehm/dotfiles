@@ -12,10 +12,8 @@ log_info "Generating chezmoi completions..."
 if ! chezmoi completion bash >"$BASH_DIR/chezmoi"; then
   log_error "Failed to generate chezmoi bash completions (non-fatal)"
 fi
-# {{ if .useZsh }}
 ZSH_DIR="$HOME/.zsh/completions"
 mkdir -p "$ZSH_DIR"
 if ! chezmoi completion zsh >"$ZSH_DIR/_chezmoi"; then
   log_error "Failed to generate chezmoi zsh completions (non-fatal)"
 fi
-# {{ end }}

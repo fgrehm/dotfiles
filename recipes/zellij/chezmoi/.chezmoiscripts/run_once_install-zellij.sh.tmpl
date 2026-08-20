@@ -1,0 +1,32 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if command -v zellij &>/dev/null; then
+  log_skip "zellij already installed"
+  exit 0
+fi
+
+set -eo pipefail
+
+# {{ if .isOmarchy }}
+if ! command -v omarchy-mise-install &>/dev/null; then
+  log_skip "omarchy-mise-install not found, skipping zellij"
+  exit 0
+fi
+
+log_info "Installing zellij through Omarchy mise..."
+omarchy-mise-install zellij zellij
+# omarchy-mise-install creates a lazy wrapper; invoke it now so completion
+# generation does not perform the first installation later in the apply.
+zellij --version >/dev/null
+# {{ else }}
+if ! command -v mise &>/dev/null; then
+  log_skip "mise not found, skipping zellij"
+  exit 0
+fi
+
+log_info "Installing zellij through mise..."
+mise use -g zellij@0.44.3
+# {{ end }}

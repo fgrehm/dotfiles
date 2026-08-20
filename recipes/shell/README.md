@@ -16,11 +16,11 @@ Core shell infrastructure: bash, zsh (via Oh My Zsh), and the modular
 ## Requirements
 
 - Containers: Debian 13 (Trixie); `wget` (for Oh My Zsh install, available by default)
-- Omarchy: bash (zsh/Oh My Zsh are not installed -- `useZsh` is false there)
+- Omarchy: zsh is installed and selected as the default shell
 
 ## Omarchy
 
-On Omarchy the recipe is bash-only: `useZsh` is false, so zsh/Oh My Zsh is not installed and `~/.bashrc` sources omarchy's `default/bash/rc` + the shellrc loader instead of the Debian skeleton bashrc.
+On Omarchy, zsh and Oh My Zsh are installed through `omarchy pkg add` and the default shell is switched to zsh. Bash remains supported: `~/.bashrc` sources Omarchy's `default/bash/rc` followed by the shared shellrc loader.
 
 ## Template variables
 

@@ -1,0 +1,22 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if command -v bun &>/dev/null; then
+  log_skip "Bun already available"
+  exit 0
+fi
+
+set -eo pipefail
+
+if ! command -v omarchy-mise-install &>/dev/null; then
+  log_skip "omarchy-mise-install not found, skipping Bun"
+  exit 0
+fi
+
+log_info "Installing Bun through Omarchy mise..."
+omarchy-mise-install bun bun
+
+# omarchy-mise-install creates a lazy wrapper; install the tool now.
+bun --version >/dev/null

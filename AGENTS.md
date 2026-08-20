@@ -65,7 +65,6 @@ This bites at any nesting level, not just the top. `dot_pi/private_agent/...` an
 | `.isOmarchy` | `omarchy` on PATH or `~/.local/share/omarchy` exists |
 | `.omarchyVersion` | `omarchy version` output (e.g. `4.0.0rc2-1`); empty string on non-Omarchy hosts |
 | `.isOmarchy4` | `omarchyVersion` starts with `4.`; gates the `omarchy3`/`omarchy4` recipe split |
-| `.useZsh` | `not .isOmarchy` (true in containers, false on Omarchy); gates zsh install/completions |
 | `.hasNvidiaGPU` | `lspci` output (skipped in containers); gates the voxtype NVIDIA GPU drop-in |
 
 Use `{{ if .isContainer }}` in templates and `.chezmoiignore` for conditional deployment.
@@ -266,6 +265,7 @@ These are dotfiles-repo-specific facts the `omarchy` skill does not cover.
   - Waybar (3.8) → Quickshell-based Omarchy shell (4.0); `omarchy restart waybar` → `omarchy restart shell`. The bar config moved from `~/.config/waybar/config.jsonc` to `~/.config/omarchy/shell.json`.
   - Ghostty is the default terminal on 3.8; foot is the default on 4.0 (supports images via sixel). The ghostty install + config are skipped on 4.0 via `.chezmoiignore` and a template guard.
 - **Omarchy has no `wget` by default.** Use `curl` in install scripts (or a shared download helper).
+- **`omarchy-mise-install` creates lazy wrappers.** Creating a wrapper does not download the tool; the first invocation performs the installation. Install scripts that need the binary immediately (for example, before generating completions) must invoke it once after calling `omarchy-mise-install`, such as `zellij --version >/dev/null`.
 - **lazygit and gh are preinstalled/managed by Omarchy.** Skip their `.chezmoiexternals` and completion scripts on Omarchy (`{{ if not .isOmarchy }}`) to avoid two copies.
 - **Ghostty `config-file` ordering:** entries are processed *after* the file that declares them, in order, so the **last** `config-file` wins. To override omarchy's read-only shipped config (`~/.local/share/omarchy/config/ghostty/config`), track `~/.config/ghostty/config` that includes it first, then load override files (`padding.conf`, etc.) last. Verify with a value `+show-config` does print (e.g. `font-size`); it does not print `window-padding-*`.
 - **`environment.d`** (`~/.config/environment.d/*.conf`) vars are read at systemd user manager startup, so they need a re-login to take effect.

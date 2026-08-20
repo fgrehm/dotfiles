@@ -17,11 +17,6 @@ THEME_TARGET="$HOME/.local/state/omarchy/current/theme/neovim.lua"
 THEME_TARGET="$HOME/.config/omarchy/current/theme/neovim.lua"
 # {{ end }}
 
-if [ -L "$THEME_LINK" ]; then
-  log_skip "theme.lua symlink already exists"
-  exit 0
-fi
-
 set -eo pipefail
 
 if [ ! -e "$THEME_TARGET" ]; then
@@ -29,5 +24,11 @@ if [ ! -e "$THEME_TARGET" ]; then
   exit 1
 fi
 
+if [ -L "$THEME_LINK" ] && [ "$(readlink -f "$THEME_LINK")" = "$THEME_TARGET" ]; then
+  log_skip "theme.lua already points to the current Omarchy theme"
+  exit 0
+fi
+
 log_info "Linking theme.lua to Omarchy theme..."
+rm -f "$THEME_LINK"
 ln -s "$THEME_TARGET" "$THEME_LINK"

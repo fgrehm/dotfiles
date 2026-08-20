@@ -12,8 +12,7 @@ alias egrep='egrep --color=auto'
 # --- ls shortcuts ---
 if command -v eza &>/dev/null; then
   alias ls='eza -lh --group-directories-first --icons=auto'
-  alias ll='ls'
-  alias lsa='ls -a'
+  alias ll='ls -a'
   alias lt='eza --tree --level=2 --long --icons --git'
 else
   alias ll='ls -alFh'
@@ -27,17 +26,19 @@ alias rails='bin/rails'
 alias rc='./bin/rails console'
 alias rspec='bundle exec rspec'
 
-# --- Project shortcuts (cdp/cdpo) ---
-# cd into ~/projects / ~/projects/oss with tab-completion of subdirectories.
-# Skipped in containers (no ~/projects there).
+# --- Project shortcuts (cdp/cdpo/cdw) ---
+# cd into ~/Projects, ~/Projects/oss, or ~/Work with tab-completion.
+# Skipped in containers (no project directories there).
 # {{ if not .isContainer }}
-cdp() { cd "$HOME/projects/${1:-}" || return; }
-cdpo() { cd "$HOME/projects/oss/${1:-}" || return; }
+cdp() { cd "$HOME/Projects/${1:-}" || return; }
+cdpo() { cd "$HOME/Projects/oss/${1:-}" || return; }
+cdw() { cd "$HOME/Work/${1:-}" || return; }
 
 if [ -n "$BASH_VERSION" ]; then
   _cdp_complete() {
-    local base="$HOME/projects"
-    [[ "${COMP_WORDS[0]}" == cdpo ]] && base="$HOME/projects/oss"
+    local base="$HOME/Projects"
+    [[ "${COMP_WORDS[0]}" == cdpo ]] && base="$HOME/Projects/oss"
+    [[ "${COMP_WORDS[0]}" == cdw ]] && base="$HOME/Work"
     local cur="${COMP_WORDS[COMP_CWORD]}"
     # Complete dirs under $base, allowing descent into subfolders. Every match
     # ends with "/" and nospace is set, so Tab keeps drilling into nested dirs
@@ -57,14 +58,15 @@ if [ -n "$BASH_VERSION" ]; then
     done
     compopt -o nospace
   }
-  complete -F _cdp_complete cdp cdpo
+  complete -F _cdp_complete cdp cdpo cdw
 elif [ -n "$ZSH_VERSION" ]; then
   # shellcheck disable=SC1087,SC2154,SC2193 # zsh $words array
   _cdp() {
-    local base="$HOME/projects"
-    [[ "${words[1]}" == cdpo ]] && base="$HOME/projects/oss"
+    local base="$HOME/Projects"
+    [[ "${words[1]}" == cdpo ]] && base="$HOME/Projects/oss"
+    [[ "${words[1]}" == cdw ]] && base="$HOME/Work"
     _files -W "$base" -/
   }
-  compdef _cdp cdp cdpo
+  compdef _cdp cdp cdpo cdw
 fi
 # {{ end }}

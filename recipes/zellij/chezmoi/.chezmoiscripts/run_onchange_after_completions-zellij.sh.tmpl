@@ -1,8 +1,8 @@
 #!/bin/env bash
 # vim: ft=bash.gotmpl
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
-# Re-run when the zellij external definition changes:
-# zellij-hash: # {{ include ".chezmoiexternals/zellij.toml" | sha256sum }}
+# Re-run when the zellij config changes:
+# config-hash: # {{ include "private_dot_config/zellij/config.kdl" | sha256sum }}
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 export PATH="$HOME/.local/bin:$PATH"
@@ -19,10 +19,8 @@ log_info "Generating zellij completions..."
 if ! zellij setup --generate-completion bash >"$BASH_DIR/zellij"; then
   log_error "Failed to generate zellij bash completions (non-fatal)"
 fi
-# {{ if .useZsh }}
 ZSH_DIR="$HOME/.zsh/completions"
 mkdir -p "$ZSH_DIR"
 if ! zellij setup --generate-completion zsh >"$ZSH_DIR/_zellij"; then
   log_error "Failed to generate zellij zsh completions (non-fatal)"
 fi
-# {{ end }}

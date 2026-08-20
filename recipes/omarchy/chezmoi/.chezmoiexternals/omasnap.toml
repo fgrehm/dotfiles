@@ -1,0 +1,13 @@
+{{- $version := "1.15.0" -}}
+[".local/bin/omasnap"]
+  type = "archive-file"
+  url = "https://github.com/tobi/omasnap/releases/download/v{{ $version }}/omasnap-{{ $version }}-archlinux-x86_64.tar.gz"
+  path = "./usr/bin/omasnap"
+  executable = true
+  checksum.sha256 = "04957930d8f231374ca245a8a794ffdb9fe06051250a560f397740b2db62724a"
+[".local/share/applications/omasnap.desktop"]
+  type = "archive-file"
+  url = "https://github.com/tobi/omasnap/releases/download/v{{ $version }}/omasnap-{{ $version }}-archlinux-x86_64.tar.gz"
+  path = "./usr/share/applications/omasnap.desktop"
+  checksum.sha256 = "04957930d8f231374ca245a8a794ffdb9fe06051250a560f397740b2db62724a"
+# vim: ft=toml.gotmpl

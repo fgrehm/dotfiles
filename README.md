@@ -54,7 +54,7 @@ make check      # lint shell scripts (shfmt + shellcheck)
 
 ### Environment Detection
 
-`.chezmoi.toml.tmpl` auto-detects the environment via `/.dockerenv`, env vars, `omarchy` on PATH, etc. Template data available: `.name`, `.email`, `.isContainer`, `.isOmarchy`, `.useZsh`, `.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
+`.chezmoi.toml.tmpl` auto-detects the environment via `/.dockerenv`, env vars, `omarchy` on PATH, etc. Template data available: `.name`, `.email`, `.isContainer`, `.isOmarchy`, `.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
 
 ## License
 

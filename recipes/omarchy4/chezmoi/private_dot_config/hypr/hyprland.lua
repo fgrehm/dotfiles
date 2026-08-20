@@ -1,4 +1,4 @@
--- Overrides omarchy's default entry: /usr/share/omarchy/default/hypr/hyprland.lua
+-- Overrides omarchy's default entry: /usr/share/omarchy/config/hypr/hyprland.lua
 --
 -- This is a near-verbatim copy of the omarchy 4.0 default entry with one
 -- addition: `require("hypr.windowrules")` to load the tracked window-rules
@@ -6,8 +6,8 @@
 --
 -- Drift tradeoff: because this file is tracked in full, an `omarchy update`
 -- that changes the default entry will not propagate here. Re-sync by diffing
--- against `/usr/share/omarchy/default/hypr/hyprland.lua` after updates and
--- re-applying via `chezmoi apply`. (Same tradeoff as omarchy3's hyprland.conf.)
+-- against `/usr/share/omarchy/config/hypr/hyprland.lua` after updates and
+-- re-applying via `chezmoi apply`.
 
 -- Learn how to configure Hyprland: https://wiki.hypr.land/Configuring/Start/
 

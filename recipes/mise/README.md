@@ -6,13 +6,12 @@
 
 - Installs mise to `~/.local/bin/mise` via the official install script
 - Adds `dot_shellrc.d/mise.sh` to activate mise in bash and zsh shells
-- Deploys `~/.config/mise/config.toml` with global tools (node, go, ruby, bun)
-- Runs `mise install` after config deployment (re-runs when config changes)
+- Does not manage the global mise tool list or `~/.config/mise/config.toml`; Omarchy owns that configuration
 
 ## Requirements
 
 - wget
-- Internet access (mise.run install script, tool downloads)
+- Internet access (mise.run install script)
 
 ## Notes
 
@@ -20,5 +19,4 @@ In devcontainers where mise is already installed (e.g. via the devcontainer feat
 install script skips installation. The shell activation fragment still runs, so `mise` works
 normally in the shell.
 
-The global `config.toml` and `mise install` are skipped in containers (containers
-manage their own tool versions).
+Containers manage their own mise tool versions; this recipe only installs mise when it is absent and enables shell activation.

@@ -1,0 +1,21 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if command -v lmk &>/dev/null; then
+  log_skip "lmk already installed"
+  exit 0
+fi
+
+set -eo pipefail
+
+if ! command -v omarchy-mise-install &>/dev/null; then
+  log_skip "omarchy-mise-install not found, skipping lmk"
+  exit 0
+fi
+
+log_info "Installing lmk through Omarchy mise..."
+omarchy-mise-install github:fgrehm/lmk@2.3.0 lmk
+# omarchy-mise-install creates a lazy wrapper; invoke it to install now.
+lmk --version >/dev/null

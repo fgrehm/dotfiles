@@ -1,21 +1,18 @@
 # ai-tooling
 
-Installs AI tools and deploys their shared configuration (Claude Code, Pi coding agent, shared skills).
+Deploys shared agent instructions, skills, and Pi agent settings. Claude Code and Pi themselves are managed by Omarchy/devcontainers.
 
 ## What it does
 
-### Tool installs
+### Shared configuration
 
-- **Claude Code**: installs the CLI binary via the official install script
-- **Pi coding agent**: installs globally via npm
-- **dot-ai-private**: clones the private overlay repo and runs its `install.sh` (skips gracefully if SSH access is not available)
-
-### Configuration
-
-- `~/.agents/AGENTS.md`: global agent instructions (canonical). `~/.claude/CLAUDE.md` and `~/.pi/agent/AGENTS.md` are symlinks to it, so both tools read the same rules.
-- `~/.claude/statusline.sh`: status line script
-- `~/.claude/output-styles/`: custom output styles (`navigator-v1`, `navigator-v2`)
-- `~/.claude/settings.json`: deep-merged from a chezmoi-managed base. The merge preserves machine-local keys (model, hooks, plugins, ...) and concatenates permission arrays. See `run_onchange_after_merge-claude-settings.sh.tmpl`.
+- `~/.agents/AGENTS.md`: global agent instructions (canonical).
+- `~/.pi/agent/AGENTS.md`: symlink to the canonical instructions.
+- `~/.pi/agent/ollama-cloud.json`: Pi agent settings.
+- When `pi` is available, the recipe installs `npm:pi-web-access` and `npm:pi-ollama-cloud` through Pi itself; the resulting package settings remain machine-local.
+- `~/.claude/settings.json`: deep-merged Claude settings; local model/hooks/plugins are preserved.
+- `~/.claude/statusline.sh` and `~/.claude/output-styles/`: Claude presentation settings.
+- The optional `dot-ai-private` overlay remains supported and skips gracefully when unavailable.
 
 ### Shared skills
 
@@ -33,16 +30,3 @@ recipes/ai-tooling/scripts/vendor-skill.sh https://github.com/owner/repo/tree/ma
 ```
 
 It pins the skill to a commit SHA and writes the vendored copy under `recipes/ai-tooling/chezmoi/private_dot_agents/skills/<skill>/`.
-
-## Requirements
-
-- wget
-- curl
-- git
-- jq (required by the Claude Code settings merge script)
-- npm (required for Pi coding agent)
-- Internet access (GitHub releases, npm registry)
-
-## Notes
-
-- dot-ai-private is a private GitHub repo. Cloning requires SSH key forwarding or a configured credential helper. The script exits cleanly if the clone fails so the rest of `chezmoi apply` is not blocked.

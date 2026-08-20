@@ -1,0 +1,24 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if command -v rustc &>/dev/null && command -v cargo &>/dev/null; then
+  log_skip "Rust toolchain already available"
+  exit 0
+fi
+
+set -eo pipefail
+
+if ! command -v omarchy-mise-install &>/dev/null; then
+  log_skip "omarchy-mise-install not found, skipping Rust"
+  exit 0
+fi
+
+log_info "Installing Rust through Omarchy mise..."
+omarchy-mise-install rust rustc
+omarchy-mise-install rust cargo
+
+# omarchy-mise-install creates lazy wrappers; install the toolchain now.
+rustc --version >/dev/null
+cargo --version >/dev/null

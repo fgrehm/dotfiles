@@ -4,21 +4,18 @@
 
 ## What it does
 
-- Installs zellij binary to `~/.local/bin/zellij` from GitHub releases
+- Installs Zellij through mise (`omarchy-mise-install` on Omarchy)
 - Deploys `~/.config/zellij/config.kdl` (custom keybindings, Ctrl+A prefix, vibrant theme)
-- Deploys `~/.config/zellij/layouts/zellaude.kdl` (zellaude Claude Code status bar layout)
+- Adds the `zac` shell helper for attaching to or creating sessions
 
 ## Requirements
 
-- wget
-- Internet access (GitHub releases)
+- mise
+- Internet access (mise tool download)
 
 ## Notes
 
-The zellaude layout loads the [zellaude](https://github.com/ishefi/zellaude) wasm plugin
-from GitHub releases at startup — no separate plugin install needed. The `zellaude-hook.sh`
-bridge script is placed under `~/.config/zellij/plugins/` by the plugin automatically on
-first load.
+The repository does not install `zellicat` or the `zc` alias currently.
 
 ## Opening links
 
