@@ -11,7 +11,9 @@
 
 hl.config({
   input = {
-    kb_options = "ctrl:nocaps",
+    kb_layout = "us,us",
+    kb_variant = ",intl",
+    kb_options = "ctrl:nocaps,grp:alt_shift_toggle",
     touchpad = {
       natural_scroll = true,
     },
