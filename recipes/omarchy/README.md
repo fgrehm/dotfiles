@@ -1,6 +1,6 @@
 # omarchy
 
-Omarchy configuration and tweaks for the 4.x release. Always applied on Omarchy hosts (bare-metal/laptop target). Version-specific Hyprland config lives in [`omarchy4`](../omarchy4); this recipe is gated to Omarchy by `recipes/.recipeignore` (skipped in containers and on non-Omarchy hosts).
+Omarchy configuration and tweaks for the 4.x release. Always applied on Omarchy hosts (bare-metal/laptop target). This recipe is gated to Omarchy by `recipes/.recipeignore` (skipped in containers and on non-Omarchy hosts).
 
 ## What does what
 
@@ -21,9 +21,12 @@ Shared across Omarchy 4:
 - `~/.local/bin/crib` (via `.chezmoiexternals/crib.toml`) + `~/.config/crib/config.toml` — the [crib](https://github.com/fgrehm/crib) CLI ("Just Enough Devcontainers"). Bare-metal-only; lives here because Omarchy is the only bare-metal target.
 - `run_once_install-omasnap.sh` + `.chezmoiexternals/omasnap.toml` — install Omasnap's runtime dependencies and pinned screenshot binary/desktop entry.
 
-## Version-specific recipes
+## Hyprland configuration
 
-- [`omarchy4`](../omarchy4) — Hyprland `.lua` overrides (4.0 only).
+- `~/.config/hypr/hyprland.lua` — the Omarchy 4 entry point, loading Omarchy defaults and the tracked user modules.
+- `~/.config/hypr/bindings.lua` — custom Typora and personal bindings.
+- `~/.config/hypr/input.lua` — Caps Lock as Ctrl and natural touchpad scrolling.
+- `~/.config/hypr/windowrules.lua` — float and center rules for transient dialog toolkits.
 
 ## Notes
 
