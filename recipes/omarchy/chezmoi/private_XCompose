@@ -1,0 +1,7 @@
+# Personal Compose overrides.
+# Keep the standard US International dead-key behavior except make acute+c
+# produce cedilla, matching the desired typing convention.
+include "%L"
+
+<dead_acute> <c> : "ç" U00E7
+<dead_acute> <C> : "Ç" U00C7
