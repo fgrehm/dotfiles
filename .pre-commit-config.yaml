@@ -1,0 +1,15 @@
+repos:
+  - repo: local
+    hooks:
+      - id: shell-fmt-check
+        name: Check shell formatting
+        entry: make shell-fmt-check
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: shell-lint
+        name: Lint shell scripts
+        entry: make shell-lint
+        language: system
+        pass_filenames: false
+        always_run: true
