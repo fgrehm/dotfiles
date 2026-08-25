@@ -29,7 +29,11 @@ Stage files explicitly by name. NEVER use `git add .`, `git add -A`, or `git add
 
 ## GitHub interactions
 
-**NEVER comment on GitHub on behalf of the user.** Do not post issue comments, PR reviews, replies, or any GitHub interactions. Opening draft pull requests is OK. For everything else, ALWAYS ask first. No exceptions.
+Use the GitHub CLI (`gh`) for GitHub repository interaction instead of web tools whenever possible. This includes inspecting repositories, issues, pull requests, releases, workflows, and files.
+
+Use web tools for general research or non-GitHub sources. Do not use web tools to mutate GitHub state.
+
+**NEVER comment on GitHub on behalf of the user.** Do not post issue comments, PR reviews, replies, or any other GitHub interactions without explicit approval. Opening draft pull requests is OK. For everything else, ALWAYS ask first.
 
 Do not reference PRs from other repositories in PR descriptions unless explicitly asked. It creates unwanted cross-repo notifications. Keep PR descriptions self-contained.
 
