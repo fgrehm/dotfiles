@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "fgrehm.pomodoro",
+  "name": "Pomodoro",
+  "version": "0.4.1",
+  "author": "Nejc",
+  "license": "MIT",
+  "description": "Pomodoro countdown in the bar, with a session log",
+  "kinds": [
+    "bar-widget",
+    "service"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml",
+    "service": "Service.qml"
+  },
+  "barWidget": {
+    "displayName": "Pomodoro",
+    "description": "Pomodoro countdown in the bar, with a session log",
+    "category": "Time",
+    "allowMultiple": false
+  }
+}
