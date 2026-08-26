@@ -9,6 +9,7 @@ Deploys shared agent instructions, skills, and Pi agent settings. Claude Code an
 - `~/.agents/AGENTS.md`: global agent instructions (canonical).
 - `~/.pi/agent/AGENTS.md`: symlink to the canonical instructions.
 - `~/.pi/agent/ollama-cloud.json`: Pi agent settings.
+- `~/.pi/agent/extensions/pi-footer.ts`: Pi footer showing project, Git branch, provider/model, context usage, token totals, and cost.
 - When `pi` is available, the recipe installs `npm:pi-web-access` and `npm:pi-ollama-cloud` through Pi itself; the resulting package settings remain machine-local.
 - `~/.claude/settings.json`: deep-merged Claude settings; local model/hooks/plugins are preserved.
 - `~/.claude/statusline.sh` and `~/.claude/output-styles/`: Claude presentation settings.
