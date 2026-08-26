@@ -15,7 +15,7 @@ The prefix is `Ctrl+Space`, matching Omarchy's Tmux and Herdr configurations. `A
 
 ## Theme integration
 
-Omarchy renders `zellij.kdl.tpl` from the active theme palette. The `theme-set.d` hook converts it to `~/.config/zellij/themes/omarchy.kdl`, which Zellij hot-reloads when the Omarchy theme changes. A `create_` seed file provides a bootstrap theme before the first theme change. Zellij 0.45's `pane_selection` style uses the Omarchy accent as a translucent selection overlay while preserving terminal text colors.
+Omarchy renders `zellij.kdl.tpl` from the active theme palette. The `theme-set.d` hook converts it to `~/.config/zellij/themes/omarchy.kdl`, which Zellij hot-reloads when the Omarchy theme changes. A `create_` seed file provides a bootstrap theme before the first theme change. Pane selection uses Zellij's `text_selected` colors, with the Omarchy accent as a high-contrast background.
 
 Zellij pane frames use the `full` style. Foot provides the surrounding terminal padding through `pad=8x8` in the Omarchy recipe.
 
