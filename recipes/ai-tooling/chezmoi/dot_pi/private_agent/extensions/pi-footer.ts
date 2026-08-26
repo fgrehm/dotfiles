@@ -21,6 +21,7 @@ export default function (pi: ExtensionAPI) {
         render(width: number): string[] {
           const usage = ctx.getContextUsage();
           const branch = footerData.getGitBranch();
+          const session = pi.getSessionName();
           const model = ctx.model;
           const project = ctx.cwd.split("/").filter(Boolean).at(-1) ?? "~";
 
@@ -60,6 +61,7 @@ export default function (pi: ExtensionAPI) {
             : theme.fg("muted", "no model");
           const location =
             theme.fg("accent", project) +
+            (session ? theme.fg("muted", ` [${session}]`) : "") +
             (branch
               ? theme.fg("muted", " (") +
                 theme.fg("mdLink", branch) +
