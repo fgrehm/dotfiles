@@ -280,6 +280,21 @@ Panel {
         spacing: Style.space(14)
         visible: root.screen === "timer"
 
+        TextField {
+          id: taskField
+          width: parent.width
+          placeholderText: "What are you focusing on?"
+          text: root.timer && root.timer.activeTaskId
+            ? ((root.timer.tasks.find(function (task) { return task.id === root.timer.activeTaskId }) || {}).title || "")
+            : ""
+          enabled: !!root.timer && !root.timer.started
+          onEditingFinished: {
+            if (!root.timer) return
+            if (root.timer.activeTaskId) root.timer.renameTask(root.timer.activeTaskId, text)
+            else root.timer.addTask(text)
+          }
+        }
+
         Text {
           visible: root.timer && root.timer.mode === Model.MODE_POMODORO
           width: parent.width

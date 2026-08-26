@@ -240,6 +240,15 @@ Item {
         persistSession()
     }
 
+    function renameTask(id, title) {
+        title = String(title || "").trim()
+        if (!title) return
+        tasks = tasks.map(function (task) {
+            return task.id === id ? ({ id: task.id, title: title, pomodoros: Number(task.pomodoros) || 0 }) : task
+        })
+        persistSession()
+    }
+
     function deleteTask(id) {
         if (started && id === activeTaskId) return
         tasks = tasks.filter(function (task) { return task.id !== id })
