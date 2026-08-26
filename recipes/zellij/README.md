@@ -5,7 +5,7 @@
 ## What it does
 
 - Installs Zellij through mise (`omarchy-mise-install` on Omarchy)
-- Deploys `~/.config/zellij/config.kdl` with custom keybindings, a stacked default layout, full pane borders, and Omarchy theme integration
+- Deploys `~/.config/zellij/config.kdl` with custom keybindings, full pane borders, and Omarchy theme integration
 - Adds the `zac` shell helper for attaching to or creating sessions
 - Uses 8px Foot padding, shared with non-Zellij Foot applications
 
@@ -15,7 +15,7 @@ The prefix is `Ctrl+Space`, matching Omarchy's Tmux and Herdr configurations. `A
 
 ## Theme integration
 
-Omarchy renders `zellij.kdl.tpl` from the active theme palette. The `theme-set.d` hook converts it to `~/.config/zellij/themes/omarchy.kdl`, which Zellij hot-reloads when the Omarchy theme changes. A `create_` seed file provides a bootstrap theme before the first theme change.
+Omarchy renders `zellij.kdl.tpl` from the active theme palette. The `theme-set.d` hook converts it to `~/.config/zellij/themes/omarchy.kdl`, which Zellij hot-reloads when the Omarchy theme changes. A `create_` seed file provides a bootstrap theme before the first theme change. Zellij 0.45's `pane_selection` style uses the Omarchy accent as a translucent selection overlay while preserving terminal text colors.
 
 Zellij pane frames use the `full` style. Foot provides the surrounding terminal padding through `pad=8x8` in the Omarchy recipe.
 
