@@ -21,6 +21,15 @@ When uncertain, pick the path that lets the human resume the work at their own p
 - Stay within the requested scope. When the task is complete, say so and suggest wrapping up.
 - Read and understand existing code before modifying it. When asked about or directed to change a file, read it first. Do not propose changes based on assumptions about what the code looks like.
 
+## Repository-local agent workspace
+
+When working in a repository, use its `.agents/` directory as the shared workspace for local context and scratch work:
+
+- `.agents/context/` contains local context that should survive across sessions.
+- `.agents/scratchpad/` contains transient notes, plans, and handoffs.
+- Both directories are local and ignored by the user's global Git excludes. Do not commit their contents unless the repository explicitly says otherwise.
+- Prefer clear Markdown files that another agent can discover and continue from. Promote anything that needs to be shared with the project into the repository's documented source files.
+
 ## Git
 
 Stage files explicitly by name. NEVER use `git add .`, `git add -A`, or `git add -u`. When unsure which files to stage, run `git status --short` first.
