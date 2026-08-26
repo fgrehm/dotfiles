@@ -36,5 +36,5 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
           echo "$HOME/.local/share/mise/shims" >> "$GITHUB_PATH"
 
-      - name: Lint shell scripts
+      - name: Run lint checks
         run: make check

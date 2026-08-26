@@ -13,3 +13,9 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+      - id: ts-fmt-check
+        name: Check TypeScript formatting
+        entry: make ts-fmt-check
+        language: system
+        pass_filenames: false
+        always_run: true

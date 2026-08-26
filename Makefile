@@ -1,8 +1,9 @@
 SHELL_FILES := $(shell find recipes \( -name "*.sh" -o -name "*.sh.tmpl" -o -name "*.bash" \) -not -path "*/private_dot_ai/agent-skills/*" 2>/dev/null | sort)
+TS_FILES := $(shell find recipes home -name "*.ts" 2>/dev/null | sort)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help shell-fmt shell-fmt-check shell-lint check prek prek-install check-versions init apply diff doctor
+.PHONY: help shell-fmt shell-fmt-check shell-lint ts-fmt-check check prek prek-install check-versions init apply diff doctor
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
@@ -29,7 +30,10 @@ shell-fmt-check: ## Check shell formatting without modifying (shfmt -d)
 shell-lint: ## Lint shell scripts (shellcheck)
 	shellcheck --severity=warning $(SHELL_FILES)
 
-check: shell-fmt-check shell-lint ## Run shell formatting check and shellcheck
+ts-fmt-check: ## Check TypeScript formatting (Prettier)
+	bunx --bun prettier@3.6.2 --check $(TS_FILES)
+
+check: shell-fmt-check shell-lint ts-fmt-check ## Run shell and TypeScript checks
 
 prek: ## Run all pre-commit hooks
 	prek run --all-files

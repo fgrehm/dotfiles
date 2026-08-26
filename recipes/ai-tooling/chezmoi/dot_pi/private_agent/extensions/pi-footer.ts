@@ -30,7 +30,8 @@ export default function (pi: ExtensionAPI) {
           let cacheWrite = 0;
           let cost = 0;
           for (const entry of ctx.sessionManager.getBranch()) {
-            if (entry.type !== "message" || entry.message.role !== "assistant") continue;
+            if (entry.type !== "message" || entry.message.role !== "assistant")
+              continue;
             const message = entry.message as AssistantMessage;
             input += message.usage.input;
             output += message.usage.output;
@@ -41,9 +42,13 @@ export default function (pi: ExtensionAPI) {
 
           const contextPercent = usage?.percent;
           const contextColor =
-            contextPercent !== null && contextPercent !== undefined && contextPercent >= 90
+            contextPercent !== null &&
+            contextPercent !== undefined &&
+            contextPercent >= 90
               ? "error"
-              : contextPercent !== null && contextPercent !== undefined && contextPercent >= 70
+              : contextPercent !== null &&
+                  contextPercent !== undefined &&
+                  contextPercent >= 70
                 ? "warning"
                 : "success";
           const context =
@@ -53,8 +58,13 @@ export default function (pi: ExtensionAPI) {
           const providerModel = model
             ? theme.bold(theme.fg("text", `${model.id}@${model.provider}`))
             : theme.fg("muted", "no model");
-          const location = theme.fg("accent", project) +
-            (branch ? theme.fg("muted", " (") + theme.fg("mdLink", branch) + theme.fg("muted", ")") : "");
+          const location =
+            theme.fg("accent", project) +
+            (branch
+              ? theme.fg("muted", " (") +
+                theme.fg("mdLink", branch) +
+                theme.fg("muted", ")")
+              : "");
           const stats = theme.fg(
             "dim",
             `↑${formatTokens(input)} ↓${formatTokens(output)}  cr${formatTokens(cacheRead)} cw${formatTokens(cacheWrite)}  $${cost.toFixed(2)}`,
@@ -63,8 +73,15 @@ export default function (pi: ExtensionAPI) {
           const left = `${location}  ${context}  ${stats}`;
           const full = `${left}  ${providerModel}`;
           if (visibleWidth(full) <= width) {
-            const padding = " ".repeat(Math.max(1, width - visibleWidth(left) - visibleWidth(providerModel)));
-            return [truncateToWidth(`${left}${padding}${providerModel}`, width, "")];
+            const padding = " ".repeat(
+              Math.max(
+                1,
+                width - visibleWidth(left) - visibleWidth(providerModel),
+              ),
+            );
+            return [
+              truncateToWidth(`${left}${padding}${providerModel}`, width, ""),
+            ];
           }
           if (visibleWidth(`${location}  ${context}`) <= width) {
             return [truncateToWidth(`${location}  ${context}`, width, "")];
