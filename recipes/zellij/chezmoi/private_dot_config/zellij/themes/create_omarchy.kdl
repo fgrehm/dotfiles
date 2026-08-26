@@ -1,0 +1,29 @@
+// Bootstrap theme. Omarchy's theme-set hook replaces this with the active palette.
+themes {
+    omarchy {
+        text_unselected {
+            base 255 255 255
+            background 0 0 0
+        }
+        text_selected {
+            base 255 255 255
+            background 0 0 0
+        }
+        ribbon_selected {
+            base 0 0 0
+            background 80 80 80
+        }
+        ribbon_unselected {
+            base 255 255 255
+            background 40 40 40
+        }
+        frame_selected {
+            base 80 80 80
+            background 0 0 0
+        }
+        frame_unselected {
+            base 80 80 80
+            background 0 0 0
+        }
+    }
+}

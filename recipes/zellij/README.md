@@ -5,8 +5,12 @@
 ## What it does
 
 - Installs Zellij through mise (`omarchy-mise-install` on Omarchy)
-- Deploys `~/.config/zellij/config.kdl` (custom keybindings, Ctrl+A prefix, vibrant theme)
+- Deploys `~/.config/zellij/config.kdl` with custom keybindings and Omarchy theme integration
 - Adds the `zac` shell helper for attaching to or creating sessions
+
+## Theme integration
+
+Omarchy renders `zellij.kdl.tpl` from the active theme palette. The `theme-set.d` hook converts it to `~/.config/zellij/themes/omarchy.kdl`, which Zellij hot-reloads when the Omarchy theme changes.
 
 ## Requirements
 

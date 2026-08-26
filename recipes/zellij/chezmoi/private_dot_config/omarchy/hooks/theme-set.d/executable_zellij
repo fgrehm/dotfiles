@@ -1,0 +1,18 @@
+#!/bin/bash
+# Sync Zellij's theme with Omarchy's active theme.
+
+set -euo pipefail
+
+GENERATED_THEME="$HOME/.local/state/omarchy/current/theme/zellij.kdl"
+ZELLIJ_THEME_DIR="$HOME/.config/zellij/themes"
+ZELLIJ_THEME="$ZELLIJ_THEME_DIR/omarchy.kdl"
+
+if [[ ! -f "$GENERATED_THEME" ]]; then
+  exit 0
+fi
+
+mkdir -p "$ZELLIJ_THEME_DIR"
+
+# Omarchy emits RGB values as R,G,B; Zellij expects R G B.
+sed -E 's/([0-9]{1,3}),([0-9]{1,3}),([0-9]{1,3})/\1 \2 \3/g' \
+  "$GENERATED_THEME" > "$ZELLIJ_THEME"

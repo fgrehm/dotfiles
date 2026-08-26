@@ -1,6 +1,6 @@
 keybinds clear-defaults=true {
     locked {
-        bind "Ctrl a" { SwitchToMode "normal"; }
+        bind "Ctrl Space" { SwitchToMode "normal"; }
     }
     pane {
         bind "left" { MoveFocus "left"; }
@@ -44,8 +44,9 @@ keybinds clear-defaults=true {
         bind "b" { BreakPane; SwitchToMode "locked"; }
         bind "h" { GoToPreviousTab; }
         bind "j" { GoToNextTab; }
-        bind "k" { GoToPreviousTab; }
         bind "l" { GoToNextTab; }
+        bind "c" { NewTab; SwitchToMode "locked"; }
+        bind "k" { CloseTab; SwitchToMode "locked"; }
         bind "n" { NewTab; SwitchToMode "locked"; }
         bind "r" { SwitchToMode "renametab"; TabNameInput 0; }
         bind "t" { SwitchToMode "normal"; }
@@ -86,8 +87,6 @@ keybinds clear-defaults=true {
     }
     scroll {
         bind "Alt left" { MoveFocusOrTab "left"; SwitchToMode "locked"; }
-        bind "Alt down" { MoveFocus "down"; SwitchToMode "locked"; }
-        bind "Alt up" { MoveFocus "up"; SwitchToMode "locked"; }
         bind "Alt right" { MoveFocusOrTab "right"; SwitchToMode "locked"; }
         bind "e" { EditScrollback; SwitchToMode "locked"; }
         bind "f" { SwitchToMode "entersearch"; SearchInput 0; }
@@ -145,9 +144,11 @@ keybinds clear-defaults=true {
     }
     shared_among "normal" "locked" {
         bind "Alt left" { MoveFocusOrTab "left"; }
-        bind "Alt down" { MoveFocus "down"; }
-        bind "Alt up" { MoveFocus "up"; }
         bind "Alt right" { MoveFocusOrTab "right"; }
+        bind "Ctrl Alt left" { MoveFocusOrTab "left"; }
+        bind "Ctrl Alt down" { MoveFocus "down"; }
+        bind "Ctrl Alt up" { MoveFocus "up"; }
+        bind "Ctrl Alt right" { MoveFocusOrTab "right"; }
         bind "Alt +" { Resize "Increase"; }
         bind "Alt -" { Resize "Decrease"; }
         bind "Alt =" { Resize "Increase"; }
@@ -206,6 +207,8 @@ keybinds clear-defaults=true {
         // bind "Alt Up" { MoveFocus "Up"; }
     }
     shared_among "scroll" "search" {
+        bind "Ctrl PageUp" { GoToPreviousTab; }
+        bind "Ctrl PageDown" { GoToNextTab; }
         bind "PageDown" { PageScrollDown; }
         bind "PageUp" { PageScrollUp; }
         bind "left" { PageScrollUp; }
@@ -265,45 +268,11 @@ web_client {
 }
 
 default_mode "locked"
+pane_frames true
+pane_frame_style "full"
 
 show_startup_tips false
 
-// Custom theme with bold, distinct tab colors
-themes {
-    vibrant {
-        fg 216 222 233
-        bg 46 52 64
-        black 59 66 82
-        red 191 97 106
-        green 163 190 140
-        yellow 235 203 139
-        blue 129 161 193
-        magenta 180 142 173
-        cyan 136 192 208
-        white 229 233 240
-        orange 255 140 0
-
-        // Ribbon for inactive tabs - bright text colors on dark background
-        ribbon_unselected {
-            base 200 200 200
-            background 40 40 40
-            emphasis_0 100 200 255     // Bright cyan text
-            emphasis_1 100 255 150     // Bright green text
-            emphasis_2 255 200 100     // Bright yellow text
-            emphasis_3 255 100 255     // Bright magenta text
-        }
-
-        // Active/selected tab - white text on bright background
-        ribbon_selected {
-            base 255 255 255
-            background 255 100 50
-            emphasis_0 255 255 255
-            emphasis_1 255 255 255
-            emphasis_2 255 255 255
-            emphasis_3 255 255 255
-        }
-    }
-}
-
-// Use the custom theme
-theme "vibrant"
+// Generated from Omarchy's active theme by the theme-set hook.
+// Zellij's default theme directory is ~/.config/zellij/themes.
+theme "omarchy"
