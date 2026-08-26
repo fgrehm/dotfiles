@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# Summarize recent work across local Git repositories.
+
+set -o pipefail
+
+usage() {
+  printf 'Usage: dev-recap [--since DATE|Nd] [--github] [ROOT ...]\n'
+}
+
+since='yesterday 00:00'
+github=false
+roots=()
+while (($#)); do
+  case $1 in
+    --since) since=${2:?missing value for --since}; shift 2 ;;
+    --github) github=true; shift ;;
+    -h|--help) usage; exit 0 ;;
+    *) roots+=("$1"); shift ;;
+  esac
+done
+
+((${#roots[@]})) || roots=(.)
+if ! cutoff=$(date -d "$since" +%s 2>/dev/null); then
+  printf 'dev-recap: invalid date: %s\n' "$since" >&2
+  exit 2
+fi
+
+interactive=false
+if [[ -t 1 ]] && command -v bat &>/dev/null; then
+  interactive=true
+fi
+
+exec 3>&1
+output=$(mktemp)
+trap 'rm -f "$output"' EXIT
+exec >"$output"
+
+repos=()
+for root in "${roots[@]}"; do
+  if [[ -d $root/.git ]]; then
+    repos+=("$root")
+  else
+    while IFS= read -r gitdir; do
+      repos+=("${gitdir%/.git}")
+    done < <(find "$root" -type d -name .git -print 2>/dev/null)
+  fi
+done
+
+printf '# Recap since %s\n\n' "$(date -d "@$cutoff" '+%Y-%m-%d %H:%M')"
+printf '## Local repositories\n'
+
+for repo in "${repos[@]}"; do
+  name=$(basename "$(cd "$repo" && pwd)")
+  commits=$(git -C "$repo" log --all --since="@$cutoff" --author="$(git -C "$repo" config user.email)" \
+    --no-merges --pretty=format:'- %s (%h)' 2>/dev/null || true)
+  branches=$(git -C "$repo" for-each-ref refs/heads/ --sort=committerdate \
+    --format='%(committerdate:unix) %(refname:short)' 2>/dev/null | \
+    awk -v cutoff="$cutoff" '$1 < cutoff {sub(/^[^ ]+ /, ""); print}' || true)
+
+  [[ -n $commits || -n $branches ]] || continue
+  printf '\n### %s\n' "$name"
+  if [[ -n $commits ]]; then
+    printf '%s\n' "$commits"
+  fi
+  if [[ -n $branches ]]; then
+    printf '\nLingering local branches:\n'
+    printf '%s\n' "$branches" | sed 's/^/- /'
+  fi
+done
+
+if $github && command -v gh &>/dev/null; then
+  printf '\n## GitHub contributions\n'
+  gh search prs --author=@me --merged="$(date -d "@$cutoff" '+%Y-%m-%d')" \
+    --limit 100 --json repository,title,url,mergedAt \
+    --jq '.[] | "- [\(.repository.nameWithOwner)](\(.url)): \(.title) (\(.mergedAt[0:10]))"' \
+    2>/dev/null || printf '(GitHub search unavailable)\n'
+fi
+
+if $interactive; then
+  bat --language=markdown --style=plain --paging=auto "$output" >&3
+else
+  cat "$output" >&3
+fi
