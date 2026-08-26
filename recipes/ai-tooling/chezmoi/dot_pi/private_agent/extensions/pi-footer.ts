@@ -1,3 +1,11 @@
+/**
+ * Replaces Pi's footer with a compact Claude-style status line.
+ *
+ * Shows the project, session name, Git branch, context usage, token totals,
+ * cache totals, cost, provider, model, and thinking level. The layout
+ * collapses to the most useful fields on narrow terminals.
+ */
+
 import type { AssistantMessage } from "@earendil-works/pi-ai";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { truncateToWidth, visibleWidth } from "@earendil-works/pi-tui";
@@ -57,7 +65,8 @@ export default function (pi: ExtensionAPI) {
               ? theme.fg("muted", "ctx ?")
               : theme.fg(contextColor, `ctx ${Math.round(contextPercent)}%`);
           const providerModel = model
-            ? theme.bold(theme.fg("text", `${model.id}@${model.provider}`))
+            ? theme.bold(theme.fg("text", `${model.id}@${model.provider}`)) +
+              theme.fg("muted", ` [${ctx.thinkingLevel}]`)
             : theme.fg("muted", "no model");
           const location =
             theme.fg("accent", project) +
