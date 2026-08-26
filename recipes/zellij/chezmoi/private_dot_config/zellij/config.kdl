@@ -162,6 +162,7 @@ keybinds clear-defaults=true {
         bind "Alt l" { MoveFocusOrTab "right"; }
         bind "Alt n" { NewPane; }
         bind "Alt o" { MoveTab "right"; }
+        bind "Alt s" { NewPane "stacked"; }
         bind "Alt p" { TogglePanePinned; }  // Toggle pin on focused floating pane
         bind "Alt Shift p" { ToggleGroupMarking; }
         bind "Ctrl k" { Clear; }  // Clear scrollback (like tmux)
@@ -270,6 +271,7 @@ web_client {
 default_mode "locked"
 pane_frames true
 pane_frame_style "full"
+stacked_pane_list false
 
 show_startup_tips false
 

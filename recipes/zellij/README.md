@@ -11,7 +11,7 @@
 
 ## Keybindings
 
-The prefix is `Ctrl+Space`, matching Omarchy's Tmux and Herdr configurations. `Alt+Up` and `Alt+Down` are intentionally unbound so pi can use them for queued-message steering. Pane focus is available through `Ctrl+Alt+Arrow` and `Alt+H/J/K/L`. `Ctrl+PageUp/PageDown` switches tabs from normal, scroll, and search modes.
+The prefix is `Ctrl+Space`, matching Omarchy's Tmux and Herdr configurations. `Alt+N` opens a new pane using Zellij's default placement, while `Alt+S` opens a stacked pane. Stacked panes use the classic expanded-pane rendering rather than the newer title-list presentation. `Alt+[` and `Alt+]` cycle the active swap layout. `Alt+Up` and `Alt+Down` are intentionally unbound so pi can use them for queued-message steering. Pane focus is available through `Ctrl+Alt+Arrow` and `Alt+H/J/K/L`. `Ctrl+PageUp/PageDown` switches tabs from normal, scroll, and search modes.
 
 ## Theme integration
 
