@@ -268,6 +268,7 @@ web_client {
 }
 
 default_mode "locked"
+default_layout "stacked"
 pane_frames true
 pane_frame_style "full"
 

@@ -1,0 +1,7 @@
+layout {
+    pane stacked=true {
+        pane
+        pane
+        pane
+    }
+}
