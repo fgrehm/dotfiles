@@ -3,7 +3,7 @@
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
-# Check both $HOME/.oh-my-zsh and $ZSH (devcontainers may pre-set $ZSH)
+# Check both $HOME/.oh-my-zsh and $ZSH (containers may pre-set $ZSH)
 if [ -d "${ZSH:-$HOME/.oh-my-zsh}" ]; then
   log_skip "Oh My Zsh already installed"
   exit 0
@@ -27,14 +27,13 @@ if ! command -v zsh &>/dev/null; then
   run_quiet $SUDO apt-get install -y zsh
   # {{ end }}
 fi
-log_info "Installing Oh My Zsh..."
-# Prevent the installer from replacing our chezmoi-managed .zshrc.
-# Unset ZSH so the installer defaults to $HOME/.oh-my-zsh.
-export KEEP_ZSHRC=yes
-unset ZSH
-# wget preferred, curl fallback (Omarchy has no wget by default)
-if command -v wget &>/dev/null; then
-  sh -c "$(wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-else
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-fi
+# This commit is the trust anchor. Fetching an object by its full Git SHA avoids
+# executing the mutable installer from Oh My Zsh's master branch.
+OH_MY_ZSH_COMMIT="146461f7c6d95f4ba1220559d66eb113418b40a8"
+OH_MY_ZSH_DIR="$HOME/.oh-my-zsh"
+
+log_info "Installing Oh My Zsh at $OH_MY_ZSH_COMMIT..."
+git init -q "$OH_MY_ZSH_DIR"
+git -C "$OH_MY_ZSH_DIR" remote add origin https://github.com/ohmyzsh/ohmyzsh.git
+git -C "$OH_MY_ZSH_DIR" fetch -q --depth 1 origin "$OH_MY_ZSH_COMMIT"
+git -C "$OH_MY_ZSH_DIR" checkout -q --detach FETCH_HEAD

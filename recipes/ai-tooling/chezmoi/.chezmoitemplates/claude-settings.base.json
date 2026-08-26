@@ -9,7 +9,7 @@
     "pr": ""
   },
   "permissions": {
-    "defaultMode": "auto",
+    "defaultMode": "default",
     "allow": [
       "WebFetch(domain:github.com)"
     ],
@@ -34,7 +34,12 @@
     "ask": [
       "Bash(git push --force *)",
       "Bash(git push --force-with-lease *)",
-      "Bash(git reset --hard *)"
+      "Bash(git reset --hard *)",
+      "Bash(sudo *)",
+      "Bash(pacman *)",
+      "Bash(apt-get *)",
+      "Bash(omarchy pkg *)",
+      "Bash(git push *)"
     ]
   },
   "statusLine": {

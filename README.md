@@ -1,18 +1,20 @@
 # dotfiles
 
-Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Bare-metal/laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian-based images are used for devcontainers/Codespaces.
+Personal dotfiles managed with [chezmoi](https://www.chezmoi.io/) and [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). The bare-metal/laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian-based images are supported for devcontainers, Codespaces, and CI.
 
 ## Supported Platforms
 
 - **Omarchy** (Arch-based, Hyprland) — the bare-metal/laptop target
-- **Debian-based containers** (Debian 13, Ubuntu, etc.) — devcontainers/Codespaces/CI
+- **Debian-based containers and VMs** (Debian 13, Ubuntu, etc.) — devcontainers, Codespaces, CI, and other non-Omarchy environments
 
 Omarchy is the only bare-metal target. The `apt` branches in install scripts exist for the container path; on Omarchy the equivalent steps go through `omarchy pkg add` / `pacman`.
 
 ## Quick Start
 
 ```bash
-sh -c "$(wget -qO- https://raw.githubusercontent.com/fgrehm/dotfiles/main/install.sh)"
+git clone https://github.com/fgrehm/dotfiles.git ~/.local/share/chezmoi
+cd ~/.local/share/chezmoi
+./install.sh
 ```
 
 ## How It Works
@@ -44,11 +46,9 @@ On a new laptop, `chezmoi apply` needs to run twice:
 
 ## Development
 
-Development and testing happens inside a devcontainer (Debian 13).
+Run checks in CI or in an isolated environment with the tools from [`.tool-versions`](.tool-versions).
 
 ```bash
-# Open devcontainer, then:
-make test       # run e2e tests (bats)
 make check      # lint shell scripts (shfmt + shellcheck)
 ```
 

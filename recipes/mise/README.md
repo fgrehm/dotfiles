@@ -4,7 +4,7 @@
 
 ## What it does
 
-- Installs mise to `~/.local/bin/mise` via the official install script
+- Installs mise to `~/.local/bin/mise` from a pinned GitHub release with a SHA-256 check
 - Adds `dot_shellrc.d/mise.sh` to activate mise in bash and zsh shells
 - Installs shared command-line tools through mise when they are missing: `shfmt`, `shellcheck`, Worktrunk (`wt`), Hunk (`hunk`), `gh`, `prek`, and `bat`
 - Uses `omarchy-mise-install` on Omarchy and direct `mise use -g` elsewhere
@@ -14,12 +14,10 @@
 ## Requirements
 
 - wget
-- Internet access (mise.run install script)
+- Internet access to download the pinned GitHub release
 
 ## Notes
 
-In devcontainers where mise is already installed (e.g. via the devcontainer feature), the
-install script skips installation. The shell activation fragment still runs, so `mise` works
-normally in the shell.
+In devcontainers and VMs where mise is already installed, the install script skips installation. The shell activation fragment still runs, so `mise` works normally in the shell.
 
-Containers manage their own mise tool versions; this recipe only installs mise when it is absent and enables shell activation.
+Container and VM environments can manage their own mise tool versions; this recipe only installs mise when it is absent and enables shell activation.

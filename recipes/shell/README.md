@@ -28,7 +28,7 @@ On Omarchy, zsh and Oh My Zsh are installed through `omarchy pkg add` and the de
 |----------|-------------|--------|
 | `.name` | User's full name | `chezmoi init` prompt |
 | `.email` | User's email address | `chezmoi init` prompt |
-| `.isContainer` | true in Docker/devcontainers | auto-detected |
+| `.isContainer` | true in Docker containers | auto-detected |
 
 ## Adding shell fragments from other recipes
 

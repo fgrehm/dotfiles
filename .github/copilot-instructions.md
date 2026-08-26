@@ -98,4 +98,4 @@ The pattern `.chezmoiscripts/install-ollama.sh` correctly skips
 - Every recipe needs `test/unit/<recipe>.bats` (file deployment checks).
 - Recipes with install scripts need `test/e2e/<recipe>.bats` (binary on PATH,
   idempotency).
-- Tests run in the devcontainer, never on the host.
+- Run tests in a devcontainer, VM, or CI. Never run `chezmoi apply` on the host.

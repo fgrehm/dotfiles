@@ -1,6 +1,6 @@
 # ai-tooling
 
-Deploys shared agent instructions, skills, and Pi agent settings. Claude Code and Pi themselves are managed by Omarchy/devcontainers.
+Deploys shared agent instructions, skills, and Pi agent settings. Claude Code and Pi themselves are managed by Omarchy or the surrounding devcontainer/VM environment.
 
 ## What it does
 

@@ -4,7 +4,7 @@ Project context for AI assistants working on this repo.
 
 ## What This Is
 
-A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). Bare-metal/laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian-based images are used for devcontainers/Codespaces. Omarchy is the only bare-metal target -- the `apt` branches in install scripts exist for the container path.
+A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). The bare-metal/laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian-based containers and VMs are supported for devcontainers, Codespaces, CI, and other non-Omarchy environments. Omarchy is the only bare-metal target -- the `apt` branches in install scripts exist for Debian-based container and VM paths.
 
 > **Config philosophy:** only track a config in the repo when there's a need to customize it; otherwise let omarchy manage it (e.g. ghostty config is omarchy's default -- we only handle install + default terminal).
 
@@ -23,7 +23,6 @@ recipes/              modular recipe directories
     README.md         required (discovery marker)
     chezmoi/          chezmoi source fragment (dot_*, .chezmoiscripts/, etc.)
 compiled-home/        generated, gitignored
-.devcontainer/        devcontainer config (Debian 13 + mise)
 ```
 
 ## Recipe Structure
