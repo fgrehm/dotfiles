@@ -163,6 +163,12 @@ keybinds clear-defaults=true {
         bind "Alt n" { NewPane; }
         bind "Alt o" { MoveTab "right"; }
         bind "Alt s" { NewPane "stacked"; }
+        bind "Alt v" {
+            Run "bash" "-lc" "cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" && exec nvim" {
+                stacked true
+                close_on_exit true
+            }
+        }
         bind "Alt p" { TogglePanePinned; }  // Toggle pin on focused floating pane
         bind "Alt Shift p" { ToggleGroupMarking; }
         bind "Ctrl k" { Clear; }  // Clear scrollback (like tmux)
