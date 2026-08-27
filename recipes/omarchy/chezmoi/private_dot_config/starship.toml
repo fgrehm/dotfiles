@@ -1,0 +1,46 @@
+# Overrides omarchy's default: /usr/share/omarchy/config/starship.toml
+add_newline = false
+format = "💻 [$directory$git_branch]($style)${custom.changes}${custom.stashes}$git_status${custom.line_break}$character"
+
+[directory]
+truncation_length = 2
+style = "cyan"
+
+[git_branch]
+format = "[$branch]($style) "
+style = "italic cyan"
+
+[git_status]
+format = '$ahead_behind'
+style = "cyan"
+conflicted = "⚠️ "
+untracked = "📝 "
+modified = "📝 "
+staged = "📝 "
+renamed = "📝 "
+deleted = "📝 "
+stashed = "📦 "
+ahead = "🔼 "
+behind = "🔽 "
+diverged = "🔼🔽 "
+
+[custom.changes]
+command = "git status --porcelain 2>/dev/null | wc -l"
+when = "test -n \"$(git status --porcelain 2>/dev/null)\""
+format = "📝 $output "
+
+[custom.stashes]
+command = "git stash list 2>/dev/null | wc -l"
+when = "test -n \"$(git stash list 2>/dev/null)\""
+format = "📦 $output "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
+
+# Insert a newline before the prompt character only inside git repos.
+[custom.line_break]
+command = "echo"
+when = true
+require_repo = true
+format = "\n"

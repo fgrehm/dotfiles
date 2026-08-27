@@ -21,31 +21,27 @@ setopt APPEND_HISTORY
 setopt HIST_IGNORE_SPACE
 setopt HIST_IGNORE_DUPS
 
-# --- Git prompt extensions (ahead/behind + stash count) ---
+# --- Prompt ---
+if [ -f /.dockerenv ] || [ -f /run/.containerenv ] || grep -qaE '(docker|kubepods|containerd)' /proc/1/cgroup 2>/dev/null || [ -n "${CODESPACES:-}" ]; then
 function git_ahead_behind() {
     local ahead behind output
     ahead=$(command git rev-list --count @{upstream}..HEAD 2>/dev/null) || return
     behind=$(command git rev-list --count HEAD..@{upstream} 2>/dev/null) || return
     output=""
-    (( ahead > 0 )) && output+="%{$fg[green]%}⬆ ${ahead}%{$reset_color%} "
-    (( behind > 0 )) && output+="%{$fg[red]%}⬇ ${behind}%{$reset_color%} "
+    (( ahead > 0 )) && output+="🔼 ${ahead} "
+    (( behind > 0 )) && output+="🔽 ${behind} "
     [[ -n "$output" ]] && echo "$output"
 }
 
-function git_dirty_count() {
-    local count
-    count=$(command git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
-    (( count > 0 )) && echo "%{$fg[yellow]%}✏️ ${count}%{$reset_color%} "
+function git_status_emojis() {
+    local changes stashes output
+    changes=$(command git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+    stashes=$(command git stash list 2>/dev/null | wc -l | tr -d ' ')
+    output=""
+    (( changes > 0 )) && output+="📝 ${changes} "
+    (( stashes > 0 )) && output+="📦 ${stashes} "
+    [[ -n "$output" ]] && echo "$output"
 }
-
-function git_stash_count() {
-    local count
-    count=$(command git stash list 2>/dev/null | wc -l | tr -d ' ')
-    (( count > 0 )) && echo "%{$fg[yellow]%}📦 ${count}%{$reset_color%} "
-}
-
-ZSH_THEME_GIT_PROMPT_DIRTY="%{$fg[blue]%})"
-ZSH_THEME_GIT_PROMPT_CLEAN="%{$fg[blue]%})"
 
 _PROMPT_NL=''
 function _precmd_prompt_nl() {
@@ -57,9 +53,12 @@ function _precmd_prompt_nl() {
 }
 precmd_functions+=(_precmd_prompt_nl)
 
-PROMPT="{{ if .isContainer }}🐳 {{ end }}%{$fg[cyan]%}%c%{$reset_color%}"
-PROMPT+=' $(git_prompt_info)$(git_dirty_count)$(git_ahead_behind)$(git_stash_count)'
+PROMPT="🐳 %{$fg[cyan]%}%c%{$reset_color%}"
+PROMPT+=' $(git_prompt_info)$(git_status_emojis)$(git_ahead_behind)'
 PROMPT+='${_PROMPT_NL}%(?:%{$fg_bold[green]%}%1{➜%} :%{$fg_bold[red]%}%1{➜%} )%{$reset_color%} '
+else
+eval "$(starship init zsh)"
+fi
 
 # Source shared shell configuration (env vars, aliases, PATH)
 if [ -f ~/.shellrc ]; then
