@@ -25,6 +25,16 @@ Skills live once at `~/.agents/skills/<name>/` (the canonical cross-client home)
 
 A `run_onchange_after_link-skills.sh.tmpl` script creates these symlinks for every skill in `~/.agents/skills/` and re-runs whenever the skill set changes. It only creates missing symlinks, so anything else you drop into `~/.agents/skills/` (or the per-agent dirs) is left alone. The omarchy skill already lives in `~/.agents/skills/` and coexists.
 
+### Project continuity context
+
+Pi and Claude Code can load an explicitly approved `<git-root>/.agents/context/main.md` as project-state context. The file is limited to 8 KiB, must be a regular UTF-8 file inside the Git root, and each SHA-256 version requires approval. Approvals are shared at `~/.agents/project-context-trust.json`, so approving a version in either client authorizes the same version in the other. Claude Code prints the approval command when it encounters an unapproved file:
+
+```sh
+~/.agents/bin/project-context-hook --approve
+```
+
+Pi prompts to review the file in interactive mode, or use `/project-context`. Neither client loads new or changed context in non-interactive mode. Keep `main.md` as a short index that links detailed work in `.agents/scratchpad/`.
+
 To vendor a third-party skill from GitHub, use the helper under this recipe:
 
 ```sh

@@ -31,15 +31,21 @@ fi
 # Deep-merge base on top of the existing file:
 # - Objects merge recursively, base wins for shared scalar keys.
 # - Permission arrays (allow, deny, ask) are concatenated and deduplicated.
-# - Machine-local keys (hooks, plugins, model, ...) survive because they are
+# - Hook arrays merge per event so machine-local hooks survive alongside the
+#   managed SessionStart context hook.
+# - Other machine-local keys (plugins, model, ...) survive because they are
 #   absent from the base.
 merged="$(jq -s '
   def merge_arrays: map(. // []) | add | unique;
+  def merge_hooks($local; $base):
+    reduce (($local.hooks // {} | keys_unsorted[]), ($base.hooks // {} | keys_unsorted[])) as $event
+      ({}; .[$event] = ((($local.hooks[$event] // []) + ($base.hooks[$event] // [])) | unique));
   .[0] as $local | .[1] as $base |
   ($local * $base) |
   .permissions.allow = ([$local.permissions.allow, $base.permissions.allow] | merge_arrays) |
   .permissions.deny  = ([$local.permissions.deny,  $base.permissions.deny]  | merge_arrays) |
-  .permissions.ask   = ([$local.permissions.ask,   $base.permissions.ask]   | merge_arrays)
+  .permissions.ask   = ([$local.permissions.ask,   $base.permissions.ask]   | merge_arrays) |
+  .hooks = merge_hooks($local; $base)
 ' "$TARGET" "$BASE")"
 
 current_sorted="$(jq --sort-keys . "$TARGET")"

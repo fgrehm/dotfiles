@@ -1,57 +1,69 @@
 ---
 name: flush
-description: "Flush working context to disk at any point during a session. Use when the user says flush, checkpoint, save progress, save context, let's wrap up, end of session, or signals a pause. Also invoke proactively when context is getting long and the user hasn't explicitly saved progress."
+description: "Persist session state at a pause or handoff. Use when the user says flush, checkpoint, save progress, save context, let's wrap up, end of session, or signals a pause."
 ---
 
 # Flush
 
-Persist everything worth keeping from working memory to disk. Works mid-session or at session end, no difference.
+Persist only state that lets the next session resume safely. Use the repository's `.agents/` workspace:
 
-## 1. Git state
+- `.agents/context/main.md`: short, durable project-state index. It is auto-loaded by approved Pi and Claude Code sessions.
+- `.agents/scratchpad/`: detailed reviews, plans, investigations, and handoffs. These files are local and ignored.
+- Canonical repository docs: project decisions that belong with the codebase and should be shared.
 
-Using your built-in tools (not a script), check:
+## Rules
 
-- `git status` - uncommitted staged/unstaged changes
-- `git log @{u}..HEAD` (or last 10 if no upstream) - unpushed commits
-- `git diff --unified=0 HEAD` filtered for TODO/FIXME/HACK - new annotations
+1. Read existing `.agents/context/main.md` before changing it. Keep its current confirmed state and update it in place.
+2. Keep `main.md` under 8 KiB. Record active state, durable decisions, and links to detailed artifacts. Put detail in `scratchpad/`.
+3. When `main.md` changes, tell the user it requires renewed SHA-256 approval before Pi or Claude Code loads the new version.
+4. Keep scratchpad files resumable: goal, confirmed facts, current status, and exact next step.
+5. Never delete untracked `.agents/` files. Ask before removing or replacing uncertain local state.
+6. Ask before committing. Stage files explicitly by name.
 
-If there are uncommitted changes, ask the user if they want to commit.
+## Process
 
-## 2. Memory
+### 1. Check Git state
 
-Review the session for learnings worth persisting.
+Use built-in tools to inspect:
 
-Worth saving:
-- Confirmed patterns and architectural decisions
-- Gotchas, debugging insights, tool quirks
-- User preferences (workflow, naming, communication style)
+- `git status` for staged and unstaged changes.
+- `git log @{u}..HEAD` (or the last 10 commits when no upstream exists) for unpushed commits.
+- `git diff --unified=0 HEAD` filtered for TODO, FIXME, or HACK annotations added in this session.
 
-Not worth saving:
-- Session-specific task details or temporary state
-- Things already in project docs or derivable from code
-- One-off observations that haven't been confirmed
+Ask whether to commit any uncommitted work.
 
-Check existing memory files first. Update existing entries rather than creating duplicates.
+### 2. Reconcile session artifacts
 
-## 3. Stale docs
+Review the session for state worth preserving.
 
-Check whether any project docs are out of date relative to what was built this session: specs, READMEs, changelogs, roadmap entries, status headers, checkboxes. Update what you can confidently fix. For anything ambiguous, ask the user.
+Update `.agents/context/main.md` for:
 
-## 4. Dangling work
+- Active work that the next session needs immediately.
+- Confirmed decisions, constraints, or cross-client workflow preferences.
+- Links to the relevant scratchpad artifact.
 
-Scan for anything left half-done:
+Create or update `.agents/scratchpad/<topic>.md` for:
 
-- Unresolved TODOs/FIXMEs added this session
-- Tests skipped or marked pending
+- Detailed analysis, plans, incomplete implementation, or a handoff.
+- Facts established during the session that would otherwise require rediscovery.
+- The exact next step and any pending human decision.
 
-Flag anything found and ask the user how to handle it.
+Do not add derivable code facts, stale task narration, or detailed logs to `main.md`.
 
-## 5. Report
+### 3. Update canonical documentation
 
-Short summary of what was flushed:
+Update project docs only when the session established a durable project fact that belongs in version control. For ambiguous promotions from local context to repository docs, ask the user.
 
-- Commits made (count + last hash)
-- Docs updated (list)
-- Memory entries added/updated (list)
-- Dangling items (if any)
-- Unpushed commits (remind user)
+### 4. Surface dangling work
+
+Identify unresolved agent annotations, skipped tests, incomplete implementation, and pending decisions. Record a concrete next step in the relevant scratchpad file, then ask the user how to proceed if judgment is required.
+
+## Report
+
+Summarize:
+
+- Git state, commits, and unpushed work.
+- `main.md` changes and whether renewed Pi/Claude approval is needed.
+- Scratchpad artifacts created or updated.
+- Canonical docs changed.
+- Dangling work and the next step.
