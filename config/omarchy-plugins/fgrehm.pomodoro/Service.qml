@@ -175,6 +175,7 @@ Item {
     // --- state -------------------------------------------------------------
     property bool running: false
     property bool started: false
+    property bool nextPhasePending: false
     property var history: []
     // Task state is shared by all monitor views through this service.
     property var tasks: []
@@ -346,8 +347,13 @@ Item {
             persistHistory()
             persistSession()
         }
-        // Already gated on the `notify` setting inside the decision.
-        if (decision.notify) sendCompletionNotification(decision.notify)
+        // When the transition offers the in-shell Start button, that card is
+        // the notification. Avoid showing a second desktop alert for the same
+        // event. Keep the desktop notification for transitions that do not
+        // offer auto-start.
+        var offersContinue = decision.autoStart && allowAutoStart !== false
+        if (decision.notify && !offersContinue)
+            sendCompletionNotification(decision.notify, false)
         settle(decision, allowAutoStart)
     }
 
@@ -370,11 +376,21 @@ Item {
     function settle(decision, allowAutoStart) {
         running = false
         started = false
-        // Before start(), so the new session banks the armed phase's duration
-        // rather than the finished one's.
+        // Before offering the next phase, so Start banks the armed phase's
+        // duration rather than the finished one's.
         phase = decision.next.phase
-        if (decision.autoStart && allowAutoStart !== false) start()
-        else persistSession()
+        nextPhasePending = decision.autoStart && allowAutoStart !== false
+        persistSession()
+    }
+
+    function startPendingPhase() {
+        if (!nextPhasePending || started) return
+        nextPhasePending = false
+        start()
+    }
+
+    function dismissPendingPhase() {
+        nextPhasePending = false
     }
 
     // --- duration adjustment, panel +/- and wheel --------------------
@@ -600,12 +616,14 @@ Item {
     // its own: what just ended is the decision's to know (a break announces
     // itself differently, and only it knows the phase the session actually
     // ran under).
-    function sendCompletionNotification(notify) {
+    function sendCompletionNotification(notify, offersContinue) {
         // Clicking the toast routes through the shell's bar-widget summon
         // path, which opens the existing panel on the focused monitor.
+        var body = notify.body
+        if (offersContinue) body += " - Click Start to move on"
         Quickshell.execDetached(["omarchy", "notification", "send",
                                  "--app-name", "Pomodoro", "-u", "critical",
-                                 notify.title, notify.body,
+                                 notify.title, body,
                                  "--exec", "omarchy-shell", "shell", "summon",
                                  "fgrehm.pomodoro", "{}"])
     }
@@ -732,6 +750,14 @@ Item {
             return
         }
         historyFile.setText(Model.serializeHistory(root.history))
+    }
+
+    NextPhaseCard {
+        timer: root
+        visibleCard: root.nextPhasePending
+        phaseLabel: Model.phaseLabel(root.phase)
+        onStartRequested: root.startPendingPhase()
+        onDismissRequested: root.dismissPendingPhase()
     }
 
     Component.onCompleted: {
