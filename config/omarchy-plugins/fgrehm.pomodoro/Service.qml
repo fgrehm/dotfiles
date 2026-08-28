@@ -601,9 +601,13 @@ Item {
     // itself differently, and only it knows the phase the session actually
     // ran under).
     function sendCompletionNotification(notify) {
+        // Clicking the toast routes through the shell's bar-widget summon
+        // path, which opens the existing panel on the focused monitor.
         Quickshell.execDetached(["omarchy", "notification", "send",
                                  "--app-name", "Pomodoro", "-u", "critical",
-                                 notify.title, notify.body])
+                                 notify.title, notify.body,
+                                 "--exec", "omarchy-shell", "shell", "summon",
+                                 "fgrehm.pomodoro", "{}"])
     }
 
     // --- persistence ---------------------------------------------------
