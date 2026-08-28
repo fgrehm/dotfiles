@@ -14,6 +14,11 @@ fpath=("$HOME/.zsh/completions" $fpath)
 
 source $ZSH/oh-my-zsh.sh
 
+# Match Omarchy bash: Ctrl-R opens fzf's interactive history search.
+if command -v fzf >/dev/null 2>&1 && [ -f /usr/share/fzf/key-bindings.zsh ]; then
+    source /usr/share/fzf/key-bindings.zsh
+fi
+
 # --- History: save on exit, don't share across sessions ---
 unsetopt SHARE_HISTORY
 unsetopt INC_APPEND_HISTORY

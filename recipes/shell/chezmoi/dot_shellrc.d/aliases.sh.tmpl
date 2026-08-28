@@ -3,6 +3,11 @@
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 # General-purpose aliases shared across bash and zsh.
 
+# Open files and URLs with the desktop default application.
+open() (
+  xdg-open "$@" >/dev/null 2>&1 &
+)
+
 # --- Colors ---
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
