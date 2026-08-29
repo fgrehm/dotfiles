@@ -17,6 +17,7 @@ Shared across Omarchy 4:
   - `run_once_install-lmk.sh.tmpl` — installs the pinned `lmk` command-line tool through Omarchy mise's GitHub backend.
   - `run_once_install-rust.sh.tmpl` — installs the Rust toolchain (`rustc` and `cargo`) through Omarchy mise.
   - `run_once_install-bun.sh.tmpl` — installs Bun through Omarchy mise.
+  - `run_once_install-nvidia-vulkan.sh.tmpl` — on NVIDIA machines, installs the proprietary DKMS driver and Vulkan tooling, then rebuilds DKMS modules. A reboot is required afterward.
 - `~/.config/environment.d/ssh-agent.conf` — points `SSH_AUTH_SOCK` at the stock OpenSSH agent socket and configures Seahorse's graphical SSH askpass prompt. Takes effect after re-login.
 - `~/.local/bin/crib` (via `.chezmoiexternals/crib.toml`) + `~/.config/crib/config.toml` — the [crib](https://github.com/fgrehm/crib) CLI ("Just Enough Devcontainers"). Bare-metal-only; lives here because Omarchy is the only bare-metal target.
 - `run_once_install-omasnap.sh` + `.chezmoiexternals/omasnap.toml` — install Omasnap's runtime dependencies and pinned screenshot binary/desktop entry.
@@ -35,3 +36,4 @@ Shared across Omarchy 4:
 - The `environment.d` SSH_AUTH_SOCK setting only takes effect after re-login (environment.d is read at systemd user manager startup).
 - `AddKeysToAgent yes` is intentionally NOT duplicated here — it lives in the `shell` recipe's `~/.ssh/config`.
 - `gpg-agent-ssh.socket` (GnuPG SSH emulation) is active by default and can override `SSH_AUTH_SOCK` via `ExecStartPost`; mask it if it hijacks the socket (see BACKLOG.md).
+- NVIDIA setup is detected from `lspci`; verify after reboot with `nvidia-smi` and `vulkaninfo --summary`.

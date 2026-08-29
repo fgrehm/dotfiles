@@ -1,0 +1,23 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if command -v nvidia-smi &>/dev/null && command -v vulkaninfo &>/dev/null; then
+  log_skip "NVIDIA/Vulkan tooling already installed"
+  exit 0
+fi
+
+# {{ if ne .chezmoi.username "root" }}
+SUDO="sudo"
+# {{ else }}
+SUDO=""
+# {{ end }}
+
+set -eo pipefail
+
+log_info "Installing NVIDIA Vulkan support..."
+omarchy pkg add nvidia-open-dkms nvidia-utils vulkan-intel vulkan-tools linux-headers
+run_quiet $SUDO dkms autoinstall
+
+log_info "NVIDIA Vulkan support installed; reboot required to load the driver"

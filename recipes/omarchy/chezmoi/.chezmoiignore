@@ -1,0 +1,3 @@
+{{ if not .hasNvidiaGPU }}
+.chezmoiscripts/install-nvidia-vulkan.sh
+{{ end }}
