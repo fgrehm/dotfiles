@@ -1,4 +1,5 @@
 {{- if not .isOmarchy }}
 omarchy
 omarchy-plugins
+podman
 {{- end }}

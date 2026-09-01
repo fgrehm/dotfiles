@@ -1,0 +1,49 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+declare -A pkgs=(
+  [podman]=podman
+  ["podman-compose"]=podman-compose
+  [docker]=podman-docker
+)
+
+packages=()
+for bin in "${!pkgs[@]}"; do
+  command -v "$bin" &>/dev/null || packages+=("${pkgs[$bin]}")
+done
+
+set -eo pipefail
+
+# Remove Docker and its networking helpers first. `podman-docker` provides the
+# Docker CLI name and conflicts with the Docker package.
+log_info "Removing Docker packages..."
+run_quiet omarchy pkg drop docker docker-compose docker-buildx ufw-docker
+
+if [ ${#packages[@]} -eq 0 ]; then
+  log_skip "Podman already installed"
+else
+  log_info "Installing Podman and rootless dependencies..."
+  run_quiet omarchy pkg add "${packages[@]}"
+fi
+
+# Rootless Podman needs subordinate UID/GID ranges. Add a standard range if
+# the account does not already have one. User lingering keeps user services
+# available after logout.
+if [ "$(id -u)" -ne 0 ] && command -v usermod &>/dev/null; then
+  if ! grep -q "^${USER}:" /etc/subuid 2>/dev/null; then
+    run_quiet sudo usermod --add-subuids 100000-165535 "$USER"
+  fi
+  if ! grep -q "^${USER}:" /etc/subgid 2>/dev/null; then
+    run_quiet sudo usermod --add-subgids 100000-165535 "$USER"
+  fi
+fi
+
+if command -v loginctl &>/dev/null && [ "$(id -u)" -ne 0 ]; then
+  loginctl enable-linger "$USER" 2>/dev/null || log_warn "Could not enable user lingering"
+fi
+
+if command -v podman &>/dev/null && [ "$(id -u)" -ne 0 ]; then
+  podman system migrate 2>/dev/null || true
+fi
