@@ -1,5 +1,4 @@
-# Skipped in containers (mise tools are for development only)
+# Machine-local mise config is skipped in containers.
 {{ if .isContainer }}
 .config/mise/config.toml
-.chezmoiscripts/install-mise-tools.sh
 {{ end }}
