@@ -3,8 +3,15 @@
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
+# Containers do not run the full development-tool recipe, but these tools are
+# needed by the dotfiles themselves and can be installed without root.
+# {{ if not .isContainer }}
+log_skip "Container-only mise tools"
+exit 0
+# {{ end }}
+
 if ! command -v mise &>/dev/null; then
-  log_skip "mise not found, skipping mise-managed tools"
+  log_skip "mise not found, skipping container tools"
   exit 0
 fi
 
@@ -13,25 +20,17 @@ set -eo pipefail
 install_tool() {
   local package="$1" command="$2"
   if command -v "$command" &>/dev/null; then
-    log_skip "$command already available"
+    log_skip "$command already installed"
     return
   fi
 
   log_info "Installing $command through mise..."
-  # {{ if .isOmarchy }}
-  omarchy-mise-install "$package" "$command"
-  # omarchy-mise-install creates a lazy wrapper; install the tool now.
-  "$command" --version >/dev/null
-  # {{ else }}
   mise use -g "${package}@latest"
   "$command" --version >/dev/null
-  # {{ end }}
 }
 
+install_tool jq jq
+install_tool neovim nvim
 install_tool shfmt shfmt
+install_tool bun bunx
 install_tool shellcheck shellcheck
-install_tool worktrunk wt
-install_tool aqua:modem-dev/hunk hunk
-install_tool gh gh
-install_tool prek prek
-install_tool bat bat
