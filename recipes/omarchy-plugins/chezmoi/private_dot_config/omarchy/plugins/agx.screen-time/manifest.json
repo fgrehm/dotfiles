@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "agx.screen-time",
+  "name": "Screen Time",
+  "version": "1.4.0",
+  "author": "agx",
+  "description": "Know where your time goes. Live per-app screen time in your bar with a donut breakdown, a 13-week trend, a yearly overview, and usage insights — terminal-aware, keyboard-first, fully local.",
+  "kinds": [
+    "service",
+    "bar-widget"
+  ],
+  "keepLoaded": true,
+  "entryPoints": {
+    "service": "Service.qml",
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Screen Time",
+    "description": "Daily screen time per app with usage insights",
+    "category": "Wellbeing",
+    "allowMultiple": false,
+    "defaultSection": "right"
+  }
+}
