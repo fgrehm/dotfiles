@@ -2,13 +2,8 @@
 # vim: ft=bash.gotmpl
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
-
-# Use sudo only when it is authorized without prompting.
-if [ "$(id -u)" -ne 0 ] && command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
-  SUDO="sudo"
-else
-  SUDO=""
-fi
+source "$CHEZMOI_SOURCE_DIR/scripts/privilege.bash"
+setup_sudo
 
 # binary:package pairs. Package names differ per-OS: `fd` on Omarchy (Arch),
 # `fd-find` on Debian-based containers (binary ships as `fdfind`).

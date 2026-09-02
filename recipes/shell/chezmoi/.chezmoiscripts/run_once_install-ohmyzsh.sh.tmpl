@@ -2,17 +2,13 @@
 # vim: ft=bash.gotmpl
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+source "$CHEZMOI_SOURCE_DIR/scripts/privilege.bash"
+setup_sudo
 
 # Check both $HOME/.oh-my-zsh and $ZSH (containers may pre-set $ZSH)
 if [ -d "${ZSH:-$HOME/.oh-my-zsh}" ]; then
   log_skip "Oh My Zsh already installed"
   exit 0
-fi
-
-if [ "$(id -u)" -ne 0 ] && command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
-  SUDO="sudo"
-else
-  SUDO=""
 fi
 
 set -eo pipefail

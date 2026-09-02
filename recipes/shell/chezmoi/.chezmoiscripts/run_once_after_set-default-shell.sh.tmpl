@@ -2,6 +2,8 @@
 # vim: ft=bash.gotmpl
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+source "$CHEZMOI_SOURCE_DIR/scripts/privilege.bash"
+setup_sudo
 
 ZSH_BIN="$(command -v zsh 2>/dev/null || true)"
 if [ -z "$ZSH_BIN" ]; then
@@ -13,13 +15,6 @@ CURRENT_SHELL="$(getent passwd "$(whoami)" | cut -d: -f7)"
 if [ "$CURRENT_SHELL" = "$ZSH_BIN" ]; then
   log_skip "zsh is already the default shell"
   exit 0
-fi
-
-# Use sudo only when it is authorized without prompting.
-if [ "$(id -u)" -ne 0 ] && command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
-  SUDO="sudo"
-else
-  SUDO=""
 fi
 
 set -eo pipefail
