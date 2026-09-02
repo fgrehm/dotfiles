@@ -8,17 +8,23 @@ if command -v nvim &>/dev/null; then
   exit 0
 fi
 
-# {{ if ne .chezmoi.username "root" }}
-SUDO="sudo"
-# {{ else }}
-SUDO=""
-# {{ end }}
+# Use sudo only when it is authorized without prompting.
+if [ "$(id -u)" -ne 0 ] && command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
+  SUDO="sudo"
+else
+  SUDO=""
+fi
 
 VERSION="0.12.4"
 ARCHIVE="/tmp/nvim-linux-x86_64.tar.gz"
 SHA256="012bf3fcac5ade43914df3f174668bf64d05e049a4f032a388c027b1ebd78628"
 
 set -eo pipefail
+
+if [ "$(id -u)" -ne 0 ] && [ -z "$SUDO" ]; then
+  log_skip "Cannot install Neovim globally without root or usable sudo"
+  exit 0
+fi
 
 log_info "Installing Neovim..."
 # Installed globally (/opt + /usr/local/bin) so `sudo nvim` works.

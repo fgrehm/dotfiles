@@ -1,0 +1,16 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+# The theme symlink can be left behind when moving from Omarchy to a
+# container. Remove it so Neovim does not try to load a dangling theme module.
+# {{ if not .isOmarchy }}
+THEME_LINK="$HOME/.config/nvim/lua/plugins/theme.lua"
+if [ -L "$THEME_LINK" ]; then
+  rm -f "$THEME_LINK"
+  log_info "Removed stale Omarchy Neovim theme link"
+else
+  log_skip "No stale Omarchy Neovim theme link found"
+fi
+# {{ end }}

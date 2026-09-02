@@ -3,11 +3,12 @@
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
-# {{ if ne .chezmoi.username "root" }}
-SUDO="sudo"
-# {{ else }}
-SUDO=""
-# {{ end }}
+# Use sudo only when it is authorized without prompting.
+if [ "$(id -u)" -ne 0 ] && command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
+  SUDO="sudo"
+else
+  SUDO=""
+fi
 
 # binary:package pairs. Package names differ per-OS: `fd` on Omarchy (Arch),
 # `fd-find` on Debian-based containers (binary ships as `fdfind`).
@@ -38,6 +39,10 @@ fi
 set -eo pipefail
 
 if [ ${#packages[@]} -gt 0 ]; then
+  if [ "$(id -u)" -ne 0 ] && [ -z "$SUDO" ]; then
+    log_skip "Cannot install base packages without root or usable sudo: ${packages[*]}"
+    exit 0
+  fi
   log_info "Installing base packages: ${packages[*]}..."
   # Omarchy: pacman via omarchy pkg. Containers: apt.
   # {{ if .isOmarchy }}

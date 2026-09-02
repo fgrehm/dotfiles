@@ -8,13 +8,19 @@ if command -v git &>/dev/null; then
   exit 0
 fi
 
-# {{ if ne .chezmoi.username "root" }}
-SUDO="sudo"
-# {{ else }}
-SUDO=""
-# {{ end }}
+# Use sudo only when it is authorized without prompting.
+if [ "$(id -u)" -ne 0 ] && command -v sudo &>/dev/null && sudo -n true 2>/dev/null; then
+  SUDO="sudo"
+else
+  SUDO=""
+fi
 
 set -eo pipefail
+
+if [ "$(id -u)" -ne 0 ] && [ -z "$SUDO" ]; then
+  log_skip "Cannot install git without root or usable sudo"
+  exit 0
+fi
 
 log_info "Installing git..."
 # Omarchy: pacman. Containers: apt.
