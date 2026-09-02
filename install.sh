@@ -41,7 +41,10 @@ aarch64 | arm64) ARCH=arm64 ;;
 esac
 
 mkdir -p "$BIN_DIR"
-export PATH="$BIN_DIR:$PATH"
+case ":${PATH:-}:" in
+*":$BIN_DIR:"*) ;;
+*) export PATH="$BIN_DIR${PATH:+:$PATH}" ;;
+esac
 
 CHEZMOI_VERSION="2.72.0"
 CHEZMOI_RECIPES_VERSION="0.6.0"
