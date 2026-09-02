@@ -1,10 +1,9 @@
 /**
- * Loads explicitly approved project continuity context.
+ * Loads validated project continuity context.
  *
  * The extension reads only <git-root>/.agents/context/main.md. Each distinct
- * file hash requires an interactive review and approval before its contents are
- * added to the system prompt. Non-interactive sessions never approve or load
- * new context.
+ * file hash is loaded automatically unless it contains HTML comments or strict
+ * mode is enabled with PROJECT_CONTEXT_STRICT=1.
  */
 
 import { createHash } from "node:crypto";
@@ -147,6 +146,18 @@ function isApproved(context: ProjectContext, store: TrustStore): boolean {
   return store.approvals[context.root]?.hash === context.hash;
 }
 
+function hasHtmlComments(content: string): boolean {
+  return content.includes("<!--") || content.includes("-->");
+}
+
+function warn(ctx: ExtensionContext, message: string): void {
+  if (ctx.mode === "tui") {
+    ctx.ui.notify(message, "warning");
+  } else {
+    console.warn(`Project context: ${message}`);
+  }
+}
+
 async function reviewAndApprove(
   context: ProjectContext,
   ctx: ExtensionContext,
@@ -179,14 +190,26 @@ export default function (pi: ExtensionAPI) {
     const context = await readProjectContext(ctx.cwd);
     if (!context) return false;
 
+    if (hasHtmlComments(context.content)) {
+      warn(ctx, "context contains HTML comments and was blocked");
+      return false;
+    }
+
     const store = await loadTrustStore();
     if (!isApproved(context, store)) {
-      if (!(await reviewAndApprove(context, ctx))) return false;
-      store.approvals[context.root] = {
-        hash: context.hash,
-        approvedAt: new Date().toISOString(),
-      };
-      await saveTrustStore(store);
+      if (process.env.PROJECT_CONTEXT_STRICT === "1") {
+        if (!(await reviewAndApprove(context, ctx))) return false;
+        store.approvals[context.root] = {
+          hash: context.hash,
+          approvedAt: new Date().toISOString(),
+        };
+        await saveTrustStore(store);
+      } else {
+        warn(
+          ctx,
+          "unapproved context was loaded automatically; set PROJECT_CONTEXT_STRICT=1 to require approval",
+        );
+      }
     }
 
     approvedContext = context;

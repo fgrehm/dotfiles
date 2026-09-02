@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Load only SHA-256-approved project continuity context for Claude Code.
+# Load validated project continuity context, warning when it is unapproved.
 set -euo pipefail
 
 CONTEXT_RELATIVE_PATH=".agents/context/main.md"
@@ -45,6 +45,14 @@ is_approved() {
   [[ -f "$TRUST_STORE" ]] || return 1
   jq -e --arg root "$CONTEXT_ROOT" --arg hash "$CONTEXT_HASH" \
     '.version == 1 and .approvals[$root].hash == $hash' "$TRUST_STORE" >/dev/null 2>&1
+}
+
+has_html_comments() {
+  [[ "$CONTEXT_CONTENT" == *'<!--'* || "$CONTEXT_CONTENT" == *'-->'* ]]
+}
+
+warn_unapproved() {
+  printf 'Project context was not approved; loading it automatically. Set PROJECT_CONTEXT_STRICT=1 to require approval.\n' >&2
 }
 
 approve_context() {
@@ -108,10 +116,17 @@ case "${1:-}" in
   cwd="$(jq -r '.cwd // empty' <<<"$event")"
   [[ -n "$cwd" ]] || exit 0
 
-  if read_context "$cwd" && is_approved; then
-    emit_context
+  if read_context "$cwd"; then
+    if has_html_comments; then
+      printf 'Project context contains HTML comments and was blocked.\n' >&2
+    elif [[ "${PROJECT_CONTEXT_STRICT:-}" == 1 ]] && ! is_approved; then
+      printf 'Project context is not approved. Run ~/.agents/bin/project-context-hook --approve from the project root.\n' >&2
+    else
+      is_approved || warn_unapproved
+      emit_context
+    fi
   elif [[ -f "$(find_git_root "$cwd" 2>/dev/null || true)/$CONTEXT_RELATIVE_PATH" ]]; then
-    printf 'Project context is not approved. Run ~/.agents/bin/project-context-hook --approve from the project root.\n' >&2
+    printf 'Project context is invalid or unavailable and was skipped.\n' >&2
   fi
   ;;
 *)
