@@ -60,7 +60,8 @@ function canonicalApp(name) {
 // engine has no require(), so fs-based lookups would throw at runtime.
 function trackingApp(app, title) {
   var key = canonicalApp(app)
-  if (!key || !BROWSER_ALIASES || !title) return key
+  if (!key || !BROWSER_ALIASES
+      || !Object.prototype.hasOwnProperty.call(BROWSER_ALIASES, key) || !title) return key
   var cleanTitle = String(title).replace(/\s+/g, " ").trim()
   return cleanTitle ? "browser:" + key + ":" + cleanTitle : key
 }

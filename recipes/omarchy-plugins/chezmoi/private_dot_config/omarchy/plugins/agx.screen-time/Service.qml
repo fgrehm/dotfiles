@@ -97,6 +97,9 @@ Item {
   property int resolveSpawnGen: 0
   property bool ready: false
   property bool startupPhase: true
+  property bool sessionLocked: false
+  readonly property var lockService: root.shell ? root.shell.serviceFor("omarchy.lock") : null
+  onLockServiceChanged: root.setSessionLocked(root.lockService && root.lockService.locked)
 
   // ---- Public read API for the UI ----------------------------------------
   readonly property string barLabel: today ? Model.fmt(today.total) : ""
@@ -442,16 +445,39 @@ Item {
     }
   }
 
-  // Keeps the suspend-gap baseline fresh every few seconds so the gap check
-  // resolves suspends down to ~30s instead of being locked to the 60s commit
-  // cadence. On a detected gap the open bucket is dropped without accrual
-  // (closeActiveBucket's gap branch) and tracking restarts from wake time.
+  // The Omarchy lock plugin owns the native Wayland session lock. Subscribe
+  // to its state instead of polling loginctl, so lock/unlock is handled at
+  // the source and screen-time does no extra process spawning.
+  function setSessionLocked(locked) {
+    locked = locked === true
+    if (locked === root.sessionLocked) return
+    root.sessionLocked = locked
+    if (locked) {
+      var now = Date.now()
+      applyState(State.closeActiveBucket(
+        root, root.activeApp, root.activeStart, now,
+        root.todayKey, root.suspendGapMs, root.lastTick))
+      root.persist()
+    } else {
+      root.lastTick = Date.now()
+      root.switchActive()
+    }
+  }
+
+  Connections {
+    target: root.lockService
+    function onLockedChanged() {
+      root.setSessionLocked(root.lockService.locked)
+    }
+  }
+
   Timer {
     id: heartbeatTimer
     interval: 5000
     repeat: true
     running: root.ready
     onTriggered: {
+      if (root.sessionLocked) return
       var now = Date.now()
       if (State.isSuspendGap(now, root.lastTick, root.suspendGapMs)) {
         applyState(State.closeActiveBucket(
