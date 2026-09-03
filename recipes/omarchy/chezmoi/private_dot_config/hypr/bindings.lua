@@ -6,6 +6,10 @@
 -- the webapp bindings (ChatGPT, Grok, HEY calendar/email, YouTube, WhatsApp,
 -- Google Messages, Google Photos, X). So this file only records the deltas.
 
+-- SUPER+E: capture a thought without opening Obsidian.
+hl.unbind("SUPER + E")
+o.bind("SUPER + E", "Quick note", "obsidian-quick-note")
+
 -- SUPER+SHIFT+W: Omarchy 4.0 binds this to Omawrite; we want Typora.
 hl.unbind("SUPER + SHIFT + W")
 o.bind("SUPER + SHIFT + W", "Typora", { launch = "typora --enable-wayland-ime" })

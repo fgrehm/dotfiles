@@ -8,6 +8,7 @@
 -- the previous Hyprland configuration.
 
 o.window("^(yad|zenity|kdialog)$", { float = true, center = true })
+o.window("^obsidian-quick-note$", { float = true, center = true })
 
 -- Keep the Omasnap layer surface from receiving Hyprland animations.
 hl.layer_rule({

@@ -27,7 +27,8 @@ Shared across Omarchy 4:
 - `~/.config/hypr/hyprland.lua` — the Omarchy 4 entry point, loading Omarchy defaults and the tracked user modules.
 - `~/.config/hypr/bindings.lua` — custom Typora and personal bindings.
 - `~/.config/hypr/input.lua` — Caps Lock as Ctrl and natural touchpad scrolling.
-- `~/.config/hypr/windowrules.lua` — float and center rules for transient dialog toolkits.
+- `~/.config/hypr/windowrules.lua` — float and center rules for transient dialog toolkits and quick notes.
+- `~/.local/bin/obsidian-quick-note` — opens a temporary Markdown file in `nvim` and saves it to `~/Obsidian/Echo/` with a timestamped title. Bound to `Super+e`.
 
 ## Notes
 

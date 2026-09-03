@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Capture a quick thought in the Echo Obsidian vault without opening Obsidian.
+set -euo pipefail
+
+vault="$HOME/Obsidian/Echo"
+tmp=$(mktemp --suffix=.md)
+cleanup() {
+  rm -f "$tmp"
+}
+trap cleanup EXIT
+
+printf '# \n\n' >"$tmp"
+
+foot --app-id=obsidian-quick-note nvim "$tmp"
+
+title=$(sed -n 's/^# //p' "$tmp" | head -n1)
+if [[ -z "$title" ]]; then
+  exit 0
+fi
+
+# Keep the title usable as a single filename while preserving the note text.
+safe_title=$(printf '%s' "$title" | sed 's#[\\/:*?"<>|[:cntrl:]]#-#g; s/[[:space:]]\+/ /g; s/^ *//; s/ *$//')
+if [[ -z "$safe_title" ]]; then
+  exit 0
+fi
+
+mkdir -p "$vault"
+timestamp=$(date +%Y%m%d%H%M)
+destination="$vault/$timestamp - $safe_title.md"
+
+# Avoid overwriting a note created during the same minute.
+if [[ -e "$destination" ]]; then
+  suffix=2
+  while [[ -e "${destination%.md}-$suffix.md" ]]; do
+    ((suffix++))
+  done
+  destination="${destination%.md}-$suffix.md"
+fi
+
+# The first line is only an in-editor title field. Do not put it in the note.
+# Remove the blank separator that was seeded after it as well.
+tail -n +2 "$tmp" | sed '1{/^[[:space:]]*$/d;}' >"$destination"
+trap - EXIT
