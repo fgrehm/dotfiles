@@ -15,6 +15,8 @@ Open items not yet done. Checked-off migration work that used to live in `OMARCH
 
 ## Cross-recipe
 
+- **Avoid managing `~/.ssh` as a directory.**
+- **Protect redirected agent skill directories.** `dot-ai-private/install.sh` removes a symlink at `~/.claude/skills` or `~/.pi/agent/skills` before recreating it locally. Fix upstream to follow an existing redirected directory instead of removing the symlink. `recipes/shell/chezmoi/private_dot_ssh/create_private_config` has the same managed-parent-directory risk as the former `~/.claude` payload. Move it to a `run_onchange_after_` script that writes `~/.ssh/config` only when absent, preserving the current `create_` semantics.
 - **Shared `_download` helper in `scripts/`.** Several install scripts call `wget`/`curl` directly. Omarchy has no `wget` by default. Extract a shared `_download` helper (like the one in `install.sh`) into `scripts/` and use it across recipes instead of ad-hoc wget/curl.
 
 ## git

@@ -1,0 +1,34 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Re-run when the SSH config payload changes:
+# config hash: # {{ include "private_dot_agents/ssh/config" | sha256sum }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+set -eo pipefail
+
+SSH_DIR="$HOME/.ssh"
+SOURCE="$HOME/.agents/ssh/config"
+TARGET="$SSH_DIR/config"
+
+if [ -L "$SSH_DIR" ] && [ ! -e "$SSH_DIR" ]; then
+  log_warn "$SSH_DIR is a broken symlink, skipping SSH config"
+  exit 0
+fi
+if [ -e "$SSH_DIR" ] && [ ! -d "$SSH_DIR" ]; then
+  log_warn "$SSH_DIR exists but is not a directory, skipping SSH config"
+  exit 0
+fi
+
+# Follow an existing symlink or mount, but never replace ~/.ssh itself.
+mkdir -p "$SSH_DIR"
+chmod 700 "$SSH_DIR"
+
+# Preserve create_ semantics: an existing config belongs to the machine/user.
+if [ -e "$TARGET" ] || [ -L "$TARGET" ]; then
+  log_skip "$TARGET already exists, leaving it"
+  exit 0
+fi
+
+install -m 600 "$SOURCE" "$TARGET"
+log_info "Installed SSH config"

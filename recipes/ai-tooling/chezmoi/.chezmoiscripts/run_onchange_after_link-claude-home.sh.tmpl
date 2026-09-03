@@ -1,0 +1,59 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Re-run when the linked payload changes:
+# statusline hash: # {{ include "private_dot_agents/statusline.sh" | sha256sum }}
+# output-styles:   # {{ output "bash" "-c" (printf "find %s -type f -printf '%%f\\n' | sort | sha256sum" (joinPath .chezmoi.sourceDir "private_dot_agents/output-styles")) }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+set -eo pipefail
+
+AGENTS_DIR="$HOME/.agents"
+CLAUDE_DIR="$HOME/.claude"
+
+# Refuse hostile-but-harmless states instead of aborting halfway through apply.
+if [ -L "$CLAUDE_DIR" ] && [ ! -e "$CLAUDE_DIR" ]; then
+  log_warn "$CLAUDE_DIR is a broken symlink, skipping Claude links"
+  exit 0
+fi
+if [ -e "$CLAUDE_DIR" ] && [ ! -d "$CLAUDE_DIR" ]; then
+  log_warn "$CLAUDE_DIR exists but is not a directory, skipping Claude links"
+  exit 0
+fi
+
+# mkdir -p follows an existing symlink or mount, so this never replaces one.
+mkdir -p "$CLAUDE_DIR/output-styles"
+
+link_into_claude() { # <source> <dest>
+  local src="$1" dest="$2"
+
+  # Adopt our own stale link, leave anything else the user put there alone.
+  if [ -L "$dest" ]; then
+    case "$(readlink "$dest")" in
+    "$AGENTS_DIR"/*) rm -f "$dest" ;;
+    *)
+      log_skip "$(basename "$dest") is a symlink we do not own, leaving it"
+      return 0
+      ;;
+    esac
+  elif [ -e "$dest" ]; then
+    if cmp -s "$src" "$dest"; then
+      rm -f "$dest"
+      log_info "Replacing unchanged legacy $(basename "$dest") with a link"
+    else
+      log_skip "$(basename "$dest") exists as a real file, leaving it"
+      return 0
+    fi
+  fi
+
+  ln -s "$src" "$dest"
+  log_info "Linked $(basename "$dest") into $CLAUDE_DIR"
+}
+
+link_into_claude "$AGENTS_DIR/AGENTS.md" "$CLAUDE_DIR/CLAUDE.md"
+link_into_claude "$AGENTS_DIR/statusline.sh" "$CLAUDE_DIR/statusline.sh"
+
+for style in "$AGENTS_DIR"/output-styles/*.md; do
+  [ -e "$style" ] || continue
+  link_into_claude "$style" "$CLAUDE_DIR/output-styles/$(basename "$style")"
+done

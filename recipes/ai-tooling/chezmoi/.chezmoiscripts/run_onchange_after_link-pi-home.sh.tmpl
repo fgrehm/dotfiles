@@ -1,0 +1,67 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Re-run when the linked Pi payload changes:
+# payload hash: # {{ output "bash" "-c" (printf "find %s -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum" (joinPath .chezmoi.sourceDir "private_dot_agents/pi")) }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+set -eo pipefail
+
+AGENTS_DIR="$HOME/.agents"
+PI_DIR="$HOME/.pi/agent"
+
+# Refuse hostile-but-harmless states instead of aborting halfway through apply.
+if [ -L "$HOME/.pi" ] && [ ! -e "$HOME/.pi" ]; then
+  log_warn "$HOME/.pi is a broken symlink, skipping Pi links"
+  exit 0
+fi
+if [ -e "$HOME/.pi" ] && [ ! -d "$HOME/.pi" ]; then
+  log_warn "$HOME/.pi exists but is not a directory, skipping Pi links"
+  exit 0
+fi
+if [ -L "$PI_DIR" ] && [ ! -e "$PI_DIR" ]; then
+  log_warn "$PI_DIR is a broken symlink, skipping Pi links"
+  exit 0
+fi
+if [ -e "$PI_DIR" ] && [ ! -d "$PI_DIR" ]; then
+  log_warn "$PI_DIR exists but is not a directory, skipping Pi links"
+  exit 0
+fi
+
+# mkdir -p follows existing symlinks or mounts, so this never replaces ~/.pi.
+mkdir -p "$PI_DIR/extensions"
+
+link_into_pi() { # <source> <dest>
+  local src="$1" dest="$2"
+
+  # Adopt our own stale link, leave anything else the user put there alone.
+  if [ -L "$dest" ]; then
+    case "$(readlink "$dest")" in
+    "$AGENTS_DIR"/*) rm -f "$dest" ;;
+    *)
+      log_skip "$(basename "$dest") is a symlink we do not own, leaving it"
+      return 0
+      ;;
+    esac
+  elif [ -e "$dest" ]; then
+    if cmp -s "$src" "$dest"; then
+      rm -f "$dest"
+      log_info "Replacing unchanged legacy $(basename "$dest") with a link"
+    else
+      log_skip "$(basename "$dest") exists as a real file, leaving it"
+      return 0
+    fi
+  fi
+
+  ln -s "$src" "$dest"
+  log_info "Linked $(basename "$dest") into $PI_DIR"
+}
+
+link_into_pi "$AGENTS_DIR/AGENTS.md" "$PI_DIR/AGENTS.md"
+link_into_pi "$AGENTS_DIR/pi/ollama-cloud.json" "$PI_DIR/ollama-cloud.json"
+link_into_pi "$AGENTS_DIR/pi/web-search.json" "$PI_DIR/web-search.json"
+
+for extension in "$AGENTS_DIR"/pi/extensions/*.ts; do
+  [ -e "$extension" ] || continue
+  link_into_pi "$extension" "$PI_DIR/extensions/$(basename "$extension")"
+done
