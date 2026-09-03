@@ -15,8 +15,8 @@ Open items not yet done. Checked-off migration work that used to live in `OMARCH
 
 ## Cross-recipe
 
-- **Avoid managing `~/.ssh` as a directory.**
-- **Protect redirected agent skill directories.** `dot-ai-private/install.sh` removes a symlink at `~/.claude/skills` or `~/.pi/agent/skills` before recreating it locally. Fix upstream to follow an existing redirected directory instead of removing the symlink. `recipes/shell/chezmoi/private_dot_ssh/create_private_config` has the same managed-parent-directory risk as the former `~/.claude` payload. Move it to a `run_onchange_after_` script that writes `~/.ssh/config` only when absent, preserving the current `create_` semantics.
+- **Protect redirected agent skill directories.** `dot-ai-private/install.sh` removes a symlink at `~/.claude/skills` or `~/.pi/agent/skills` before recreating it locally, which detaches those paths from wherever they were redirected. Fix upstream to follow an existing redirected directory instead of removing the symlink.
+- **Never declare a redirected directory as a managed target.** `~/.claude`, `~/.pi` and `~/.ssh` are symlinks or mounts into persistent storage on some machines, and chezmoi enforces target type: it replaces the symlink with a local directory, silently and without showing it in the diff. Each is now seeded by a `run_onchange_after_` script that writes only inside the directory. A `run_before_` guard that aborts the apply when a source tree reintroduces one of these would make the class of bug impossible rather than merely absent.
 - **Shared `_download` helper in `scripts/`.** Several install scripts call `wget`/`curl` directly. Omarchy has no `wget` by default. Extract a shared `_download` helper (like the one in `install.sh`) into `scripts/` and use it across recipes instead of ad-hoc wget/curl.
 
 ## git

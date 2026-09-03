@@ -2,6 +2,11 @@
 # Preserve payload files from the old managed Claude/Pi layout before chezmoi
 # removes those source entries. Never touch session, transcript, credential, or
 # other user data.
+#
+# For files this repo still ships, the copy is promptly overwritten by the file
+# phase, which is fine. What this actually saves is the machine-local extras --
+# an output style or a Pi extension the user added by hand -- which nothing
+# else would carry over into ~/.agents.
 set -euo pipefail
 
 AGENTS_DIR="$HOME/.agents"
@@ -9,7 +14,11 @@ AGENTS_DIR="$HOME/.agents"
 copy_if_missing() {
   local src="$1" dest="$2"
   [ -e "$src" ] || return 0
-  [ -e "$dest" ] || [ -L "$dest" ] && return 0
+  # Spelled out rather than `[ -e ] || [ -L ] && return 0`: that idiom leaves
+  # the function returning the status of its own test when the file is absent.
+  if [ -e "$dest" ] || [ -L "$dest" ]; then
+    return 0
+  fi
   mkdir -p "$(dirname "$dest")"
   cp -p -- "$src" "$dest"
 }

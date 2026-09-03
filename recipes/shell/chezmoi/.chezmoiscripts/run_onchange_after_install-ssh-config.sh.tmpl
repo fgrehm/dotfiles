@@ -11,12 +11,22 @@ SSH_DIR="$HOME/.ssh"
 SOURCE="$HOME/.agents/ssh/config"
 TARGET="$SSH_DIR/config"
 
+# Anything that exits non-zero here aborts the whole apply and skips every
+# later script, so these paths must exit 0. log_warn does not exist in
+# scripts/ui.bash; log_skip is the helper that does.
 if [ -L "$SSH_DIR" ] && [ ! -e "$SSH_DIR" ]; then
-  log_warn "$SSH_DIR is a broken symlink, skipping SSH config"
+  log_skip "$SSH_DIR is a broken symlink, no SSH config"
   exit 0
 fi
 if [ -e "$SSH_DIR" ] && [ ! -d "$SSH_DIR" ]; then
-  log_warn "$SSH_DIR exists but is not a directory, skipping SSH config"
+  log_skip "$SSH_DIR exists but is not a directory, no SSH config"
+  exit 0
+fi
+
+# The payload comes from the ai-tooling recipe, so it is absent on a machine
+# that ignores it. Missing input is not a reason to fail the apply.
+if [ ! -f "$SOURCE" ]; then
+  log_skip "$SOURCE is not present, no SSH config"
   exit 0
 fi
 

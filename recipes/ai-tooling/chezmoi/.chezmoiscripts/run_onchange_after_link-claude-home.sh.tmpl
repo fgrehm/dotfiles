@@ -12,12 +12,19 @@ AGENTS_DIR="$HOME/.agents"
 CLAUDE_DIR="$HOME/.claude"
 
 # Refuse hostile-but-harmless states instead of aborting halfway through apply.
+# Anything that exits non-zero here aborts the whole apply and skips every
+# later script, so these paths must exit 0. log_warn does not exist in
+# scripts/ui.bash; log_skip is the helper that does.
 if [ -L "$CLAUDE_DIR" ] && [ ! -e "$CLAUDE_DIR" ]; then
-  log_warn "$CLAUDE_DIR is a broken symlink, skipping Claude links"
+  log_skip "$CLAUDE_DIR is a broken symlink, no Claude links"
   exit 0
 fi
 if [ -e "$CLAUDE_DIR" ] && [ ! -d "$CLAUDE_DIR" ]; then
-  log_warn "$CLAUDE_DIR exists but is not a directory, skipping Claude links"
+  log_skip "$CLAUDE_DIR exists but is not a directory, no Claude links"
+  exit 0
+fi
+if [ -e "$CLAUDE_DIR/output-styles" ] && [ ! -d "$CLAUDE_DIR/output-styles" ]; then
+  log_skip "$CLAUDE_DIR/output-styles is not a directory, no Claude links"
   exit 0
 fi
 
@@ -26,6 +33,12 @@ mkdir -p "$CLAUDE_DIR/output-styles"
 
 link_into_claude() { # <source> <dest>
   local src="$1" dest="$2"
+
+  # Never trade a real file or a working link for a dangling one.
+  if [ ! -e "$src" ]; then
+    log_skip "$(basename "$src") is not in $AGENTS_DIR"
+    return 0
+  fi
 
   # Adopt our own stale link, leave anything else the user put there alone.
   if [ -L "$dest" ]; then

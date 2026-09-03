@@ -11,20 +11,28 @@ AGENTS_DIR="$HOME/.agents"
 PI_DIR="$HOME/.pi/agent"
 
 # Refuse hostile-but-harmless states instead of aborting halfway through apply.
+# Anything that exits non-zero here aborts the whole apply and skips every
+# later script, so these paths must exit 0. log_warn does not exist in
+# scripts/ui.bash; log_skip is the helper that does.
 if [ -L "$HOME/.pi" ] && [ ! -e "$HOME/.pi" ]; then
-  log_warn "$HOME/.pi is a broken symlink, skipping Pi links"
+  log_skip "$HOME/.pi is a broken symlink, no Pi links"
   exit 0
 fi
 if [ -e "$HOME/.pi" ] && [ ! -d "$HOME/.pi" ]; then
-  log_warn "$HOME/.pi exists but is not a directory, skipping Pi links"
+  log_skip "$HOME/.pi exists but is not a directory, no Pi links"
   exit 0
 fi
 if [ -L "$PI_DIR" ] && [ ! -e "$PI_DIR" ]; then
-  log_warn "$PI_DIR is a broken symlink, skipping Pi links"
+  log_skip "$PI_DIR is a broken symlink, no Pi links"
   exit 0
 fi
 if [ -e "$PI_DIR" ] && [ ! -d "$PI_DIR" ]; then
-  log_warn "$PI_DIR exists but is not a directory, skipping Pi links"
+  log_skip "$PI_DIR exists but is not a directory, no Pi links"
+  exit 0
+fi
+
+if [ -e "$PI_DIR/extensions" ] && [ ! -d "$PI_DIR/extensions" ]; then
+  log_skip "$PI_DIR/extensions is not a directory, no Pi links"
   exit 0
 fi
 
@@ -33,6 +41,12 @@ mkdir -p "$PI_DIR/extensions"
 
 link_into_pi() { # <source> <dest>
   local src="$1" dest="$2"
+
+  # Never trade a real file or a working link for a dangling one.
+  if [ ! -e "$src" ]; then
+    log_skip "$(basename "$src") is not in $AGENTS_DIR"
+    return 0
+  fi
 
   # Adopt our own stale link, leave anything else the user put there alone.
   if [ -L "$dest" ]; then
