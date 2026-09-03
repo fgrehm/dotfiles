@@ -2,4 +2,7 @@
 omarchy
 omarchy-plugins
 podman
+vanta-agent
+{{- else if not .installVantaAgent }}
+vanta-agent
 {{- end }}

@@ -1,0 +1,66 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+if command -v vanta-cli &>/dev/null && systemctl is-enabled --quiet vanta-agent.service 2>/dev/null; then
+  log_skip "Vanta agent already installed and enabled"
+  exit 0
+fi
+
+# {{ if ne .chezmoi.username "root" }}
+SUDO="sudo"
+# {{ else }}
+SUDO=""
+# {{ end }}
+
+set -eo pipefail
+
+VERSION="2.18.0"
+URL="https://agent-downloads.vanta.com/targets/versions/${VERSION}/vanta-amd64.deb"
+SHA256="0e6e584896237ad11ddaa5bd36de8d1b51a71ae93d84c95dd6b9b0ca7dc3f47d"
+TMP_DIR=$(mktemp -d)
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+log_info "Downloading Vanta agent ${VERSION}..."
+curl --fail --silent --show-error --location "$URL" --output "$TMP_DIR/vanta.deb"
+echo "${SHA256}  $TMP_DIR/vanta.deb" | sha256sum --check --status
+
+mkdir -p "$TMP_DIR/data"
+ar -p "$TMP_DIR/vanta.deb" data.tar.gz | tar -xzf - -C "$TMP_DIR/data"
+
+log_info "Installing Vanta agent..."
+$SUDO install -d -m 755 /var/vanta
+$SUDO install -m 755 "$TMP_DIR/data/var/vanta/"* /var/vanta/
+$SUDO install -d -m 755 /usr/lib/systemd/system
+$SUDO install -m 644 "$TMP_DIR/data/usr/lib/systemd/system/vanta.service" /usr/lib/systemd/system/vanta-agent.service
+$SUDO install -d -m 755 /etc/systemd/system/vanta-agent.service.d
+$SUDO tee /etc/systemd/system/vanta-agent.service.d/vanta-agent.conf >/dev/null <<'EOF'
+[Service]
+Restart=always
+RuntimeMaxSec=12h
+EOF
+$SUDO ln -sfn /var/vanta/vanta-cli /usr/bin/vanta-cli
+$SUDO touch /etc/vanta.conf
+$SUDO chmod 600 /etc/vanta.conf
+$SUDO chown root:root /etc/vanta.conf
+$SUDO systemctl daemon-reload
+
+log_info "Configuring Vanta agent interactively..."
+$SUDO bash -c 'cat > /usr/bin/vanta-setup' <<'EOF'
+#!/bin/bash
+set -e
+if [[ $EUID -ne 0 ]]; then echo "Run this command with sudo." >&2; exit 1; fi
+read -r -p "Enter Vanta Owner Email: " email
+read -r -p "Enter Vanta Agent Key: " key
+read -r -p "Enter Region (default: US, or EU): " region
+region=${region:-US}
+nonce=$(date +%s000)
+printf '{"ACTIVATION_REQUESTED_NONCE":%s,"AGENT_KEY":"%s","OWNER_EMAIL":"%s","REGION":"%s","NEEDS_OWNER":true}\n' "$nonce" "$key" "$email" "$region" > /etc/vanta.conf
+chmod 600 /etc/vanta.conf
+chown root:root /etc/vanta.conf
+EOF
+$SUDO chmod 755 /usr/bin/vanta-setup
+$SUDO /usr/bin/vanta-setup
+$SUDO systemctl enable --now vanta-agent.service
+log_info "Vanta agent installed, configured, enabled, and started"

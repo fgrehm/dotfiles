@@ -66,6 +66,11 @@ sourceDir = "{{ .chezmoi.workingTree }}"
     onepasswordSshVault = {{ promptStringOnce . "onepasswordSshVault" "1Password vault for SSH keys [Keys]" | default "Keys" | quote }}
     onepasswordSshItem = {{ promptStringOnce . "onepasswordSshItem" "1Password item for SSH keys [SSH]" | default "SSH" | quote }}
     {{- end }}
+    {{- if $isOmarchy }}
+    installVantaAgent = {{ promptBoolOnce . "installVantaAgent" "Install the Vanta user agent?" }}
+    {{- else }}
+    installVantaAgent = false
+    {{- end }}
     isContainer = {{ $isContainer }}
     isOmarchy = {{ $isOmarchy }}
     omarchyVersion = {{ $omarchyVersion | quote }}
