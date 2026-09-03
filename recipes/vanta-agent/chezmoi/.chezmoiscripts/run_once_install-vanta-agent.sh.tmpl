@@ -53,14 +53,23 @@ set -e
 if [[ $EUID -ne 0 ]]; then echo "Run this command with sudo." >&2; exit 1; fi
 read -r -p "Enter Vanta Owner Email: " email
 read -r -p "Enter Vanta Agent Key: " key
-read -r -p "Enter Region (default: US, or EU): " region
-region=${region:-US}
+read -r -p "Enter Region (default: us, eu, or aus): " region
+region=${region:-us}
+region=${region,,}
+if [[ "$region" != "us" && "$region" != "eu" && "$region" != "aus" ]]; then
+  echo "Region must be us, eu, or aus." >&2
+  exit 1
+fi
 nonce=$(date +%s000)
 printf '{"ACTIVATION_REQUESTED_NONCE":%s,"AGENT_KEY":"%s","OWNER_EMAIL":"%s","REGION":"%s","NEEDS_OWNER":true}\n' "$nonce" "$key" "$email" "$region" > /etc/vanta.conf
 chmod 600 /etc/vanta.conf
 chown root:root /etc/vanta.conf
+
+# Clear stale enrollment state before registering this machine.
+/var/vanta/vanta-cli reset
+/var/vanta/vanta-cli register --secret="$key" --email="$email"
 EOF
 $SUDO chmod 755 /usr/bin/vanta-setup
 $SUDO /usr/bin/vanta-setup
 $SUDO systemctl enable --now vanta-agent.service
-log_info "Vanta agent installed, configured, enabled, and started"
+log_info "Vanta agent installed, configured, registered, enabled, and started"
