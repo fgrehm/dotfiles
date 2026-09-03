@@ -23,7 +23,8 @@ if [ -e "$CLAUDE_DIR" ] && [ ! -d "$CLAUDE_DIR" ]; then
   log_skip "$CLAUDE_DIR exists but is not a directory, no Claude links"
   exit 0
 fi
-if [ -e "$CLAUDE_DIR/output-styles" ] && [ ! -d "$CLAUDE_DIR/output-styles" ]; then
+if { [ -e "$CLAUDE_DIR/output-styles" ] || [ -L "$CLAUDE_DIR/output-styles" ]; } &&
+  [ ! -d "$CLAUDE_DIR/output-styles" ]; then
   log_skip "$CLAUDE_DIR/output-styles is not a directory, no Claude links"
   exit 0
 fi

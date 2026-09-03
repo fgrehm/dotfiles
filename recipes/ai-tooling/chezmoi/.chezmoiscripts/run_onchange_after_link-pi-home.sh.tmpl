@@ -31,7 +31,8 @@ if [ -e "$PI_DIR" ] && [ ! -d "$PI_DIR" ]; then
   exit 0
 fi
 
-if [ -e "$PI_DIR/extensions" ] && [ ! -d "$PI_DIR/extensions" ]; then
+if { [ -e "$PI_DIR/extensions" ] || [ -L "$PI_DIR/extensions" ]; } &&
+  [ ! -d "$PI_DIR/extensions" ]; then
   log_skip "$PI_DIR/extensions is not a directory, no Pi links"
   exit 0
 fi
