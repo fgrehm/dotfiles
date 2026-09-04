@@ -21,6 +21,7 @@
       ".",
       "~/.gitconfig",
       "~/.config/git/config",
+      "~/.config/gh",
       "~/.ssh",
       "/dev/null"
     ],
