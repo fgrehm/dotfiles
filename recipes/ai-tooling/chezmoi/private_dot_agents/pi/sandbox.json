@@ -1,0 +1,47 @@
+{
+  "enabled": true,
+  "shell": {
+    "readAccess": "host"
+  },
+  "network": {
+    "allowNetwork": false,
+    "allowLocalBinding": false,
+    "allowAllUnixSockets": false,
+    "allowUnixSockets": [
+      "/run/user/1000/ssh-agent.socket"
+    ],
+    "allowedDomains": [],
+    "deniedDomains": []
+  },
+  "filesystem": {
+    "denyRead": [
+      "/home"
+    ],
+    "allowRead": [
+      ".",
+      "~/.gitconfig",
+      "~/.config/git/config",
+      "~/.ssh",
+      "/dev/null"
+    ],
+    "allowWrite": [
+      ".",
+      "/dev/null",
+      "~/.cache",
+      "~/.local",
+      "/tmp"
+    ],
+    "denyWrite": [
+      "**/.env",
+      "**/.env.*",
+      "**/*.pem",
+      "**/*.key",
+      ".pi/sandbox.json",
+      "~/.pi/agent/sandbox.json"
+    ]
+  },
+  "windows": {
+    "appContainerMode": "standard",
+    "allowLoopback": false
+  }
+}

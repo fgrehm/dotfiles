@@ -75,6 +75,7 @@ link_into_pi() { # <source> <dest>
 link_into_pi "$AGENTS_DIR/AGENTS.md" "$PI_DIR/AGENTS.md"
 link_into_pi "$AGENTS_DIR/pi/ollama-cloud.json" "$PI_DIR/ollama-cloud.json"
 link_into_pi "$AGENTS_DIR/pi/web-search.json" "$PI_DIR/web-search.json"
+link_into_pi "$AGENTS_DIR/pi/sandbox.json" "$PI_DIR/sandbox.json"
 
 for extension in "$AGENTS_DIR"/pi/extensions/*.ts; do
   [ -e "$extension" ] || continue

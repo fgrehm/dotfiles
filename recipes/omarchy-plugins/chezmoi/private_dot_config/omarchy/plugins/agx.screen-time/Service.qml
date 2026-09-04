@@ -101,6 +101,9 @@ Item {
   property bool screensaverActive: false
   property double lockStartedAt: 0
   property double screensaverStartedAt: 0
+  // Debug timing logs for lock/screensaver intervals. Off by default; flip
+  // to true to trace when screen time pauses and resumes.
+  property bool debugLogging: false
   property var lockService: null
   property var idleService: null
   onShellChanged: root.refreshShellServices()
@@ -473,7 +476,7 @@ Item {
     root.sessionLocked = locked
     if (locked) {
       root.lockStartedAt = Date.now()
-      console.warn("agx.screen-time: lock started")
+      if (root.debugLogging) console.warn("agx.screen-time: lock started")
       var now = Date.now()
       applyState(State.closeActiveBucket(
         root, root.activeApp, root.activeStart, now,
@@ -482,7 +485,7 @@ Item {
     } else {
       var endedAt = Date.now()
       var duration = root.lockStartedAt ? endedAt - root.lockStartedAt : 0
-      console.warn("agx.screen-time: lock ended, duration=" + duration + "ms")
+      if (root.debugLogging) console.warn("agx.screen-time: lock ended, duration=" + duration + "ms")
       root.lockStartedAt = 0
       root.lastTick = endedAt
       root.switchActive()
@@ -495,7 +498,7 @@ Item {
     root.screensaverActive = active
     if (active) {
       root.screensaverStartedAt = Date.now()
-      console.warn("agx.screen-time: screensaver started")
+      if (root.debugLogging) console.warn("agx.screen-time: screensaver started")
       var now = Date.now()
       applyState(State.closeActiveBucket(
         root, root.activeApp, root.activeStart, now,
@@ -504,7 +507,7 @@ Item {
     } else if (!root.sessionLocked) {
       var endedAt = Date.now()
       var duration = root.screensaverStartedAt ? endedAt - root.screensaverStartedAt : 0
-      console.warn("agx.screen-time: screensaver ended, duration=" + duration + "ms")
+      if (root.debugLogging) console.warn("agx.screen-time: screensaver ended, duration=" + duration + "ms")
       root.screensaverStartedAt = 0
       root.lastTick = endedAt
       root.switchActive()

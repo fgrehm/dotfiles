@@ -35,8 +35,9 @@ A recipe is a directory under `recipes/` with a `README.md` and a `chezmoi/` sub
 
 - `~/.agents/AGENTS.md` — global agent instructions (canonical). `~/.pi/agent/AGENTS.md` and `~/.claude/CLAUDE.md` are symlinks to it, so both tools read the same rules.
 - `~/.agents/skills/<name>/` — canonical skills home. A `run_onchange_after_link-skills.sh.tmpl` script creates individual per-agent symlinks (`~/.claude/skills/<name>`, `~/.pi/agent/skills/<name>`) and re-runs when the skill set changes (embedded hash). It only creates missing symlinks, so non-chezmoi entries coexist (e.g. the omarchy skill).
+- `~/.agents/pi/` — canonical home for Pi-specific config. The Pi linking script creates individual symlinks in `~/.pi/agent/` for each managed file, including `sandbox.json`.
 
-Do NOT use whole-directory symlinks for the per-agent skills dirs — that would clobber non-chezmoi entries (like the omarchy skill). Use the individual-symlink script instead.
+When adding agent configuration, place the source under `private_dot_agents/` and link it into tool-specific homes with the appropriate linking script. Do not deploy directly under `private_dot_pi/` or `private_dot_claude/`, and do not use whole-directory symlinks. Individual links preserve non-chezmoi files and tool-specific additions.
 
 ## Directory Privacy Must Be Consistent Across Recipes
 
@@ -46,9 +47,9 @@ chezmoi maps `dot_<dir>` and `private_dot_<dir>` to the same target directory (`
 chezmoi: .config: inconsistent state (...dot_config, ...private_dot_config)
 ```
 
-This bites at any nesting level, not just the top. `dot_pi/private_agent/...` and `dot_pi/agent/...` both deploy under `~/.pi/agent` and so must share the prefix on `agent` -- the existing `private_agent` entry means any new file there is `dot_pi/private_agent/<file>`, never `dot_pi/agent/<file>`.
+This bites at any nesting level, not just the top. Agent configuration is an exception to direct deployment: managed files belong in the canonical `private_dot_agents/` tree and are linked into `~/.pi/agent` or `~/.claude` by the ai-tooling scripts.
 
-**Rule: before adding a file under a `dot_`/`private_dot_` directory, check what prefix every other recipe already uses for that same target directory and match it.** Concretely: all recipes writing under `.config` use `private_dot_config` (the `.config` directory holds user application state and is private by convention); all files under `~/.pi/agent` use `dot_pi/private_agent`. Mixing prefixes for the same target across recipes is always a bug.
+**Rule: before adding a file under a `dot_`/`private_dot_` directory, check what prefix every other recipe already uses for that same target directory and match it.** Concretely: all recipes writing under `.config` use `private_dot_config` (the `.config` directory holds user application state and is private by convention). For agent config, use `private_dot_agents/...` as the canonical source and update the relevant individual-link script rather than adding a direct `private_dot_pi/...` or `private_dot_claude/...` deployment. Mixing privacy prefixes for the same directly managed target directory is always a bug.
 
 ## Environment Detection
 

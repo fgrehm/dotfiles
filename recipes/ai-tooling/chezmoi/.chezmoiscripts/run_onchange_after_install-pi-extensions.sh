@@ -10,8 +10,15 @@ fi
 # Pi manages extension installation and settings itself. Keep these machine-local
 # settings out of the chezmoi source while making the desired extensions available
 # whenever Pi is present.
+settings="$HOME/.pi/agent/settings.json"
 
-for extension in npm:pi-web-access@0.27.0 npm:pi-ollama-cloud@0.9.0; do
+for extension in npm:pi-web-access@0.27.0 npm:pi-ollama-cloud@0.10.0; do
+  if [ -f "$settings" ] && jq -e --arg extension "$extension" \
+    '.packages | index($extension) != null' "$settings" >/dev/null 2>&1; then
+    log_skip "Pi extension already configured: $extension"
+    continue
+  fi
+
   log_info "Installing Pi extension: $extension"
   if ! pi install "$extension"; then
     log_error "Failed to install Pi extension: $extension (non-fatal)"
