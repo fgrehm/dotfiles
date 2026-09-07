@@ -52,7 +52,8 @@ $SUDO bash -c 'cat > /usr/bin/vanta-setup' <<'EOF'
 set -e
 if [[ $EUID -ne 0 ]]; then echo "Run this command with sudo." >&2; exit 1; fi
 read -r -p "Enter Vanta Owner Email: " email
-read -r -p "Enter Vanta Agent Key: " key
+read -rs -p "Enter Vanta Agent Key: " key
+echo
 read -r -p "Enter Region (default: us, eu, or aus): " region
 region=${region:-us}
 region=${region,,}
@@ -61,11 +62,18 @@ if [[ "$region" != "us" && "$region" != "eu" && "$region" != "aus" ]]; then
   exit 1
 fi
 nonce=$(date +%s000)
-printf '{"ACTIVATION_REQUESTED_NONCE":%s,"AGENT_KEY":"%s","OWNER_EMAIL":"%s","REGION":"%s","NEEDS_OWNER":true}\n' "$nonce" "$key" "$email" "$region" > /etc/vanta.conf
+# Assemble the config with jq so quoting in email/key cannot corrupt it.
+jq -n --arg email "$email" --arg key "$key" --arg region "$region" --argjson nonce "$nonce" \
+  '{ACTIVATION_REQUESTED_NONCE: $nonce, AGENT_KEY: $key, OWNER_EMAIL: $email, REGION: $region, NEEDS_OWNER: true}' \
+  > /etc/vanta.conf
 chmod 600 /etc/vanta.conf
 chown root:root /etc/vanta.conf
 
 # Clear stale enrollment state before registering this machine.
+# NOTE: the key is passed via argv because vanta-cli has no documented
+# env/stdin secret channel; this exposes it briefly to local process
+# listing. Acceptable trade-off for a one-time enrollment on a single-user
+# workstation.
 /var/vanta/vanta-cli reset
 /var/vanta/vanta-cli register --secret="$key" --email="$email"
 EOF
