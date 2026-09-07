@@ -40,4 +40,3 @@ fi
 # The first line is only an in-editor title field. Do not put it in the note.
 # Remove the blank separator that was seeded after it as well.
 tail -n +2 "$tmp" | sed '1{/^[[:space:]]*$/d;}' >"$destination"
-trap - EXIT
