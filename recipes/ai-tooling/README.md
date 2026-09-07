@@ -14,7 +14,6 @@ Deploys shared agent instructions, skills, and Pi agent settings. Claude Code an
 - When `pi` is available, the recipe installs `npm:pi-web-access` and `npm:pi-ollama-cloud` through Pi itself; the resulting package settings remain machine-local.
 - `~/.claude/settings.json`: deep-merged Claude settings; local model/hooks/plugins are preserved.
 - `~/.claude/statusline.sh` and `~/.claude/output-styles/`: Claude presentation settings.
-- The optional `dot-ai-private` overlay remains supported and skips gracefully when unavailable.
 
 ### Shared skills
 
