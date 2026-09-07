@@ -32,7 +32,10 @@ read_context() {
   CONTEXT_ROOT="$(find_git_root "$1")" || return 1
   CONTEXT_FILE="$CONTEXT_ROOT/$CONTEXT_RELATIVE_PATH"
 
+  # Reject symlinks anywhere in the path: a resolved path differing from the
+  # physical composed path means some component escapes the repo via a link.
   [[ -f "$CONTEXT_FILE" && ! -L "$CONTEXT_FILE" ]] || return 1
+  [[ "$(realpath -m -- "$CONTEXT_FILE")" == "$CONTEXT_ROOT/$CONTEXT_RELATIVE_PATH" ]] || return 1
   [[ $(wc -c <"$CONTEXT_FILE") -le $MAX_CONTEXT_BYTES ]] || return 1
   grep -Iq . "$CONTEXT_FILE" || return 1
 
