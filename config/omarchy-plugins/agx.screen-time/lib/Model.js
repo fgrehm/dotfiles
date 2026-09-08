@@ -1297,6 +1297,7 @@ if (typeof module !== "undefined" && module && module.exports) {
     pad2: pad2,
     qmlBrowserAliases: qmlBrowserAliases,
     canonicalApp: canonicalApp,
+    trackingApp: trackingApp,
     displayName: displayName,
     sanitizeHistory: sanitizeHistory,
     sanitizeDay: sanitizeDay,
