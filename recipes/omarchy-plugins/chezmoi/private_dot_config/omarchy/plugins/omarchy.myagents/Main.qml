@@ -117,9 +117,23 @@ Item {
   property int refreshIntervalSec: Math.max(30, Number(setting("refreshIntervalSec", 900)))
   property string pendingUpdateKind: ""
 
+  // Fetch-on-open: the refresh timer only runs while the panel is open, so
+  // closed-panel cycles don't walk every transcript on the disk. Records stay
+  // stale while closed; triggeredOnStart gives an instant refresh on open.
+  property bool opened: false
+
+  // The fork ships its own updater (bundled in the plugin dir) — it keeps the
+  // omarchy-agent-usage-update CLI contract but sources codex/ollama-cloud/
+  // opencode-go stats and limits from pi's auth instead of the codex CLI.
+  readonly property string updaterPath: {
+    var url = Qt.resolvedUrl("bin/myagents-usage-update").toString()
+    if (url.indexOf("file://") === 0) url = url.substring(7)
+    return decodeURIComponent(url)
+  }
+
   Timer {
     interval: root.refreshIntervalSec * 1000
-    running: true
+    running: root.opened
     repeat: true
     triggeredOnStart: true
     onTriggered: root.runUpdate("normal")
@@ -144,7 +158,7 @@ Item {
   }
 
   function updateCommand(kind, agentIds) {
-    var command = ["omarchy-agent-usage-update"]
+    var command = [root.updaterPath]
     if (kind === "force") command.push("--force")
     if (kind === "limits") command.push("--limits-only")
     var providers = settings && settings.providers ? settings.providers : {}

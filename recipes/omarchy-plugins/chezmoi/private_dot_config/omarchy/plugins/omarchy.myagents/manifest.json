@@ -21,7 +21,9 @@
       "providers": {
         "claude": { "enabled": true },
         "codex": { "enabled": true },
-        "fireworks": { "enabled": true }
+        "fireworks": { "enabled": true },
+        "ollama-cloud": { "enabled": true },
+        "opencode-go": { "enabled": true }
       },
       "refreshIntervalSec": 900,
       "syncMode": "Off",

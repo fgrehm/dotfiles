@@ -315,6 +315,7 @@ Panel {
   Main {
     id: usage
     settings: root.settings
+    opened: root.opened
   }
 
   // Cheap enough to keep running: it only re-evaluates text bindings, and a

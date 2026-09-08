@@ -1,0 +1,612 @@
+#!/usr/bin/env python3
+"""omarchy:summary=Regenerate usage records for the omarchy.myagents bar plugin fork
+
+omarchy:args=[--force] [--limits-only] [--except <agent>] [agent...]
+"""
+
+# Fork updater: same CLI contract and record shape as omarchy's
+# omarchy-agent-usage-update + omarchy-agent-usage-codex, but the codex/ollama-
+# cloud/opencode-go subscriptions are the pi ones (auth in
+# ~/.pi/agent/auth.json), so no codex CLI is needed. claude and fireworks
+# delegate to the stock omarchy collectors, whose records this writes verbatim.
+#
+# Limit endpoints (reverse-engineered; may change without notice):
+#   codex         GET https://chatgpt.com/backend-api/wham/usage
+#   opencode-go   GET https://opencode.ai/zen/go/v1/usage
+#   ollama-cloud  GET https://ollama.com/api/usage
+#
+# Stats come from pi session logs only (~/.pi/agent/sessions and bb's
+# ~/.bb/pi-bridge-sessions), counting semantics mirroring the upstream
+# scan_pi_sessions() so records merge consistently with cross-machine
+# snapshots from the pi-usage-snapshot recipe.
+
+import argparse
+import fcntl
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import tempfile
+import time
+import urllib.error
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta, timezone
+
+PI_PROVIDERS = [
+  {"key": "openai-codex", "id": "codex", "name": "Codex"},
+  {"key": "ollama-cloud", "id": "ollama-cloud", "name": "Ollama Cloud"},
+  {"key": "opencode-go", "id": "opencode-go", "name": "OpenCode Go"},
+]
+DELEGATED = ["claude", "fireworks"]
+
+SCAN_REUSE_SECONDS = 20
+LIMITS_ONLY_REUSE_SECONDS = 900
+HTTP_TIMEOUT = 10
+
+CODEX_USAGE_URL = "https://chatgpt.com/backend-api/wham/usage"
+OPENCODE_GO_USAGE_URL = "https://opencode.ai/zen/go/v1/usage"
+OLLAMA_USAGE_URL = "https://ollama.com/api/usage"
+USER_AGENT = "omarchy-myagents-usage/1"
+
+
+def home():
+  return os.path.expanduser("~")
+
+
+def pi_auth_path():
+  return os.path.join(
+    os.environ.get("PI_CODING_AGENT_DIR") or os.path.join(home(), ".pi", "agent"),
+    "auth.json",
+  )
+
+
+def usage_dir():
+  return os.path.join(
+    os.environ.get("XDG_STATE_HOME") or os.path.join(home(), ".local", "state"),
+    "omarchy", "agents", "usage",
+  )
+
+
+def omarchy_path():
+  for candidate in (
+    os.environ.get("OMARCHY_PATH"),
+    "/usr/share/omarchy",
+    os.path.join(home(), ".local", "share", "omarchy"),
+  ):
+    if candidate and os.path.isdir(os.path.join(candidate, "bin")):
+      return candidate
+  return ""
+
+
+def number(value):
+  try:
+    n = int(value)
+  except (TypeError, ValueError):
+    return 0
+  return n if n > 0 else 0
+
+
+def local_day(entry_ts, message_ts):
+  dt = None
+  if isinstance(entry_ts, str) and entry_ts:
+    try:
+      dt = datetime.fromisoformat(entry_ts.replace("Z", "+00:00"))
+    except ValueError:
+      dt = None
+  if dt is None and isinstance(message_ts, (int, float)):
+    try:
+      dt = datetime.fromtimestamp(message_ts / 1000.0, tz=timezone.utc)
+    except (OSError, OverflowError, ValueError):
+      dt = None
+  if dt is None:
+    return ""
+  return dt.astimezone().strftime("%Y-%m-%d")
+
+
+# ----------------------------------------------------------------- pi stats
+
+def session_files(roots):
+  for root in roots:
+    if not os.path.isdir(root):
+      continue
+    for dirpath, _dirnames, filenames in os.walk(root):
+      for filename in filenames:
+        if filename.endswith(".jsonl"):
+          yield os.path.join(dirpath, filename)
+
+
+def scan_sessions(roots):
+  """One pass over the pi session logs, attributing usage to every provider."""
+  now = datetime.now().astimezone()
+  today = now.strftime("%Y-%m-%d")
+  recent_dates = [(now - timedelta(days=offset)).strftime("%Y-%m-%d") for offset in range(6, -1, -1)]
+
+  accs = {}
+  for spec in PI_PROVIDERS:
+    accs[spec["id"]] = {
+      "spec": spec,
+      "today": today,
+      "recent_dates": recent_dates,
+      "recent_tokens": {day: 0 for day in recent_dates},
+      "today_tokens_by_model": {},
+      "model_usage": {},
+      "today_sessions": set(),
+      "today_prompts": 0,
+      "today_total_tokens": 0,
+      "total_prompts": 0,
+      "total_sessions": set(),
+      "active_dates": set(),
+    }
+
+  seen_messages = set()
+
+  for path in session_files(roots):
+    try:
+      handle = open(path, encoding="utf-8", errors="replace")
+    except OSError:
+      continue
+    with handle:
+      for raw in handle:
+        if '"usage"' not in raw:
+          continue
+        try:
+          entry = json.loads(raw)
+        except (ValueError, RecursionError):
+          continue
+        if not isinstance(entry, dict) or entry.get("type") != "message":
+          continue
+        message_key = path + ":" + str(entry.get("id") or "")
+        if message_key in seen_messages:
+          continue
+        seen_messages.add(message_key)
+        message = entry.get("message")
+        if not isinstance(message, dict) or message.get("role") != "assistant":
+          continue
+
+        provider = str(message.get("provider") or "")
+        api = str(message.get("api") or "")
+        acc = None
+        for spec in PI_PROVIDERS:
+          if provider == spec["key"] or api.startswith(spec["key"]):
+            acc = accs[spec["id"]]
+            break
+        if acc is None:
+          continue
+
+        usage = message.get("usage")
+        if not isinstance(usage, dict) or not usage:
+          continue
+        total = number(usage.get("totalTokens"))
+        input_tokens = number(usage.get("input"))
+        output_tokens = number(usage.get("output"))
+        cache_read = number(usage.get("cacheRead"))
+        cache_write = number(usage.get("cacheWrite"))
+        if total and not (input_tokens or output_tokens or cache_read or cache_write):
+          input_tokens = total
+        if not (input_tokens or output_tokens or cache_read or cache_write):
+          continue
+
+        day = local_day(entry.get("timestamp"), message.get("timestamp"))
+        model = str(message.get("model") or "unknown")
+        total = input_tokens + output_tokens + cache_read + cache_write
+
+        acc["total_prompts"] += 1
+        acc["total_sessions"].add(path)
+        if day:
+          acc["active_dates"].add(day)
+          if day in acc["recent_tokens"]:
+            acc["recent_tokens"][day] += total
+          if day == acc["today"]:
+            acc["today_prompts"] += 1
+            acc["today_sessions"].add(path)
+            acc["today_total_tokens"] += total
+            acc["today_tokens_by_model"][model] = acc["today_tokens_by_model"].get(model, 0) + total
+
+        bucket = acc["model_usage"].setdefault(model, {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+        })
+        bucket["inputTokens"] += input_tokens
+        bucket["outputTokens"] += output_tokens
+        bucket["cacheReadInputTokens"] += cache_read
+        bucket["cacheCreationInputTokens"] += cache_write
+
+  return {pid: stats_dict(acc) for pid, acc in accs.items()}
+
+
+def stats_dict(acc):
+  return {
+    "todayPrompts": acc["today_prompts"],
+    "todaySessions": len(acc["today_sessions"]),
+    "todayTotalTokens": acc["today_total_tokens"],
+    "todayTokensByModel": acc["today_tokens_by_model"],
+    "recentDays": [{"date": day, "messageCount": acc["recent_tokens"][day]} for day in acc["recent_dates"]],
+    "totalPrompts": acc["total_prompts"],
+    "totalSessions": len(acc["total_sessions"]),
+    "activeDays": len(acc["active_dates"]),
+    "activeDates": sorted(acc["active_dates"]),
+    "modelUsage": acc["model_usage"],
+  }
+
+
+def scan_roots():
+  roots = [
+    os.path.join(home(), ".pi", "agent", "sessions"),
+    os.path.join(home(), ".bb", "pi-bridge-sessions"),
+  ]
+  extra = os.environ.get("MYAGENTS_SCAN_ROOTS")
+  if extra:
+    roots += [os.path.expanduser(p.strip()) for p in extra.split(",") if p.strip()]
+  return roots
+
+
+def cache_paths():
+  root = os.path.join(
+    os.environ.get("XDG_CACHE_HOME") or os.path.join(home(), ".cache"),
+    "omarchy", "myagents",
+  )
+  digest = hashlib.sha1(("\n".join(scan_roots())).encode("utf-8")).hexdigest()[:16]
+  return os.path.join(root, f"scan-{digest}.json"), os.path.join(root, f"scan-{digest}.lock")
+
+
+def read_cached_stats(cache_file, max_age, today):
+  if max_age <= 0 or not os.path.exists(cache_file):
+    return None
+  try:
+    age = time.time() - os.stat(cache_file).st_mtime
+    if not (0 <= age <= max_age):
+      return None
+    cached = json.loads(open(cache_file, encoding="utf-8").read())
+    if not isinstance(cached, dict) or cached.get("schemaVersion") != 1:
+      return None
+    if cached.get("scanDate") != today:
+      return None
+    stats = cached.get("stats")
+    if not isinstance(stats, dict):
+      return None
+    for pid, acc in ((s["id"], None) for s in PI_PROVIDERS):
+      entry = stats.get(pid)
+      if not isinstance(entry, dict) or not all(
+        key in entry for key in ("todayPrompts", "todayTotalTokens", "recentDays", "activeDates", "modelUsage")
+      ):
+        return None
+    return stats
+  except Exception:
+    return None
+
+
+def cached_scan(max_age, force):
+  """Scan stats with the cache as a pure optimization; degrade to a direct scan."""
+  now = datetime.now().astimezone()
+  today = now.strftime("%Y-%m-%d")
+  cache_file, lock_file = cache_paths()
+  try:
+    cached = read_cached_stats(cache_file, 0 if force else max_age, today)
+    if cached is not None:
+      return cached
+    os.makedirs(os.path.dirname(lock_file), exist_ok=True)
+    with open(lock_file, "w") as lock:
+      fcntl.flock(lock, fcntl.LOCK_EX)
+      cached = read_cached_stats(cache_file, 0 if force else max_age, today)
+      if cached is not None:
+        return cached
+      stats = scan_sessions(scan_roots())
+      try:
+        write_json(cache_file, {"schemaVersion": 1, "scanDate": today, "stats": stats})
+      except Exception as exc:
+        print(f"myagents-usage-update: could not write scan cache ({exc})", file=sys.stderr)
+      return stats
+  except Exception as exc:
+    print(f"myagents-usage-update: cache unavailable ({exc}); scanning directly", file=sys.stderr)
+    return scan_sessions(scan_roots())
+
+
+def write_json(path, payload):
+  os.makedirs(os.path.dirname(path), exist_ok=True)
+  fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path), prefix=os.path.basename(path) + ".", suffix=".tmp")
+  try:
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+      handle.write(json.dumps(payload, separators=(",", ":")) + "\n")
+    os.chmod(tmp, 0o644)
+    os.replace(tmp, path)
+  except BaseException:
+    try:
+      os.unlink(tmp)
+    except OSError:
+      pass
+    raise
+
+
+# ------------------------------------------------------------------ limits
+
+def fetch_json(url, headers):
+  request = urllib.request.Request(url, headers={"Accept": "application/json", **headers})
+  with urllib.request.urlopen(request, timeout=HTTP_TIMEOUT) as response:
+    return json.loads(response.read().decode("utf-8", "replace"))
+
+
+def limit_entry(label, percent, resets_at):
+  return {
+    "label": label,
+    "percent": percent,
+    "resetsAt": resets_at or "",
+  }
+
+
+def parse_codex_usage(payload):
+  """wham/usage -> (limits, tierLabel, balance)."""
+  rate_limit = payload.get("rate_limit") if isinstance(payload, dict) else None
+  if not isinstance(rate_limit, dict):
+    return None, "", None
+  limits = []
+  for window in (rate_limit.get("primary_window"), rate_limit.get("secondary_window")):
+    if not isinstance(window, dict):
+      continue
+    used = window.get("used_percent")
+    if not isinstance(used, (int, float)) or not 0 <= used <= 100:
+      continue
+    seconds = number(window.get("limit_window_seconds"))
+    if seconds == 604800:
+      label = "Weekly (7-day)"
+    elif seconds and seconds % 3600 == 0:
+      label = f"{seconds // 3600}h window"
+    elif seconds:
+      label = f"{seconds}s window"
+    else:
+      label = "Limit"
+    reset = number(window.get("reset_at"))
+    resets_at = datetime.fromtimestamp(reset, timezone.utc).isoformat() if reset else ""
+    limits.append(limit_entry(label, used / 100.0, resets_at))
+
+  plan = payload.get("plan_type")
+  tier_label = str(plan).capitalize() if isinstance(plan, str) and plan else ""
+
+  balance = None
+  credits = payload.get("credits")
+  if isinstance(credits, dict) and credits.get("has_credits") and not credits.get("unlimited"):
+    remaining = credits.get("balance")
+    if isinstance(remaining, (int, float)):
+      # funded is unknown from this endpoint; the panel hides the meter when
+      # funded <= 0 and still renders the remaining amount.
+      balance = {"remaining": float(remaining), "funded": 0, "spent": 0, "currency": "USD", "estimated": False}
+  return limits, tier_label, balance
+
+
+def parse_opencode_go_usage(payload):
+  usage = payload.get("usage") if isinstance(payload, dict) else None
+  if not isinstance(usage, dict):
+    return None
+  limits = []
+  for key, label in (("rolling", "5 hours"), ("weekly", "Weekly"), ("monthly", "Monthly")):
+    window = usage.get(key)
+    if not isinstance(window, dict):
+      continue
+    percent = window.get("percent")
+    if not isinstance(percent, (int, float)) or not 0 <= percent <= 100:
+      continue
+    resets_at = window.get("resetsAt")
+    if not isinstance(resets_at, str):
+      resets_at = ""
+    limits.append(limit_entry(label, percent / 100.0, resets_at))
+  return limits or None
+
+
+def parse_ollama_usage(payload):
+  limits_root = payload.get("limits") if isinstance(payload, dict) else None
+  monthly = limits_root.get("monthly") if isinstance(limits_root, dict) else None
+  usage = monthly.get("usage") if isinstance(monthly, dict) else None
+  if not isinstance(usage, (int, float)) or not 0 <= usage <= 1:
+    return None
+  # Rolling "last 4 weeks" window with no reset date; a bogus resetsAt would
+  # render as "resets now", so it stays empty.
+  return [limit_entry("Monthly (30d)", usage, "")] or None
+
+
+def auth_state():
+  """(codex credential dict | None, status text, help text) from pi's auth.json."""
+  entry = None
+  try:
+    auth = json.loads(open(pi_auth_path(), encoding="utf-8").read())
+    candidate = auth.get("openai-codex") if isinstance(auth, dict) else None
+    if isinstance(candidate, dict) and isinstance(candidate.get("access"), str) and candidate["access"]:
+      entry = candidate
+  except FileNotFoundError:
+    pass
+  except Exception as exc:
+    return None, "Codex unavailable", f"Could not read {pi_auth_path()}: {exc}"
+
+  if entry is None:
+    return None, "Codex unavailable", "No openai-codex login in ~/.pi/agent/auth.json — run /login openai-codex in pi."
+  if isinstance(entry.get("expires"), (int, float)) and entry["expires"] < time.time():
+    # Do not refresh here: pi owns auth.json and refresh-token rotation, and a
+    # racing refresh could rotate the token pi is still holding. It self-heals
+    # the next time pi runs.
+    return None, "Codex limits unavailable", "Token expired — run /login openai-codex in pi to refresh."
+  return entry, "", ""
+
+
+def codex_limits():
+  entry, status, help_text = auth_state()
+  if entry is None:
+    return {"limits": [], "tierLabel": "", "balance": None, "usageStatusText": status, "authHelpText": help_text}
+  headers = {
+    "Authorization": "Bearer " + entry["access"],
+    "ChatGPT-Account-Id": str(entry.get("accountId") or ""),
+    "User-Agent": USER_AGENT,
+  }
+  try:
+    payload = fetch_json(CODEX_USAGE_URL, headers)
+  except urllib.error.HTTPError as exc:
+    help_text = (
+      "Credential rejected — run /login openai-codex in pi to refresh."
+      if exc.code in (401, 403) else f"Usage service returned HTTP {exc.code}."
+    )
+    return {"limits": [], "tierLabel": "", "balance": None, "usageStatusText": "Codex limits unavailable", "authHelpText": help_text}
+  except Exception as exc:
+    return {"limits": [], "tierLabel": "", "balance": None, "usageStatusText": "Codex limits unavailable", "authHelpText": str(exc)}
+  limits, tier_label, balance = parse_codex_usage(payload)
+  if limits is None:
+    return {"limits": [], "tierLabel": "", "balance": None, "usageStatusText": "Codex limits unavailable", "authHelpText": "Usage service returned an unexpected response."}
+  return {"limits": limits, "tierLabel": tier_label, "balance": balance, "usageStatusText": "", "authHelpText": ""}
+
+
+def keyed_limits(url, token, parse, extra_headers=None):
+  headers = {"Authorization": "Bearer " + token, "User-Agent": USER_AGENT, **(extra_headers or {})}
+  try:
+    payload = fetch_json(url, headers)
+  except urllib.error.HTTPError as exc:
+    help_text = (
+      "Credential rejected — refresh it in pi."
+      if exc.code in (401, 403) else f"Usage service returned HTTP {exc.code}."
+    )
+    return {"limits": [], "usageStatusText": "Limits unavailable", "authHelpText": help_text}
+  except Exception as exc:
+    return {"limits": [], "usageStatusText": "Limits unavailable", "authHelpText": str(exc)}
+  limits = parse(payload)
+  if limits is None:
+    return {"limits": [], "usageStatusText": "Limits unavailable", "authHelpText": "Usage service returned an unexpected response."}
+  return {"limits": limits, "usageStatusText": "", "authHelpText": ""}
+
+
+def ollama_cloud_limits(token):
+  # ollama's API sits behind a check that rejects unknown user agents.
+  return keyed_limits(OLLAMA_USAGE_URL, token, parse_ollama_usage, {"User-Agent": "undici"})
+
+
+def opencode_go_limits(token):
+  return keyed_limits(OPENCODE_GO_USAGE_URL, token, parse_opencode_go_usage)
+
+
+# -------------------------------------------------------------- delegated
+
+def delegated_record(agent, flags):
+  root = omarchy_path()
+  collector = os.path.join(root, "bin", f"omarchy-agent-usage-{agent}") if root else ""
+  if not collector or not os.access(collector, os.X_OK):
+    print(f"myagents-usage-update: {agent} collector not found ({collector or 'no omarchy bin dir'})", file=sys.stderr)
+    return None
+  try:
+    proc = subprocess.run([collector, *flags], capture_output=True, text=True, timeout=60)
+  except Exception as exc:
+    print(f"myagents-usage-update: {agent} collector failed ({exc})", file=sys.stderr)
+    return None
+  if proc.returncode != 0:
+    print(f"myagents-usage-update: {agent} collector failed: {proc.stderr.strip()}", file=sys.stderr)
+    return None
+  try:
+    record = json.loads(proc.stdout)
+  except ValueError:
+    print(f"myagents-usage-update: {agent} collector printed invalid JSON", file=sys.stderr)
+    return None
+  return record
+
+
+# -------------------------------------------------------------------- main
+
+def base_record(pid, name):
+  return {
+    "schemaVersion": 1,
+    "id": pid,
+    "name": name,
+    "updatedAt": datetime.now(timezone.utc).isoformat(),
+    "ready": True,
+    "hasLocalStats": True,
+  }
+
+
+def empty_stats():
+  return {
+    "todayPrompts": 0,
+    "todaySessions": 0,
+    "todayTotalTokens": 0,
+    "todayTokensByModel": {},
+    "recentDays": [],
+    "totalPrompts": 0,
+    "totalSessions": 0,
+    "activeDays": 0,
+    "activeDates": [],
+    "modelUsage": {},
+  }
+
+
+def main(argv=None):
+  parser = argparse.ArgumentParser(description="Regenerate omarchy.myagents usage records.")
+  parser.add_argument("--force", action="store_true")
+  parser.add_argument("--limits-only", action="store_true")
+  parser.add_argument("--except", dest="excepted", action="append", default=[])
+  parser.add_argument("agents", nargs="*")
+  args = parser.parse_args(argv)
+
+  pi_ids = [spec["id"] for spec in PI_PROVIDERS]
+  wanted = set(pi_ids) | set(DELEGATED)
+  if args.agents:
+    wanted &= set(args.agents)
+  for agent in args.excepted:
+    wanted.discard(agent)
+  if not wanted:
+    return 0
+
+  flags = []
+  if args.force:
+    flags.append("--force")
+  if args.limits_only:
+    flags.append("--limits-only")
+
+  max_age = 0 if args.force else (LIMITS_ONLY_REUSE_SECONDS if args.limits_only else SCAN_REUSE_SECONDS)
+  stats = cached_scan(max_age, args.force)
+
+  def limits_for(spec):
+    if spec["id"] == "codex":
+      return codex_limits()
+    try:
+      auth = json.loads(open(pi_auth_path(), encoding="utf-8").read())
+      token = (auth.get(spec["key"]) or {}).get("key")
+    except Exception:
+      token = None
+    if not token:
+      return {"limits": [], "usageStatusText": f"{spec['name']} unavailable", "authHelpText": f"No {spec['key']} login in ~/.pi/agent/auth.json — run /login {spec['key']} in pi."}
+    if spec["id"] == "ollama-cloud":
+      return ollama_cloud_limits(token)
+    return opencode_go_limits(token)
+
+  # Delegated stock collectors and our limit fetches all run concurrently.
+  futures = {}
+  with ThreadPoolExecutor(max_workers=len(DELEGATED) + len(PI_PROVIDERS)) as pool:
+    for agent in DELEGATED:
+      if agent in wanted:
+        futures[agent] = pool.submit(delegated_record, agent, flags)
+    for spec in PI_PROVIDERS:
+      if spec["id"] in wanted:
+        futures[spec["id"]] = pool.submit(limits_for, spec)
+
+    records = {}
+    for spec in PI_PROVIDERS:
+      if spec["id"] in wanted:
+        record = base_record(spec["id"], spec["name"])
+        record.update(stats.get(spec["id"]) or empty_stats())
+        record.update(futures[spec["id"]].result())
+        records[spec["id"]] = record
+    for agent in DELEGATED:
+      if agent in wanted:
+        record = futures[agent].result()
+        if record is not None:
+          records[agent] = record
+
+  # Atomic per-agent writes, mirroring omarchy-agent-usage-update.
+  target = usage_dir()
+  os.makedirs(target, exist_ok=True)
+  for pid, record in records.items():
+    fd, tmp = tempfile.mkstemp(dir=target, prefix="." + pid + ".", suffix=".tmp")
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+      handle.write(json.dumps(record, separators=(",", ":")) + "\n")
+    os.chmod(tmp, 0o644)
+    os.replace(tmp, os.path.join(target, pid + ".json"))
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
