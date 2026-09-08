@@ -3,8 +3,9 @@
 # chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 set -eu
 
-plugin="$HOME/.config/omarchy/plugins/omarchy.myagents"
-source="{{ .chezmoi.workingTree }}/config/omarchy-plugins/omarchy.myagents"
+plugin="$HOME/.config/omarchy/plugins/fgrehm.myagents"
+# Leading "# " in source is consumed by the template's custom action delimiter.
+source="# {{ .chezmoi.workingTree }}/config/omarchy-plugins/fgrehm.myagents"
 
 if [ -e "$plugin" ] && [ ! -L "$plugin" ]; then
   rm -rf "$plugin"

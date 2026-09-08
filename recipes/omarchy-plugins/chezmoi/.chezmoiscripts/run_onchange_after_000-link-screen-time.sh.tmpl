@@ -4,7 +4,8 @@
 set -eu
 
 plugin="$HOME/.config/omarchy/plugins/agx.screen-time"
-source="{{ .chezmoi.workingTree }}/config/omarchy-plugins/agx.screen-time"
+# Leading "# " in source is consumed by the template's custom action delimiter.
+source="# {{ .chezmoi.workingTree }}/config/omarchy-plugins/agx.screen-time"
 
 # Replace the previously deployed, copied directory with the tracked source.
 if [ -e "$plugin" ] && [ ! -L "$plugin" ]; then
@@ -15,9 +16,4 @@ if [ -L "$plugin" ] && [ "$(readlink "$plugin")" != "$source" ]; then
 fi
 if [ ! -e "$plugin" ] && [ ! -L "$plugin" ]; then
   ln -s "$source" "$plugin"
-fi
-
-if command -v omarchy >/dev/null 2>&1; then
-  omarchy-shell shell rescanPlugins
-  omarchy plugin enable agx.screen-time
 fi
