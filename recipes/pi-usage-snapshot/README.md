@@ -48,7 +48,7 @@ pi-usage-snapshot --dir ~/sync/agents-usage --device-id buildvm
 
 The deviceId defaults to the hostname, sanitized the same way as the plugin's `safeDeviceId()`. Use a stable `--device-id` on machines whose hostname changes between boots.
 
-The bar machine's plugin setting accepts one primary folder plus comma-separated extra folders (`syncDirs`) — its own snapshot is written to every folder and all of them are scanned and merged, so one machine can bridge several sync backends or machine groups.
+The bar machine's plugin setting takes the write-side folder (`syncDir`) plus comma-separated read-only merge sources (`syncDirs`) — one folder per sync backend or machine group, so snapshots from different fleets all land in the aggregate.
 
 Scheduling is intentionally out of scope (single-shot script): use cron, a systemd user timer, or a `pi-usage-pull` wrapper.
 

@@ -307,9 +307,9 @@ Item {
   property string syncFileName: String(setting("syncFileName", ""))
   property string syncDeviceId: String(setting("syncDeviceId", ""))
   property string detectedHostname: ""
-  // Primary folder (syncDir) plus extras (syncDirs, comma-separated): the
-  // snapshot is written to every folder, snapshots are scanned from all of
-  // them. Lets one machine bridge several sync backends / machine groups.
+  // The snapshot is written to syncDir; extra folders (syncDirs, comma-
+  // separated) are read-only merge sources for snapshots other machines
+  // placed there (e.g. one folder per sync backend / machine group).
   readonly property var syncAllDirs: {
     var list = []
     var primary = String(syncDir || "").trim()
@@ -357,16 +357,6 @@ Item {
         return
       }
       root.writeSyncSnapshot()
-    }
-  }
-
-  Process {
-    id: syncExtraProcess
-    running: false
-    onRunningChanged: root.updateSyncRunning()
-    onExited: function(exitCode) {
-      if (exitCode !== 0 && root.syncConfigured()) root.syncStatusText = "Usage sync write failed"
-      root.startSyncScan()
     }
   }
 
@@ -429,7 +419,7 @@ Item {
   }
 
   function updateSyncRunning() {
-    root.syncRunning = syncMkdirProcess.running || syncExtraProcess.running || syncScanProcess.running
+    root.syncRunning = syncMkdirProcess.running || syncScanProcess.running
   }
 
   function scheduleSync() {
@@ -455,19 +445,8 @@ Item {
       finishSyncRun()
       return
     }
-    var payload = JSON.stringify(localSnapshot(), null, 2) + "\n"
-    syncSnapshotFile.setText(payload)
-    var extras = syncAllDirs.slice(1)
-    if (extras.length > 0) {
-      // Atomic write into every extra folder; the primary folder is handled
-      // by the FileView above. Payload travels as an argv element, so shell
-      // quoting cannot touch it.
-      var script = "filename=$1; payload=$2; shift 2; for dir in \"$@\"; do mkdir -p \"$dir\" || exit 1; tmp=$(mktemp \"$dir/.snapshot.XXXXXX\") || exit 1; printf '%s' \"$payload\" > \"$tmp\" || exit 1; chmod 644 \"$tmp\"; mv \"$tmp\" \"$dir/$filename\" || exit 1; done"
-      syncExtraProcess.command = ["bash", "-c", script, "myagents-sync", syncEffectiveFileName, payload].concat(extras)
-      syncExtraProcess.running = true
-    } else {
-      Qt.callLater(root.startSyncScan)
-    }
+    syncSnapshotFile.setText(JSON.stringify(localSnapshot(), null, 2) + "\n")
+    Qt.callLater(root.startSyncScan)
   }
 
   function startSyncScan() {
