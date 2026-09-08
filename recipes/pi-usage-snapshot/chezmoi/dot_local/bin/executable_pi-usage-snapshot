@@ -239,7 +239,8 @@ def main(argv=None):
   parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
   target = parser.add_mutually_exclusive_group(required=True)
   target.add_argument("--stdout", action="store_true", help="print the snapshot JSON to stdout")
-  target.add_argument("--dir", metavar="DIR", help="atomically write DIR/<deviceId>.json")
+  target.add_argument("--dir", dest="dirs", metavar="DIR", action="append",
+                      help="atomically write DIR/<deviceId>.json; repeatable for machines bridging several sync folders")
   parser.add_argument("--device-id", help="override the device id (default: sanitized hostname)")
   parser.add_argument("--roots", metavar="A,B", help="comma-separated scan roots (default: " + ",".join(ROOTS) + ")")
   args = parser.parse_args(argv)
@@ -253,8 +254,8 @@ def main(argv=None):
   if args.stdout:
     sys.stdout.write(text)
   else:
-    path = os.path.join(args.dir, device_id + ".json")
-    write_atomic(path, text)
+    for directory in args.dirs:
+      write_atomic(os.path.join(directory, device_id + ".json"), text)
 
 
 if __name__ == "__main__":

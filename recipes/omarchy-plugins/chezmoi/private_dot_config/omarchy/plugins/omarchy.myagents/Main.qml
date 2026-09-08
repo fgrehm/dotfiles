@@ -303,13 +303,29 @@ Item {
   property var syncModeSetting: setting("syncMode", setting("syncEnabled", false))
   property bool syncEnabled: parseSyncEnabled(syncModeSetting)
   property string syncDir: String(setting("syncDir", ""))
+  property string syncDirs: String(setting("syncDirs", ""))
   property string syncFileName: String(setting("syncFileName", ""))
   property string syncDeviceId: String(setting("syncDeviceId", ""))
   property string detectedHostname: ""
-  readonly property string syncEffectiveDir: expandPath(syncDir)
+  // Primary folder (syncDir) plus extras (syncDirs, comma-separated): the
+  // snapshot is written to every folder, snapshots are scanned from all of
+  // them. Lets one machine bridge several sync backends / machine groups.
+  readonly property var syncAllDirs: {
+    var list = []
+    var primary = String(syncDir || "").trim()
+    if (primary !== "") list.push(expandPath(primary))
+    var parts = String(syncDirs || "").split(",")
+    for (var i = 0; i < parts.length; i++) {
+      var entry = parts[i].trim()
+      if (entry === "") continue
+      var expanded = expandPath(entry)
+      if (list.indexOf(expanded) === -1) list.push(expanded)
+    }
+    return list
+  }
   readonly property string syncEffectiveFileName: safeSnapshotFileName(syncFileName, syncDeviceId)
   readonly property string syncEffectiveDeviceId: safeDeviceId(syncDeviceId || syncEffectiveFileName.replace(/\.json$/i, ""))
-  readonly property string syncSnapshotPath: syncConfigured() ? syncEffectiveDir + "/" + syncEffectiveFileName : home + "/.cache/omarchy/agents-disabled.json"
+  readonly property string syncSnapshotPath: syncConfigured() && syncAllDirs.length > 0 ? syncAllDirs[0] + "/" + syncEffectiveFileName : home + "/.cache/omarchy/agents-disabled.json"
   property var aggregateData: ({})
   property int syncRevision: 0
   property bool syncRunning: false
@@ -319,6 +335,7 @@ Item {
 
   onSyncEnabledChanged: syncSettingsChanged()
   onSyncDirChanged: syncSettingsChanged()
+  onSyncDirsChanged: syncSettingsChanged()
   onSyncFileNameChanged: if (syncConfigured()) scheduleSync()
   onSyncDeviceIdChanged: if (syncConfigured()) scheduleSync()
 
@@ -340,6 +357,16 @@ Item {
         return
       }
       root.writeSyncSnapshot()
+    }
+  }
+
+  Process {
+    id: syncExtraProcess
+    running: false
+    onRunningChanged: root.updateSyncRunning()
+    onExited: function(exitCode) {
+      if (exitCode !== 0 && root.syncConfigured()) root.syncStatusText = "Usage sync write failed"
+      root.startSyncScan()
     }
   }
 
@@ -386,7 +413,7 @@ Item {
   }
 
   function syncConfigured() {
-    return root.syncEnabled === true && String(root.syncDir || "").trim() !== ""
+    return root.syncEnabled === true && root.syncAllDirs.length > 0
   }
 
   function syncSettingsChanged() {
@@ -402,7 +429,7 @@ Item {
   }
 
   function updateSyncRunning() {
-    root.syncRunning = syncMkdirProcess.running || syncScanProcess.running
+    root.syncRunning = syncMkdirProcess.running || syncExtraProcess.running || syncScanProcess.running
   }
 
   function scheduleSync() {
@@ -419,7 +446,7 @@ Item {
 
     syncRequestedWhileRunning = false
     syncStatusText = ""
-    syncMkdirProcess.command = ["mkdir", "-p", root.syncEffectiveDir]
+    syncMkdirProcess.command = ["mkdir", "-p"].concat(root.syncAllDirs)
     syncMkdirProcess.running = true
   }
 
@@ -428,8 +455,19 @@ Item {
       finishSyncRun()
       return
     }
-    syncSnapshotFile.setText(JSON.stringify(localSnapshot(), null, 2) + "\n")
-    Qt.callLater(root.startSyncScan)
+    var payload = JSON.stringify(localSnapshot(), null, 2) + "\n"
+    syncSnapshotFile.setText(payload)
+    var extras = syncAllDirs.slice(1)
+    if (extras.length > 0) {
+      // Atomic write into every extra folder; the primary folder is handled
+      // by the FileView above. Payload travels as an argv element, so shell
+      // quoting cannot touch it.
+      var script = "filename=$1; payload=$2; shift 2; for dir in \"$@\"; do mkdir -p \"$dir\" || exit 1; tmp=$(mktemp \"$dir/.snapshot.XXXXXX\") || exit 1; printf '%s' \"$payload\" > \"$tmp\" || exit 1; chmod 644 \"$tmp\"; mv \"$tmp\" \"$dir/$filename\" || exit 1; done"
+      syncExtraProcess.command = ["bash", "-c", script, "myagents-sync", syncEffectiveFileName, payload].concat(extras)
+      syncExtraProcess.running = true
+    } else {
+      Qt.callLater(root.startSyncScan)
+    }
   }
 
   function startSyncScan() {
@@ -437,8 +475,8 @@ Item {
       finishSyncRun()
       return
     }
-    var script = "dir=$0; [[ -d \"$dir\" ]] || exit 0; shopt -s nullglob; for f in \"$dir\"/*.json; do [[ -f \"$f\" ]] || continue; printf '===%s===\\n' \"$f\"; cat \"$f\"; printf '\\n=== EOM ===\\n'; done"
-    syncScanProcess.command = ["bash", "-c", script, root.syncEffectiveDir]
+    var script = "for dir in \"$@\"; do [[ -d \"$dir\" ]] || continue; shopt -s nullglob; for f in \"$dir\"/*.json; do [[ -f \"$f\" ]] || continue; printf '===%s===\\n' \"$f\"; cat \"$f\"; printf '\\n=== EOM ===\\n'; done; done"
+    syncScanProcess.command = ["bash", "-c", script, "myagents-scan"].concat(root.syncAllDirs)
     syncScanProcess.running = true
   }
 
@@ -512,7 +550,27 @@ Item {
     }
     flush()
 
-    aggregateData = aggregateSnapshots(snapshots)
+    // The same machine can appear in several folders (overlapping sync
+    // backends); merging it twice would double every device-scoped number.
+    // Keep the newest snapshot per deviceId.
+    var byDevice = {}
+    var deduped = []
+    for (var s = 0; s < snapshots.length; s++) {
+      var snap = snapshots[s]
+      var device = safeDeviceId(snap.deviceId || "device")
+      snap.updatedAtMs = Date.parse(String(snap.updatedAt || "")) || 0
+      var prev = byDevice[device]
+      if (prev !== undefined) {
+        if (snap.updatedAtMs <= prev.updatedAtMs) continue
+        deduped = deduped.filter(function(other) {
+          return safeDeviceId(other.deviceId || "device") !== device
+        })
+      }
+      byDevice[device] = snap
+      deduped.push(snap)
+    }
+
+    aggregateData = aggregateSnapshots(deduped)
     syncStatusText = ""
     syncRevision++
   }

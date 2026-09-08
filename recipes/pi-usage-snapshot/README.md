@@ -6,7 +6,7 @@ Standalone python3 tool that scans pi/agent session logs on a machine and emits 
 
 The plugin's snapshot *writer* lives inside `Main.qml`, so only machines running the Quickshell shell can push snapshots. This script reimplements the writer as a standalone CLI so any machine with pi session logs can participate, in two modes:
 
-- **Push** (`--dir`): run on the remote (cron/timer), atomically writes `<syncDir>/<deviceId>.json` into a folder shared with the bar machine (Syncthing, bind mount, ...).
+- **Push** (`--dir`): run on the remote (cron/timer), atomically writes `<syncDir>/<deviceId>.json` into a folder shared with the bar machine (Syncthing, bind mount, ...). Repeat `--dir` on a machine that bridges several sync folders.
 - **Pull** (`--stdout`): run remotely over SSH from the bar machine, printing the snapshot to stdout so the caller can write it into the local `syncDir` without installing anything on the remote.
 
 ## What it scans
@@ -47,6 +47,8 @@ pi-usage-snapshot --dir ~/sync/agents-usage --device-id buildvm
 ```
 
 The deviceId defaults to the hostname, sanitized the same way as the plugin's `safeDeviceId()`. Use a stable `--device-id` on machines whose hostname changes between boots.
+
+The bar machine's plugin setting accepts one primary folder plus comma-separated extra folders (`syncDirs`) — its own snapshot is written to every folder and all of them are scanned and merged, so one machine can bridge several sync backends or machine groups.
 
 Scheduling is intentionally out of scope (single-shot script): use cron, a systemd user timer, or a `pi-usage-pull` wrapper.
 
