@@ -110,6 +110,10 @@ Item {
   Component.onCompleted: {
     rescanAgents()
     if (syncConfigured()) scheduleSync()
+    // One-shot fresh limits at shell start (cheap: --limits-only reuses a
+    // scan for up to 15min), so the bar isn't stale until the first panel
+    // open. The recurring timer stays gated on `opened`.
+    runUpdate("limits")
   }
 
   // -------------------------------------------------------------- refresh
