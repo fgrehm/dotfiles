@@ -1,0 +1,14 @@
+# Preserve configuration supplied by a container image/runtime, but seed the
+# repo defaults when that runtime has not provided a file of its own.
+{{ if and .isContainer (stat (joinPath .chezmoi.homeDir ".agents/AGENTS.md")) }}
+.agents/AGENTS.md
+{{ end }}
+{{ if and .isContainer (stat (joinPath .chezmoi.homeDir ".pi/agent/ollama-cloud.json")) }}
+.agents/pi/ollama-cloud.json
+{{ end }}
+{{ if and .isContainer (stat (joinPath .chezmoi.homeDir ".pi/agent/sandbox.json")) }}
+.agents/pi/sandbox.json
+{{ end }}
+{{ if and .isContainer (stat (joinPath .chezmoi.homeDir ".pi/agent/web-search.json")) }}
+.agents/pi/web-search.json
+{{ end }}

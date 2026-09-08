@@ -59,6 +59,12 @@ link_into_pi() { # <source> <dest>
       ;;
     esac
   elif [ -e "$dest" ]; then
+    # In containers, every existing real file belongs to the runtime, even if
+    # it currently happens to match our default byte-for-byte.
+    # {{ if .isContainer }}
+    log_skip "$(basename "$dest") is provided by the container, leaving it"
+    return 0
+    # {{ else }}
     if cmp -s "$src" "$dest"; then
       rm -f "$dest"
       log_info "Replacing unchanged legacy $(basename "$dest") with a link"
@@ -66,6 +72,7 @@ link_into_pi() { # <source> <dest>
       log_skip "$(basename "$dest") exists as a real file, leaving it"
       return 0
     fi
+    # {{ end }}
   fi
 
   ln -s "$src" "$dest"

@@ -30,6 +30,10 @@ On Omarchy, zsh and Oh My Zsh are installed through `omarchy pkg add` and the de
 | `.email` | User's email address | `chezmoi init` prompt |
 | `.isContainer` | true in Docker containers | auto-detected |
 
+In containers, chezmoi never changes the account's login shell; that remains
+owned by the image or container runtime. Shell configuration and missing tools
+can still be installed without changing the login-shell contract.
+
 ## Adding shell fragments from other recipes
 
 Other recipes can drop files into `dot_shellrc.d/` and they'll be sourced

@@ -15,6 +15,10 @@ Deploys shared agent instructions, skills, and Pi agent settings. Claude Code an
 - `~/.claude/settings.json`: deep-merged Claude settings; local model/hooks/plugins are preserved.
 - `~/.claude/statusline.sh` and `~/.claude/output-styles/`: Claude presentation settings.
 
+### Container behavior
+
+Containers keep ownership of configuration supplied by their image or runtime. Existing global `AGENTS.md` and Pi policy/provider JSON files are preserved; when a container has not supplied one, the recipe seeds and links its default. Portable skills, Pi extensions, Claude presentation settings, and the non-destructive Claude settings merge still apply.
+
 ### Shared skills
 
 Skills live once at `~/.agents/skills/<name>/` (the canonical cross-client home) and are exposed to each tool via individual symlinks:

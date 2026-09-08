@@ -1,0 +1,5 @@
+# A container's login shell is part of the image/runtime contract. Installing
+# shell tooling is fine, but applying dotfiles must not change that contract.
+{{ if .isContainer }}
+.chezmoiscripts/set-default-shell.sh
+{{ end }}
