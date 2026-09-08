@@ -9,8 +9,8 @@ Panel {
   id: root
   // Fork identity: must not collide with the stock omarchy.agents plugin's
   // module/IPC names while both are installed. Upstream uses "omarchy.agents".
-  moduleName: "omarchy.myagents"
-  ipcTarget: "omarchy.myagents"
+  moduleName: "fgrehm.myagents"
+  ipcTarget: "fgrehm.myagents"
   manageIpc: false
 
   readonly property color foreground: bar ? bar.foreground : Color.foreground

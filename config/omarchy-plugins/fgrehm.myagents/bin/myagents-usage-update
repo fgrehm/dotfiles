@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""omarchy:summary=Regenerate usage records for the omarchy.myagents bar plugin fork
+"""omarchy:summary=Regenerate usage records for the fgrehm.myagents bar plugin fork
 
 omarchy:args=[--force] [--limits-only] [--except <agent>] [agent...]
 """
@@ -534,7 +534,7 @@ def empty_stats():
 
 
 def main(argv=None):
-  parser = argparse.ArgumentParser(description="Regenerate omarchy.myagents usage records.")
+  parser = argparse.ArgumentParser(description="Regenerate fgrehm.myagents usage records.")
   parser.add_argument("--force", action="store_true")
   parser.add_argument("--limits-only", action="store_true")
   parser.add_argument("--except", dest="excepted", action="append", default=[])

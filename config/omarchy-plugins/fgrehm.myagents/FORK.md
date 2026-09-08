@@ -1,9 +1,9 @@
 Fork notice: vendored from https://github.com/omacom/omarchy (`shell/plugins/agents` on the `quattro` branch) at upstream commit e848f1df97bbbe23db42fc2b1fb04937d7a0eae0. The plugin directory itself last changed at 3af7675a10fdfc5a49789ea4723e454aac17704b (v4.0.0-91); the vendored copy is byte-identical to `shell/plugins/agents` at the baseline commit.
 
-Rebranded as `omarchy.myagents` so it can coexist with (and eventually replace) the stock `omarchy.agents` plugin:
+Rebranded as `fgrehm.myagents` so it can coexist with (and eventually replace) the stock `omarchy.agents` plugin:
 
-- `manifest.json`: id `omarchy.myagents`, name/displayName `My Agents`
-- `Panel.qml`: `moduleName`/`ipcTarget` changed to `omarchy.myagents` (hardcoded upstream; must not collide with the stock plugin's IPC handlers)
+- `manifest.json`: id `fgrehm.myagents`, name/displayName `My Agents`
+- `Panel.qml`: `moduleName`/`ipcTarget` changed to `fgrehm.myagents` (hardcoded upstream; must not collide with the stock plugin's IPC handlers)
 
 Everything else is upstream verbatim, including the usage record directory (`~/.local/state/omarchy/agents/usage`) and the settings schema. Implemented on top of upstream:
 
@@ -22,5 +22,5 @@ Install/replace flow (manual, not automated by chezmoi so the switch stays delib
 
 ```
 omarchy plugin disable omarchy.agents
-omarchy plugin enable omarchy.myagents --section center
+omarchy plugin enable fgrehm.myagents --section right
 ```
