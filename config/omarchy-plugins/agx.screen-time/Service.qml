@@ -77,6 +77,7 @@ Item {
   property var years: ({})
 
   property string activeApp: ""
+  property string activeTitle: ""
   property double activeStart: 0
   // appId as reported by the compositor; activeApp is the resolved tracking
   // name (identical unless the toplevel is a terminal).
@@ -127,6 +128,11 @@ Item {
 
   // ---- Tracking ----------------------------------------------------------
 
+  function isBrowser(appId) {
+    return ["zen", "firefox", "chromium", "google-chrome", "brave",
+      "vivaldi", "microsoft-edge"].indexOf(String(appId || "").toLowerCase()) !== -1
+  }
+
   function isTerminal(appId) {
     return appId && root.terminalAppIds.indexOf(appId.toLowerCase()) !== -1
   }
@@ -157,6 +163,7 @@ Item {
     var tl = ToplevelManager.activeToplevel
     var app = tl && tl.appId ? tl.appId : ""
     root.rawApp = app
+    root.activeTitle = tl && tl.title ? String(tl.title) : ""
     root.resolveInFlight = false
     if (app && !root.shouldTrack(app)) {
       root.activeApp = ""
@@ -168,7 +175,7 @@ Item {
       root.activeStart = 0
       root.beginResolve()
     } else {
-      root.activeApp = Model.canonicalApp(app)
+      root.activeApp = Model.trackingApp(app, root.activeTitle)
       root.activeStart = app ? now : 0
     }
   }

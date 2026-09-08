@@ -58,8 +58,21 @@ function canonicalApp(name) {
 // game titles by scripts/resolve_app.py; unresolved ones fall through to
 // the plain-name path. This layer never touches the filesystem: QML's JS
 // engine has no require(), so fs-based lookups would throw at runtime.
+// Keep browser pages distinct while preserving the browser identity.
+function trackingApp(app, title) {
+  var key = canonicalApp(app)
+  if (!key || !BROWSER_ALIASES
+      || !Object.prototype.hasOwnProperty.call(BROWSER_ALIASES, key) || !title) return key
+  var cleanTitle = String(title).replace(/\s+/g, " ").trim()
+  return cleanTitle ? "browser:" + key + ":" + cleanTitle : key
+}
+
 function displayName(app) {
   if (!app) return ""
+  if (String(app).indexOf("browser:") === 0) {
+    var parts = String(app).split(":")
+    return "browser: " + (parts.slice(2).join(":") || parts[1] || app)
+  }
   var s = String(app)
 
   var webApp = s.match(CHROMIUM_WEB_APP_RE)
