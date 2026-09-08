@@ -13,6 +13,6 @@ fi
 if [ -L "$plugin" ] && [ "$(readlink "$plugin")" != "$source" ]; then
   rm "$plugin"
 fi
-if [ ! -e "$plugin" ]; then
+if [ ! -e "$plugin" ] && [ ! -L "$plugin" ]; then
   ln -s "$source" "$plugin"
 fi
