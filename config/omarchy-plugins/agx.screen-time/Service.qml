@@ -91,6 +91,17 @@ Item {
   property int resolveSpawnGen: 0
   property bool ready: false
   property bool startupPhase: true
+  property bool sessionLocked: false
+  property bool screensaverActive: false
+  property double lockStartedAt: 0
+  property double screensaverStartedAt: 0
+  // Debug timing logs for lock/screensaver intervals. Off by default; flip
+  // to true to trace when screen time pauses and resumes.
+  property bool debugLogging: false
+  property var lockService: null
+  property var idleService: null
+  onShellChanged: root.refreshShellServices()
+
 
   // ---- Public read API for the UI ----------------------------------------
   readonly property string barLabel: today ? Model.fmt(today.total) : ""
@@ -446,6 +457,93 @@ Item {
   // resolves suspends down to ~30s instead of being locked to the 60s commit
   // cadence. On a detected gap the open bucket is dropped without accrual
   // (closeActiveBucket's gap branch) and tracking restarts from wake time.
+  // The Omarchy lock plugin owns the native Wayland session lock. Subscribe
+  // to its state instead of polling loginctl, so lock/unlock is handled at
+  // the source and screen-time does no extra process spawning.
+  //
+  // The shell's service registry is populated asynchronously, so the service
+  // references are looked up after shell injection and retried during startup
+  // until both are found; transitions are event-driven afterward.
+  function refreshShellServices() {
+    if (!root.shell) return
+    root.lockService = root.shell.serviceFor("omarchy.lock")
+    root.idleService = root.shell.serviceFor("omarchy.idle")
+    if (root.lockService) root.setSessionLocked(root.lockService.locked)
+    if (root.idleService)
+      root.setScreensaverActive(root.idleService.screensaverStartedThisCycle
+        || root.idleService.screensaverWindowCount > 0)
+    if (root.lockService && root.idleService) serviceLookupTimer.stop()
+  }
+
+  function setSessionLocked(locked) {
+    locked = locked === true
+    if (locked === root.sessionLocked) return
+    root.sessionLocked = locked
+    if (locked) {
+      root.lockStartedAt = Date.now()
+      if (root.debugLogging) console.warn("agx.screen-time: lock started")
+      var now = Date.now()
+      applyState(State.closeActiveBucket(
+        root, root.activeApp, root.activeStart, now,
+        root.todayKey, root.suspendGapMs, root.lastTick))
+      root.persist()
+    } else {
+      var endedAt = Date.now()
+      var duration = root.lockStartedAt ? endedAt - root.lockStartedAt : 0
+      if (root.debugLogging) console.warn("agx.screen-time: lock ended, duration=" + duration + "ms")
+      root.lockStartedAt = 0
+      root.lastTick = endedAt
+      root.switchActive()
+    }
+  }
+
+  function setScreensaverActive(active) {
+    active = active === true
+    if (active === root.screensaverActive) return
+    root.screensaverActive = active
+    if (active) {
+      root.screensaverStartedAt = Date.now()
+      if (root.debugLogging) console.warn("agx.screen-time: screensaver started")
+      var now = Date.now()
+      applyState(State.closeActiveBucket(
+        root, root.activeApp, root.activeStart, now,
+        root.todayKey, root.suspendGapMs, root.lastTick))
+      root.persist()
+    } else if (!root.sessionLocked) {
+      var endedAt = Date.now()
+      var duration = root.screensaverStartedAt ? endedAt - root.screensaverStartedAt : 0
+      if (root.debugLogging) console.warn("agx.screen-time: screensaver ended, duration=" + duration + "ms")
+      root.screensaverStartedAt = 0
+      root.lastTick = endedAt
+      root.switchActive()
+    }
+  }
+
+  Timer {
+    id: serviceLookupTimer
+    interval: 250
+    repeat: true
+    running: root.ready && (!root.lockService || !root.idleService)
+    onTriggered: root.refreshShellServices()
+  }
+
+  Connections {
+    target: root.lockService
+    function onLockedChanged() {
+      root.setSessionLocked(root.lockService.locked)
+    }
+  }
+
+  Connections {
+    target: root.idleService
+    function onScreensaverStartedThisCycleChanged() {
+      root.setScreensaverActive(root.idleService.screensaverStartedThisCycle)
+    }
+    function onScreensaverWindowCountChanged() {
+      root.setScreensaverActive(root.idleService.screensaverWindowCount > 0)
+    }
+  }
+
   Timer {
     id: heartbeatTimer
     interval: 5000
