@@ -1,0 +1,261 @@
+#!/usr/bin/env python3
+"""Print or write a cross-machine pi usage snapshot for the omarchy agents bar.
+
+Scans pi session JSONL (~/.pi/agent/sessions and bb's
+~/.bb/pi-bridge-sessions) and emits one snapshot JSON matching the agents
+plugin syncDir contract consumed by shell/plugins/agents/Main.qml.
+Counting semantics mirror omarchy-agent-usage-codex's scan_pi_sessions() so
+snapshots merge consistently with locally-collected records.
+
+Two modes:
+  --stdout        print the snapshot to stdout (for ssh pull)
+  --dir DIR       atomically write DIR/<deviceId>.json (push, cron/timer)
+"""
+
+import argparse
+import json
+import os
+import socket
+import sys
+import tempfile
+from datetime import datetime, timedelta, timezone
+
+ROOTS = [
+  "~/.pi/agent/sessions",
+  "~/.bb/pi-bridge-sessions",
+]
+
+# Snapshot provider ids must match the ids local usage records use
+# (aggregateSnapshots() merges keyed by providerId). openai-codex maps to
+# "codex" because the upstream Codex collector record uses AGENT_ID "codex".
+PROVIDERS = [
+  {"key": "openai-codex", "id": "codex", "name": "Codex"},
+  {"key": "ollama-cloud", "id": "ollama-cloud", "name": "Ollama Cloud"},
+  {"key": "opencode-go", "id": "opencode-go", "name": "OpenCode Go"},
+]
+
+
+def number(value):
+  try:
+    n = int(value)
+  except (TypeError, ValueError):
+    return 0
+  return n if n > 0 else 0
+
+
+def local_day(entry_ts, message_ts):
+  """Local calendar date (YYYY-MM-DD) for a session entry timestamp."""
+  dt = None
+  if isinstance(entry_ts, str) and entry_ts:
+    try:
+      dt = datetime.fromisoformat(entry_ts.replace("Z", "+00:00"))
+    except ValueError:
+      dt = None
+  if dt is None and isinstance(message_ts, (int, float)):
+    try:
+      dt = datetime.fromtimestamp(message_ts / 1000.0, tz=timezone.utc)
+    except (OSError, OverflowError, ValueError):
+      dt = None
+  if dt is None:
+    return ""
+  return dt.astimezone().strftime("%Y-%m-%d")
+
+
+def session_files(roots):
+  for root in roots:
+    if not os.path.isdir(root):
+      continue
+    for dirpath, _dirnames, filenames in os.walk(root):
+      for filename in filenames:
+        if filename.endswith(".jsonl"):
+          yield os.path.join(dirpath, filename)
+
+
+def scan(roots, providers):
+  now = datetime.now().astimezone()
+  today = now.strftime("%Y-%m-%d")
+  recent_dates = [(now - timedelta(days=offset)).strftime("%Y-%m-%d") for offset in range(6, -1, -1)]
+
+  accs = {}
+  for spec in providers:
+    accs[spec["id"]] = {
+      "spec": spec,
+      "today": today,
+      "recent_dates": recent_dates,
+      "recent_tokens": {day: 0 for day in recent_dates},
+      "today_tokens_by_model": {},
+      "model_usage": {},
+      "today_sessions": set(),
+      "today_prompts": 0,
+      "today_total_tokens": 0,
+      "total_prompts": 0,
+      "total_sessions": set(),
+      "active_dates": set(),
+    }
+
+  seen_messages = set()
+
+  for path in session_files(roots):
+    try:
+      handle = open(path, encoding="utf-8", errors="replace")
+    except OSError:
+      continue
+    with handle:
+      for raw in handle:
+        # Cheap prefilter: only usage-bearing lines are relevant.
+        if '"usage"' not in raw:
+          continue
+        try:
+          entry = json.loads(raw)
+        except (ValueError, RecursionError):
+          continue
+        if not isinstance(entry, dict) or entry.get("type") != "message":
+          continue
+        message_key = path + ":" + str(entry.get("id") or "")
+        if message_key in seen_messages:
+          continue
+        seen_messages.add(message_key)
+        message = entry.get("message")
+        if not isinstance(message, dict) or message.get("role") != "assistant":
+          continue
+
+        provider = str(message.get("provider") or "")
+        api = str(message.get("api") or "")
+        acc = None
+        for spec in providers:
+          if provider == spec["key"] or api.startswith(spec["key"]):
+            acc = accs[spec["id"]]
+            break
+        if acc is None:
+          continue
+
+        usage = message.get("usage")
+        if not isinstance(usage, dict) or not usage:
+          continue
+        total = number(usage.get("totalTokens"))
+        input_tokens = number(usage.get("input"))
+        output_tokens = number(usage.get("output"))
+        cache_read = number(usage.get("cacheRead"))
+        cache_write = number(usage.get("cacheWrite"))
+        if total and not (input_tokens or output_tokens or cache_read or cache_write):
+          input_tokens = total
+        if not (input_tokens or output_tokens or cache_read or cache_write):
+          continue
+
+        day = local_day(entry.get("timestamp"), message.get("timestamp"))
+        session_key = path
+        model = str(message.get("model") or "unknown")
+        total = input_tokens + output_tokens + cache_read + cache_write
+
+        acc["total_prompts"] += 1
+        acc["total_sessions"].add(session_key)
+        if day:
+          acc["active_dates"].add(day)
+          if day in acc["recent_tokens"]:
+            acc["recent_tokens"][day] += total
+          if day == acc["today"]:
+            acc["today_prompts"] += 1
+            acc["today_sessions"].add(session_key)
+            acc["today_total_tokens"] += total
+            acc["today_tokens_by_model"][model] = acc["today_tokens_by_model"].get(model, 0) + total
+
+        bucket = acc["model_usage"].setdefault(model, {
+          "inputTokens": 0,
+          "outputTokens": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0,
+        })
+        bucket["inputTokens"] += input_tokens
+        bucket["outputTokens"] += output_tokens
+        bucket["cacheReadInputTokens"] += cache_read
+        bucket["cacheCreationInputTokens"] += cache_write
+
+  return accs
+
+
+def build_snapshot(device_id, accs):
+  providers_out = {}
+  for pid, acc in accs.items():
+    if acc["total_prompts"] == 0:
+      continue  # zero-data providers add nothing; the plugin filters them anyway
+    providers_out[pid] = {
+      "providerId": pid,
+      "providerName": acc["spec"]["name"],
+      "ready": True,
+      "hasLocalStats": True,
+      "hasPromptStats": True,
+      "scope": "device",
+      "todayPrompts": acc["today_prompts"],
+      "todaySessions": len(acc["today_sessions"]),
+      "todayTotalTokens": acc["today_total_tokens"],
+      "todayTokensByModel": acc["today_tokens_by_model"],
+      "recentDays": [{"date": day, "messageCount": acc["recent_tokens"][day]} for day in acc["recent_dates"]],
+      "totalPrompts": acc["total_prompts"],
+      "totalSessions": len(acc["total_sessions"]),
+      "activeDays": len(acc["active_dates"]),
+      "activeDates": sorted(acc["active_dates"]),
+      "modelUsage": acc["model_usage"],
+    }
+  return {
+    "schemaVersion": 1,
+    "deviceId": device_id,
+    "updatedAt": datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z"),
+    "providers": providers_out,
+  }
+
+
+def safe_device_id(raw):
+  """Same sanitization as the plugin's safeDeviceId()."""
+  value = str(raw or "").strip()
+  if not value:
+    value = socket.gethostname() or "device"
+  value = value.replace(" ", "-").strip("._-")
+  value = "".join(c if c.isalnum() or c in "._-" else "-" for c in value)
+  value = value.strip("._-")
+  if not value:
+    value = "device"
+  return value[:80]
+
+
+def write_atomic(path, text):
+  directory = os.path.dirname(os.path.abspath(path))
+  os.makedirs(directory, exist_ok=True)
+  fd, tmp = tempfile.mkstemp(dir=directory, prefix=".pi-usage-snapshot-", suffix=".tmp")
+  try:
+    with os.fdopen(fd, "w", encoding="utf-8") as handle:
+      handle.write(text)
+      handle.flush()
+      os.fsync(handle.fileno())
+    os.replace(tmp, path)
+  except BaseException:
+    try:
+      os.unlink(tmp)
+    except OSError:
+      pass
+    raise
+
+
+def main(argv=None):
+  parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+  target = parser.add_mutually_exclusive_group(required=True)
+  target.add_argument("--stdout", action="store_true", help="print the snapshot JSON to stdout")
+  target.add_argument("--dir", metavar="DIR", help="atomically write DIR/<deviceId>.json")
+  parser.add_argument("--device-id", help="override the device id (default: sanitized hostname)")
+  parser.add_argument("--roots", metavar="A,B", help="comma-separated scan roots (default: " + ",".join(ROOTS) + ")")
+  args = parser.parse_args(argv)
+
+  device_id = safe_device_id(args.device_id)
+  roots = [os.path.expanduser(r.strip()) for r in (args.roots or ",".join(ROOTS)).split(",") if r.strip()]
+  accs = scan(roots, PROVIDERS)
+  snapshot = build_snapshot(device_id, accs)
+  text = json.dumps(snapshot, indent=2) + "\n"
+
+  if args.stdout:
+    sys.stdout.write(text)
+  else:
+    path = os.path.join(args.dir, device_id + ".json")
+    write_atomic(path, text)
+
+
+if __name__ == "__main__":
+  main()
