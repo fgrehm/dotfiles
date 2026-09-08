@@ -1,0 +1,17 @@
+#!/bin/sh
+# vim: ft=sh.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+set -eu
+
+plugin="$HOME/.config/omarchy/plugins/omarchy.myagents"
+source="{{ .chezmoi.workingTree }}/config/omarchy-plugins/omarchy.myagents"
+
+if [ -e "$plugin" ] && [ ! -L "$plugin" ]; then
+  rm -rf "$plugin"
+fi
+if [ -L "$plugin" ] && [ "$(readlink "$plugin")" != "$source" ]; then
+  rm "$plugin"
+fi
+if [ ! -e "$plugin" ]; then
+  ln -s "$source" "$plugin"
+fi
