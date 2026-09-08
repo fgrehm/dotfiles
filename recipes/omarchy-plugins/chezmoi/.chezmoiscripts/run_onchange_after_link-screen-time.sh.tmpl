@@ -1,0 +1,18 @@
+#!/bin/sh
+# vim: ft=sh.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+set -eu
+
+plugin="$HOME/.config/omarchy/plugins/agx.screen-time"
+source="{{ .chezmoi.workingTree }}/config/omarchy-plugins/agx.screen-time"
+
+# Replace the previously deployed, copied directory with the tracked source.
+if [ -e "$plugin" ] && [ ! -L "$plugin" ]; then
+  rm -rf "$plugin"
+fi
+if [ -L "$plugin" ] && [ "$(readlink "$plugin")" != "$source" ]; then
+  rm "$plugin"
+fi
+if [ ! -e "$plugin" ]; then
+  ln -s "$source" "$plugin"
+fi
