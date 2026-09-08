@@ -16,3 +16,7 @@ fi
 if [ ! -e "$plugin" ] && [ ! -L "$plugin" ]; then
   ln -s "$source" "$plugin"
 fi
+
+if command -v omarchy >/dev/null 2>&1; then
+  omarchy plugin enable agx.screen-time
+fi
