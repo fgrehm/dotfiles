@@ -30,6 +30,18 @@ test("fmtWords renders worded durations", () => {
   assert.equal(Model.fmtWords(7800000), "2 HOURS 10 MINUTES")
 })
 
+test("trackingApp separates browser pages by normalized title", () => {
+  assert.equal(Model.trackingApp("zen-bin", "  Example   Page  "), "browser:zen:Example Page")
+  assert.equal(Model.trackingApp("firefox", "A: B"), "browser:firefox:A: B")
+  assert.equal(Model.trackingApp("foot", "shell"), "foot")
+  assert.equal(Model.trackingApp("zen", ""), "zen")
+})
+
+test("displayName renders browser page keys", () => {
+  assert.equal(Model.displayName("browser:zen:Example Page"), "browser: Example Page")
+  assert.equal(Model.displayName("browser:firefox:A: B"), "browser: A: B")
+})
+
 test("canonicalApp folds browser subprocess names", () => {
   assert.equal(Model.canonicalApp("zen-bin"), "zen")
   assert.equal(Model.canonicalApp("brave-browser"), "brave")
