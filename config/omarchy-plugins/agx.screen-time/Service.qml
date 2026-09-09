@@ -165,6 +165,14 @@ Item {
     root.rawApp = app
     root.activeTitle = tl && tl.title ? String(tl.title) : ""
     root.resolveInFlight = false
+    // Paused (locked or screensaver up): keep the bucket closed. Toplevel
+    // events and reconcile ticks still fire while the session lock is up,
+    // and reopening here would resume accrual straight through the pause.
+    if (root.sessionLocked || root.screensaverActive) {
+      root.activeApp = ""
+      root.activeStart = 0
+      return
+    }
     if (app && !root.shouldTrack(app)) {
       root.activeApp = ""
       root.activeStart = 0
@@ -198,6 +206,14 @@ Item {
   // for periodic refreshes while a terminal stays focused (its foreground
   // process can change: opencode -> bash).
   function applyResolvedApp(name) {
+    // Paused: discard the result and the pending resolve so an in-flight
+    // resolver that lands during a lock or screensaver cannot reopen a
+    // bucket through the pause. Unlock re-resolves via switchActive().
+    if (root.sessionLocked || root.screensaverActive) {
+      root.resolveInFlight = false
+      root.resolveForApp = ""
+      return
+    }
     var patch = State.applyResolvedApp(
       root, name, root.resolveForApp, root.todayKey,
       root.suspendGapMs, root.lastTick)
@@ -479,7 +495,10 @@ Item {
     if (root.idleService)
       root.setScreensaverActive(root.idleService.screensaverStartedThisCycle
         || root.idleService.screensaverWindowCount > 0)
-    if (root.lockService && root.idleService) serviceLookupTimer.stop()
+    if (root.lockService && root.idleService) {
+      serviceLookupTimer.stop()
+      root.serviceLookupWarned = false
+    }
   }
 
   function setSessionLocked(locked) {
@@ -488,6 +507,10 @@ Item {
     root.sessionLocked = locked
     if (locked) {
       root.lockStartedAt = Date.now()
+      // Kill any in-flight terminal resolve: its result would otherwise
+      // reopen a bucket through the pause (see applyResolvedApp).
+      root.resolveInFlight = false
+      root.resolveForApp = ""
       if (root.debugLogging) console.warn("agx.screen-time: lock started")
       var now = Date.now()
       applyState(State.closeActiveBucket(
@@ -526,12 +549,65 @@ Item {
     }
   }
 
+  property bool serviceLookupWarned: false
+
   Timer {
     id: serviceLookupTimer
     interval: 250
     repeat: true
     running: root.ready && (!root.lockService || !root.idleService)
-    onTriggered: root.refreshShellServices()
+    property int attempts: 0
+    onTriggered: {
+      root.refreshShellServices()
+      attempts++
+      if (attempts >= 40 && !root.serviceLookupWarned) {
+        // The shell's plugin sandbox may never resolve these services
+        // (scoped serviceFor only returns a plugin's own service). Say so
+        // once instead of failing invisibly forever.
+        root.serviceLookupWarned = true
+        console.warn("agx.screen-time: omarchy.lock/omarchy.idle services unavailable after 10s; " +
+          "falling back to polling lock state (pause accuracy degrades to the poll interval)")
+      }
+    }
+  }
+
+  // Fallback when the lock/idle services are unavailable: poll the lock CLI
+  // the same way omarchy's own idle service does, and derive the screensaver
+  // from the toplevel list. Preferred event-driven subscriptions above take
+  // over automatically once the services appear.
+  Timer {
+    id: fallbackPollTimer
+    interval: 5000
+    repeat: true
+    running: root.ready && (!root.lockService || !root.idleService)
+    onTriggered: {
+      if (!root.lockService && !lockPollProc.running) lockPollProc.running = true
+      if (!root.idleService) root.setScreensaverActive(root.screensaverWindowVisible())
+    }
+  }
+
+  function screensaverWindowVisible() {
+    var toplevels = ToplevelManager.toplevels
+    if (!toplevels || !toplevels.length) return false
+    for (var i = 0; i < toplevels.length; i++) {
+      var t = toplevels[i]
+      if (t && t.appId && String(t.appId).toLowerCase() === "org.omarchy.screensaver") return true
+    }
+    return false
+  }
+
+  Process {
+    id: lockPollProc
+    environment: ({ "HOME": root.home })
+    // stdout is "true"/"false"; stderr is discarded so a broken IPC stays
+    // quiet. An empty result reads as unlocked — the safe direction (fail-open
+    // only when there is no shell to be locked).
+    command: ["bash", "-c", "omarchy-shell lock isLocked 2>/dev/null"]
+    stdout: StdioCollector {
+      id: lockPollOut
+      waitForEnd: true
+    }
+    onExited: root.setSessionLocked(lockPollOut.text.trim() === "true")
   }
 
   Connections {
