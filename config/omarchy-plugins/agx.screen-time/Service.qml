@@ -92,6 +92,10 @@ Item {
   property int resolveSpawnGen: 0
   property bool ready: false
   property bool startupPhase: true
+  // Mirrors the state of omarchy's first-party session services (omarchy.lock,
+  // omarchy.idle) so screen time can pause during lock/screensaver without
+  // touching the compositor or spawning helpers on the hot path. The startedAt
+  // timestamps exist only to report pause durations in the debug logs.
   property bool sessionLocked: false
   property bool screensaverActive: false
   property double lockStartedAt: 0
@@ -101,6 +105,8 @@ Item {
   property bool debugLogging: false
   property var lockService: null
   property var idleService: null
+  // The shell injects the plugin API asynchronously, so the first-party
+  // service lookups must re-run whenever the shell reference appears.
   onShellChanged: root.refreshShellServices()
 
   // ---- Public read API for the UI ----------------------------------------
@@ -492,6 +498,8 @@ Item {
     root.idleService = root.shell.serviceFor("omarchy.idle")
     if (root.lockService) {
       root.setSessionLocked(root.lockService.locked)
+      // The event-driven source is authoritative once reachable; the fallback
+      // watcher must not fight it (or keep a bash loop alive) any longer.
       sessionStateWatcher.running = false
     }
     if (root.idleService)
@@ -582,6 +590,9 @@ Item {
     }
     if (!root.resumePending) return
     root.resumePending = false
+    // Rebase the accrual baseline to the actual resume instant: the pause
+    // may have ended up to two seconds (grace period) ago, and the reopen
+    // must not charge time from the stale pre-pause lastTick.
     var now = Date.now()
     root.lastTick = now
     root.switchActive()
@@ -611,12 +622,12 @@ Item {
 
   // Fallback when the sandboxed serviceFor() lookups can't reach the
   // first-party lock/idle services: watch lock state through a single
-  // persistent watcher process
-  // instead of respawning a poll command every few seconds. The loop runs
-  // for the whole session, checks the lock once every 10 seconds, and
-  // prints a line only when the state changes, so the plugin reacts within
-  // ~10s of a lock/unlock with near-zero spawn overhead. Stopped
-  // automatically if the event-driven service lookups ever succeed.
+  // persistent watcher process instead of respawning a poll command every
+  // few seconds. The loop runs for the whole session, checks the lock once
+  // every 10 seconds, and prints a line only when the state changes, so the
+  // plugin reacts within ~10s of a lock/unlock with near-zero spawn
+  // overhead. Stopped automatically if the event-driven service lookups
+  // ever succeed.
   Process {
     id: sessionStateWatcher
     environment: ({ "HOME": root.home })
@@ -648,6 +659,8 @@ Item {
 
   // The screensaver fallback is an in-process toplevel scan (no spawning),
   // so it can simply run every 10 seconds to match the lock watcher.
+  // It must only run while the idle service is unreachable — with the
+  // service present, its signals below are authoritative.
   Timer {
     id: screensaverScanTimer
     interval: 10000
@@ -656,6 +669,9 @@ Item {
     onTriggered: root.setScreensaverActive(root.screensaverWindowVisible())
   }
 
+  // Detects the screensaver without the idle service: omarchy launches it
+  // with the fixed app id "org.omarchy.screensaver", so a scan of the
+  // toplevel list is a reliable, sandbox-visible proxy for "screensaver up".
   function screensaverWindowVisible() {
     var toplevels = ToplevelManager.toplevels
     if (!toplevels || !toplevels.length) return false
@@ -666,6 +682,7 @@ Item {
     return false
   }
 
+  // Event-driven sources, used whenever the sandboxed lookups succeed.
   Connections {
     target: root.lockService
     function onLockedChanged() {
