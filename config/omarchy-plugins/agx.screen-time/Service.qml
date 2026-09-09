@@ -621,7 +621,11 @@ Item {
     id: sessionStateWatcher
     environment: ({ "HOME": root.home })
     command: ["bash", "-c",
-      "prev=''; while :; do " +
+      "ppid=$PPID; prev=''; while :; do " +
+      // Orphan guard: a SIGKILLed shell leaves this loop running forever
+      // (quickshell cannot reap children on the way out); exit once the
+      // parent is gone so restarts don't accumulate watchers.
+      "kill -0 $ppid 2>/dev/null || exit 0; " +
       "cur=$(omarchy-shell lock isLocked 2>/dev/null); " +
       "if [ -n \"$cur\" ] && [ \"$cur\" != \"$prev\" ]; then printf '%s\\n' \"$cur\"; prev=\"$cur\"; fi; " +
       "sleep 10; done"]

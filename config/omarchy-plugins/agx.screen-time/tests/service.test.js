@@ -59,6 +59,8 @@ test("falls back to a persistent lock watcher when services are unavailable", ()
   assert.match(service, /property bool serviceLookupWarned: false/)
   assert.match(service, /id: sessionStateWatcher/)
   assert.match(service, /omarchy-shell lock isLocked/)
+  // Exits when its parent shell dies, so restarts don't accumulate watchers.
+  assert.match(service, /kill -0 \$ppid 2>\/dev\/null \|\| exit 0/)
   // Single persistent watcher (change-only output), not a respawning poll.
   assert.match(service, /SplitParser/)
   assert.match(service, /setSessionLocked\(String\(line\)\.trim\(\) === "true"\)/)
