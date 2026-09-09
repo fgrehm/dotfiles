@@ -13,14 +13,20 @@ reopen one mid-lock.
 Local fix (upstream candidate):
 
 - Warn once after 10s when the lock/idle services never resolve.
-- Fallback poll every 5s: `omarchy-shell lock isLocked` (same call omarchy's
-  idle service uses; stdout `true`/`false`, empty = unlocked) feeding the
-  existing `setSessionLocked()`; screensaver derived from the toplevel list.
+- Fallback: single persistent watcher process calling
+  `omarchy-shell lock isLocked` every 10s (same call omarchy's idle service
+  uses; change-only output, supervisor restart) feeding the existing
+  `setSessionLocked()`; screensaver derived from the toplevel list every
+  10s in-process. Resume after unlock is deferred ~2s and re-validates both
+  pause flags so a stale reading cannot briefly reopen a bucket.
 - `switchActive()` / `applyResolvedApp()` keep the bucket closed while
   `sessionLocked || screensaverActive`.
 - Event-driven subscriptions still take over automatically when the shell
   exposes the services (future omarchy-shell fix: add `omarchy.lock` to the
   third-party first-party proxy allowlist with a read-only `locked`).
+- Upstream work lives in `~/Projects/oss/quickshell-screentime-plugin`
+  (branch `session-state`, commits 7331742/9a3c054/bae89e8; PR draft
+  `docs/pr-drafts/PR-lock-state.md`).
 
 Data note: history up to 2026-09-08 was corrected in place (proportional
 scale-down to measured unlocked wall time); raw file preserved as
