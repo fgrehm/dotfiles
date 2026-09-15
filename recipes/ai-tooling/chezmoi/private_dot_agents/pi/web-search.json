@@ -1,3 +1,4 @@
 {
-  "searchProvider": "anysearch"
+  "searchProvider": "anysearch",
+  "workflow": "none"
 }
