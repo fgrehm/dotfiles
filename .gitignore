@@ -1,6 +1,10 @@
 compiled-home/
 test-results/
 
+# Python bytecode
+__pycache__/
+*.py[cod]
+
 # Local session notes and memory (machine-specific, never share)
 .ai/
 
