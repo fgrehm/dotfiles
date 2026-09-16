@@ -35,4 +35,4 @@ scale-down to measured unlocked wall time); raw file preserved as
 Verification still owed: one real lock window observed with the pause
 engaged (lock for ~1 min, confirm today's total freezes).
 
-Fork notice: vendored from https://github.com/ax1g/quickshell-screentime-plugin at commit 42ca30751cf3e623e615cbb54d9bf874927560a (v1.5.0).
+Fork notice: vendored from https://github.com/ax1g/quickshell-screentime-plugin at commit 3c10c2229fab0a45fc5bdefb265094ccae80e0cb (v1.6.0). Browser-title tracking remains a repository-local experiment and is disabled by default.
