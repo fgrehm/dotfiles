@@ -14,7 +14,7 @@ Everything else is upstream verbatim, including the usage record directory (`~/.
 
 - `assets/` gains `ollama-cloud.svg`/`ollama-cloud-light.svg` (Ollama llama mark) and `opencode-go.svg`/`opencode-go-light.svg` (OpenCode square-in-square mark), sourced from [Simple Icons](https://simpleicons.org) (CC0) and following the panel's white-mark + `-light` twin convention like codex.
 
-Record ids follow the `pi-usage-snapshot` contract (`codex`, `ollama-cloud`, `opencode-go`) so local records, cross-machine snapshots, and future collectors all aggregate under the same keys. Cross-machine snapshots for non-plugin machines are produced by the `pi-usage-snapshot` dotfiles recipe (`~/.local/bin/pi-usage-snapshot`).
+Record ids follow the `agent-usage-snapshot` contract (`codex`, `ollama-cloud`, `opencode-go`) so local records, cross-machine snapshots, and future collectors all aggregate under the same keys. Cross-machine snapshots for non-plugin machines are produced by the `agent-usage-snapshot` dotfiles recipe (`~/.local/bin/agent-usage-snapshot`).
 
 Upstream note: the quattro plugin API surface (`PluginShellApi`, `AuthServiceStore`, plugin auth boundary) landed after the plugin was written and does not constrain it — the vendored copy is compatible with the current shell as-is.
 

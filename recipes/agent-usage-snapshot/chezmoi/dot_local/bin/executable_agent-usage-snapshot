@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Print or write a cross-machine pi usage snapshot for the omarchy agents bar.
 
-Scans pi session JSONL (~/.pi/agent/sessions and bb's
-~/.bb/pi-bridge-sessions) and emits one snapshot JSON matching the agents
-plugin syncDir contract consumed by shell/plugins/agents/Main.qml.
+Scans Pi session JSONL (~/.pi/agent/sessions and bb's
+~/.bb/pi-bridge-sessions) plus Claude Code transcripts (~/.claude/projects)
+and emits one snapshot JSON matching the agents plugin syncDir contract
+consumed by shell/plugins/agents/Main.qml.
 Counting semantics mirror omarchy-agent-usage-codex's scan_pi_sessions() so
 snapshots merge consistently with locally-collected records.
 
@@ -23,6 +24,7 @@ from datetime import datetime, timedelta, timezone
 ROOTS = [
   "~/.pi/agent/sessions",
   "~/.bb/pi-bridge-sessions",
+  "~/.claude/projects",
 ]
 
 # Snapshot provider ids must match the ids local usage records use
@@ -32,6 +34,7 @@ PROVIDERS = [
   {"key": "openai-codex", "id": "codex", "name": "Codex"},
   {"key": "ollama-cloud", "id": "ollama-cloud", "name": "Ollama Cloud"},
   {"key": "opencode-go", "id": "opencode-go", "name": "OpenCode Go"},
+  {"key": "claude-code", "id": "claude", "name": "Claude Code"},
 ]
 
 
@@ -109,34 +112,42 @@ def scan(roots, providers):
           entry = json.loads(raw)
         except (ValueError, RecursionError):
           continue
-        if not isinstance(entry, dict) or entry.get("type") != "message":
+        if not isinstance(entry, dict):
           continue
-        message_key = path + ":" + str(entry.get("id") or "")
+        is_claude = path.startswith(os.path.expanduser("~/.claude/projects"))
+        message = entry.get("message") if isinstance(entry.get("message"), dict) else {}
+        if is_claude:
+          if entry.get("type") != "assistant" and message.get("role") != "assistant":
+            continue
+          acc = accs["claude"]
+          usage = message.get("usage") or entry.get("usage")
+          message_key = str(message.get("id") or entry.get("messageId") or "")
+          if not message_key:
+            message_key = path + ":" + str(entry.get("uuid") or entry.get("requestId") or "")
+        else:
+          if entry.get("type") != "message" or message.get("role") != "assistant":
+            continue
+          provider = str(message.get("provider") or "")
+          api = str(message.get("api") or "")
+          acc = None
+          for spec in providers:
+            if provider == spec["key"] or api.startswith(spec["key"]):
+              acc = accs[spec["id"]]
+              break
+          if acc is None:
+            continue
+          usage = message.get("usage")
+          message_key = path + ":" + str(entry.get("id") or "")
         if message_key in seen_messages:
           continue
         seen_messages.add(message_key)
-        message = entry.get("message")
-        if not isinstance(message, dict) or message.get("role") != "assistant":
-          continue
-
-        provider = str(message.get("provider") or "")
-        api = str(message.get("api") or "")
-        acc = None
-        for spec in providers:
-          if provider == spec["key"] or api.startswith(spec["key"]):
-            acc = accs[spec["id"]]
-            break
-        if acc is None:
-          continue
-
-        usage = message.get("usage")
         if not isinstance(usage, dict) or not usage:
           continue
         total = number(usage.get("totalTokens"))
-        input_tokens = number(usage.get("input"))
-        output_tokens = number(usage.get("output"))
-        cache_read = number(usage.get("cacheRead"))
-        cache_write = number(usage.get("cacheWrite"))
+        input_tokens = number(usage.get("input", usage.get("input_tokens")))
+        output_tokens = number(usage.get("output", usage.get("output_tokens")))
+        cache_read = number(usage.get("cacheRead", usage.get("cache_read_input_tokens")))
+        cache_write = number(usage.get("cacheWrite", usage.get("cache_creation_input_tokens")))
         if total and not (input_tokens or output_tokens or cache_read or cache_write):
           input_tokens = total
         if not (input_tokens or output_tokens or cache_read or cache_write):
@@ -144,7 +155,7 @@ def scan(roots, providers):
 
         day = local_day(entry.get("timestamp"), message.get("timestamp"))
         session_key = path
-        model = str(message.get("model") or "unknown")
+        model = str(message.get("model") or entry.get("model") or ("claude" if acc["spec"]["id"] == "claude" else "unknown"))
         total = input_tokens + output_tokens + cache_read + cache_write
 
         acc["total_prompts"] += 1
@@ -220,7 +231,7 @@ def safe_device_id(raw):
 def write_atomic(path, text):
   directory = os.path.dirname(os.path.abspath(path))
   os.makedirs(directory, exist_ok=True)
-  fd, tmp = tempfile.mkstemp(dir=directory, prefix=".pi-usage-snapshot-", suffix=".tmp")
+  fd, tmp = tempfile.mkstemp(dir=directory, prefix=".agent-usage-snapshot-", suffix=".tmp")
   try:
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
       handle.write(text)

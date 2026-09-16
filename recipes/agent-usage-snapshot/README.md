@@ -1,4 +1,4 @@
-# pi-usage-snapshot
+# agent-usage-snapshot
 
 Standalone python3 tool that scans pi/agent session logs on a machine and emits a **cross-machine usage snapshot** in the shape consumed by the Omarchy agents bar plugin's sync system (`shell/plugins/agents/Main.qml` — the `syncDir` contract). It lets machines that do **not** run the Omarchy shell plugin (cloud VMs, devcontainers) contribute their pi usage stats to the aggregate shown in the bar.
 
@@ -11,12 +11,13 @@ The plugin's snapshot *writer* lives inside `Main.qml`, so only machines running
 
 ## What it scans
 
-Line-based pi session JSONL from (existing dirs only):
+Line-based session JSONL from (existing dirs only):
 
 - `~/.pi/agent/sessions/**` (standard pi layout, nested per-project dirs)
 - `~/.bb/pi-bridge-sessions/**` (bb bridge threads, flat `thr_*.jsonl`)
+- `~/.claude/projects/**` (Claude Code project transcripts)
 
-Only assistant messages carrying `message.usage` count, attributed per-message via `message.provider`/`message.api` (threads can switch providers mid-session). Counting semantics intentionally mirror the upstream `scan_pi_sessions()` in `bin/omarchy-agent-usage-codex` so snapshots merge consistently with locally-collected records: one usage message == one prompt, `recentDays[].messageCount` carries token totals, session == file, and the provider match is `provider == key or api.startswith(key)`.
+Pi and BB files count assistant messages carrying `message.usage`, attributed per-message via `message.provider`/`message.api` (threads can switch providers mid-session). Claude Code files count assistant entries using their top-level or nested `usage` object, with Claude's snake_case token field names. Counting semantics intentionally mirror the upstream `scan_pi_sessions()` in `bin/omarchy-agent-usage-codex` so snapshots merge consistently with locally-collected records: one usage message == one prompt, `recentDays[].messageCount` carries token totals, session == file, and the provider match is `provider == key or api.startswith(key)`.
 
 ## Provider ids (the contract)
 
@@ -36,14 +37,14 @@ All stats are emitted with `scope: "device"` (they count sessions that ran on th
 
 ```bash
 # Push mode: write into a synced folder
-pi-usage-snapshot --dir ~/sync/agents-usage
+agent-usage-snapshot --dir ~/sync/agents-usage
 
 # Pull mode: from the bar machine, nothing installed on the remote
-ssh vm 'python3 -' < ~/.local/bin/pi-usage-snapshot --stdout \
+ssh vm 'python3 -' < ~/.local/bin/agent-usage-snapshot --stdout \
   > ~/.local/state/omarchy/agents/usage-sync/vm.json
 
 # Explicit stable device id (recommended where hostnames churn, e.g. containers)
-pi-usage-snapshot --dir ~/sync/agents-usage --device-id buildvm
+agent-usage-snapshot --dir ~/sync/agents-usage --device-id buildvm
 ```
 
 The deviceId defaults to the hostname, sanitized the same way as the plugin's `safeDeviceId()`. Use a stable `--device-id` on machines whose hostname changes between boots.
@@ -54,4 +55,4 @@ Scheduling is intentionally out of scope (single-shot script): use cron, a syste
 
 ## Deployment
 
-Installed by this recipe as `~/.local/bin/pi-usage-snapshot` on all targets (Omarchy, Debian containers/VMs). Requires `python3` (stdlib only — no `rg`, no third-party modules).
+Installed by this recipe as `~/.local/bin/agent-usage-snapshot` on all targets (Omarchy, Debian containers/VMs). Requires `python3` (stdlib only — no `rg`, no third-party modules).

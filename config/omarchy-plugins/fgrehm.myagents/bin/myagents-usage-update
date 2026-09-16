@@ -18,7 +18,7 @@ omarchy:args=[--force] [--limits-only] [--except <agent>] [agent...]
 # Stats come from pi session logs only (~/.pi/agent/sessions and bb's
 # ~/.bb/pi-bridge-sessions), counting semantics mirroring the upstream
 # scan_pi_sessions() so records merge consistently with cross-machine
-# snapshots from the pi-usage-snapshot recipe.
+# snapshots from the agent-usage-snapshot recipe.
 
 import argparse
 import fcntl
