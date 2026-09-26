@@ -22,7 +22,9 @@ for skill in "$SKILLS_DIR"/*/; do
   [ -d "$skill" ] || continue
   name="$(basename "$skill")"
   for target in "$CLAUDE_DIR" "$PI_DIR"; do
-    if [ ! -e "$target/$name" ]; then
+    # Skip anything already there, including a dangling symlink (-e is false
+    # for one); ln -s without -f would fail on it and log a bogus success.
+    if [ ! -e "$target/$name" ] && [ ! -L "$target/$name" ]; then
       ln -s "$skill" "$target/$name"
       log_info "Linked $name into $target"
     fi

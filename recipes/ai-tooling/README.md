@@ -8,7 +8,7 @@ Deploys shared agent instructions, skills, and Pi agent settings. Claude Code an
 
 - `~/.agents/AGENTS.md`: global agent instructions (canonical).
 - `~/.pi/agent/AGENTS.md`: symlink to the canonical instructions.
-- `~/.pi/agent/ollama-cloud.json`: Pi agent settings.
+- `~/.agents/pi/{ollama-cloud,web-search}.json`: Pi provider settings, linked into `~/.pi/agent/` on machines that do not have another owner for those paths (see below).
 - `~/.pi/agent/extensions/pi-footer.ts`: Claude-style Pi footer showing project, session, Git branch, provider/model, thinking level, context usage, token totals, cache totals, and cost.
 - `~/.pi/agent/extensions/pi-quit.ts`: Pi quit aliases for `/exit`, `/quit`, bare `exit`, and Vim-style `:q`, `:wq`, and `:x` variants.
 - When `pi` is available, the recipe installs `npm:pi-web-access` and `npm:pi-ollama-cloud` through Pi itself; the resulting package settings remain machine-local. Versions are pinned for fresh machines, but an extension already present in `settings.json` (at any version) is left untouched, so machine-local updates are never downgraded.
@@ -18,6 +18,10 @@ Deploys shared agent instructions, skills, and Pi agent settings. Claude Code an
 ### Container behavior
 
 Containers keep ownership of configuration supplied by their image or runtime. Existing global `AGENTS.md` and Pi policy/provider JSON files are preserved; when a container has not supplied one, the recipe seeds and links its default. Portable skills, Pi extensions, Claude presentation settings, and the non-destructive Claude settings merge still apply.
+
+### Link policy (never overwrite)
+
+The link scripts (`link-pi-home`, `link-claude-home`, `link-skills`) only create missing symlinks. If the target path already holds a real file, it is left alone even when it matches our content byte-for-byte: that file belongs to another manager or the user, and that manager stays authoritative for the path (a VM image seed rewriting its files, a container runtime, or a hand-configured tool). The same applies to symlinks the scripts do not own; the scripts' own correct links are skipped, and only a stale link pointing elsewhere under `~/.agents` is repointed.
 
 ### Shared skills
 

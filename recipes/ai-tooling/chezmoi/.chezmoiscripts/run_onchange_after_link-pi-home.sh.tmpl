@@ -49,30 +49,30 @@ link_into_pi() { # <source> <dest>
     return 0
   fi
 
-  # Adopt our own stale link, leave anything else the user put there alone.
+  # Never overwrite what is already at dest. A real file there belongs to
+  # another manager or the user (a container runtime, a home-seed manager)
+  # even when it matches our content byte-for-byte: it was that
+  # cmp-then-replace path that traded another manager's files for symlinks
+  # and broke its startup checks.
   if [ -L "$dest" ]; then
-    case "$(readlink "$dest")" in
-    "$AGENTS_DIR"/*) rm -f "$dest" ;;
+    dest_link="$(readlink "$dest")"
+    case "$dest_link" in
+    "$AGENTS_DIR"/*)
+      if [ "$dest_link" = "$src" ]; then
+        log_skip "$(basename "$dest") is already linked, leaving it"
+        return 0
+      fi
+      # Adopt our own stale link that points elsewhere in $AGENTS_DIR.
+      rm -f "$dest"
+      ;;
     *)
       log_skip "$(basename "$dest") is a symlink we do not own, leaving it"
       return 0
       ;;
     esac
   elif [ -e "$dest" ]; then
-    # In containers, every existing real file belongs to the runtime, even if
-    # it currently happens to match our default byte-for-byte.
-    # {{ if .isContainer }}
-    log_skip "$(basename "$dest") is provided by the container, leaving it"
+    log_skip "$(basename "$dest") exists as a real file, leaving it"
     return 0
-    # {{ else }}
-    if cmp -s "$src" "$dest"; then
-      rm -f "$dest"
-      log_info "Replacing unchanged legacy $(basename "$dest") with a link"
-    else
-      log_skip "$(basename "$dest") exists as a real file, leaving it"
-      return 0
-    fi
-    # {{ end }}
   fi
 
   ln -s "$src" "$dest"
