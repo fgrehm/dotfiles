@@ -1,0 +1,40 @@
+#!/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# One-time cleanup: the recipe used to install the cartage binary and enable
+# its systemd user service on VMs (non-container, non-Omarchy), where nothing
+# uses it: there are no client symlinks and no host daemon socket. The recipe
+# now skips VMs entirely (see .chezmoiignore); this removes what an earlier
+# apply left behind. Runs before file deployment so a re-apply does not
+# resurrect the unit before it is disabled.
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+# {{ if or .isContainer .isOmarchy }}
+log_skip "Cartage cleanup only applies to VMs"
+exit 0
+# {{ end }}
+
+set -eo pipefail
+
+UNIT_DIR="$HOME/.config/systemd/user"
+UNIT="$UNIT_DIR/cartage.service"
+
+if [ -f "$UNIT" ]; then
+  if systemctl --user status &>/dev/null; then
+    log_info "Disabling cartage.service..."
+    systemctl --user disable --now cartage.service || true
+    systemctl --user daemon-reload || true
+  else
+    log_skip "No systemd user session, skipping service disable"
+  fi
+  rm -f "$UNIT"
+  log_info "Removed cartage.service"
+fi
+
+if [ -f "$HOME/.local/bin/cartage" ]; then
+  rm -f "$HOME/.local/bin/cartage"
+  log_info "Removed cartage binary"
+fi
+
+rm -f "$HOME/.local/share/bash-completion/completions/cartage"
+rm -f "$HOME/.zsh/completions/_cartage"

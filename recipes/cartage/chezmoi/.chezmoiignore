@@ -1,5 +1,17 @@
-# Skipped in containers (no systemd for user services)
-{{ if .isContainer }}
+# Cartage has two halves: the client (binary + command symlinks, containers)
+# and the host daemon (systemd user service, Omarchy only).
+# - Containers: binary + client symlinks, no service (no systemd user session)
+# - Omarchy (bare metal): binary + service
+# - VMs (non-container, non-Omarchy): nothing. There is no host daemon socket
+#   to forward to, the client symlinks are useless, and the daemon would run
+#   with no clients. A run_once_before_ cleanup script removes what earlier
+#   applies left behind on such machines.
+{{ if and (not .isContainer) (not .isOmarchy) }}
+.local/bin/cartage
+.config/systemd/user/cartage.service
+.chezmoiscripts/enable-cartage.sh
+.chezmoiscripts/completions-cartage.sh
+{{ else if .isContainer }}
 .config/systemd/user/cartage.service
 .chezmoiscripts/enable-cartage.sh
 {{ else }}

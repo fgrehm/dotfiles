@@ -3,7 +3,9 @@
 Installs 1Password desktop app and CLI (`op`), then downloads SSH keys from a
 configured 1Password vault/item during `chezmoi apply`.
 
-Skipped in containers (they use SSH agent forwarding).
+Skipped in containers (they use SSH agent forwarding) and on VMs (the SSH-key
+setup requires the `op` CLI and interactive sign-in; the `chezmoi init` vault
+prompts are likewise scoped to Omarchy).
 
 On Omarchy, 1Password is preinstalled, so only the SSH-key setup runs (no install step). The apt install script that used to run on the Debian laptop was removed when Debian-as-bare-metal was dropped.
 

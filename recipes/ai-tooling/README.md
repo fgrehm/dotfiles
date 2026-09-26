@@ -11,7 +11,7 @@ Deploys shared agent instructions, skills, and Pi agent settings. Claude Code an
 - `~/.agents/pi/{ollama-cloud,web-search}.json`: Pi provider settings, linked into `~/.pi/agent/` on machines that do not have another owner for those paths (see below).
 - `~/.pi/agent/extensions/pi-footer.ts`: Claude-style Pi footer showing project, session, Git branch, provider/model, thinking level, context usage, token totals, cache totals, and cost.
 - `~/.pi/agent/extensions/pi-quit.ts`: Pi quit aliases for `/exit`, `/quit`, bare `exit`, and Vim-style `:q`, `:wq`, and `:x` variants.
-- When `pi` is available, the recipe installs `npm:pi-web-access` and `npm:pi-ollama-cloud` through Pi itself; the resulting package settings remain machine-local. Versions are pinned for fresh machines, but an extension already present in `settings.json` (at any version) is left untouched, so machine-local updates are never downgraded.
+- When `pi` is available, the recipe installs `npm:pi-web-access@0.31.0` and `npm:pi-ollama-cloud@0.12.1` through Pi itself, but only when the package is absent or older than the pin (never downgrading a newer installed version, which is what home-seed managers on VMs pin and re-apply at every boot); the resulting package settings remain machine-local.
 - `~/.claude/settings.json`: deep-merged Claude settings; local model/hooks/plugins are preserved.
 - `~/.claude/statusline.sh` and `~/.claude/output-styles/`: Claude presentation settings.
 
@@ -22,6 +22,8 @@ Containers keep ownership of configuration supplied by their image or runtime. E
 ### Link policy (never overwrite)
 
 The link scripts (`link-pi-home`, `link-claude-home`, `link-skills`) only create missing symlinks. If the target path already holds a real file, it is left alone even when it matches our content byte-for-byte: that file belongs to another manager or the user, and that manager stays authoritative for the path (a VM image seed rewriting its files, a container runtime, or a hand-configured tool). The same applies to symlinks the scripts do not own; the scripts' own correct links are skipped, and only a stale link pointing elsewhere under `~/.agents` is repointed.
+
+The Pi provider and sandbox JSON files (`ollama-cloud.json`, `web-search.json`, `sandbox.json`) are a common claim for home-seed managers. Because seeds write their files at boot, the link scripts skip them on those machines as long as the files exist; a link is only created if the file is absent at apply time, so do not install these dotfiles on a machine before its home seed has run.
 
 ### Shared skills
 

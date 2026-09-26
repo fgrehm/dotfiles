@@ -12,15 +12,43 @@ fi
 # whenever Pi is present.
 settings="$HOME/.pi/agent/settings.json"
 
-# Pin versions so a fresh machine gets a known-good set, but never downgrade or
-# reinstall an extension the machine already has. Match on the package name, not
-# the pinned version, so a newer machine-local version is left untouched.
-for extension in npm:pi-web-access@0.27.0 npm:pi-ollama-cloud@0.10.0; do
-  package_name="${extension%@*}"
-  if [ -f "$settings" ] && jq -e --arg name "$package_name" \
-    '.packages | any(.[]; (if type == "string" then . else .source end) as $s | $s == $name or ($s | startswith($name + "@")))' \
-    "$settings" >/dev/null 2>&1; then
-    log_skip "Pi extension already configured: $package_name"
+# Never downgrade an extension that is already installed: machines whose home is
+# seeded by another manager (a VM image seed) pin newer versions and re-apply
+# them at every boot, so reinstalling our pin would ping-pong. Only install when
+# the package is absent or older than our pin; otherwise leave it alone and let
+# whichever manager pinned the installed version keep it.
+newer_than() { # <candidate> <installed> -> 0 when candidate > installed
+  [ "$1" = "$2" ] && return 1
+  [ "$(printf '%s\n' "$2" "$1" | sort -V | tail -n 1)" = "$1" ]
+}
+
+# Build a name -> installed version map from the settings entries. Entries are
+# either "npm:<name>@<version>" strings or objects carrying a "source" key.
+declare -A installed=()
+if [ -f "$settings" ]; then
+  map_file="$(mktemp)"
+  jq -r '
+    .packages[]?
+    | if type == "object" then .source else . end
+    | select(startswith("npm:"))
+    | .[4:]
+    | if test("@[^@]+$")
+      then capture("^(?<name>.+)@(?<version>[^@]+)$") | "\(.name)\t\(.version)"
+      else . + "\t"
+      end' "$settings" >"$map_file" 2>/dev/null
+  while IFS=$'\t' read -r name version; do
+    [ -n "$name" ] && installed["$name"]="$version"
+  done <"$map_file"
+  rm -f "$map_file"
+fi
+
+for extension in npm:pi-web-access@0.31.0 npm:pi-ollama-cloud@0.12.1; do
+  name="${extension#npm:}"
+  name="${name%@*}"
+  pin="${extension##*@}"
+
+  if [ -n "${installed[$name]+x}" ] && ! newer_than "$pin" "${installed[$name]}"; then
+    log_skip "Pi extension up to date: $name ${installed[$name]}"
     continue
   fi
 
