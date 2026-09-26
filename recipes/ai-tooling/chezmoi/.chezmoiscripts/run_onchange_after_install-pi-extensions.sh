@@ -12,10 +12,15 @@ fi
 # whenever Pi is present.
 settings="$HOME/.pi/agent/settings.json"
 
+# Pin versions so a fresh machine gets a known-good set, but never downgrade or
+# reinstall an extension the machine already has. Match on the package name, not
+# the pinned version, so a newer machine-local version is left untouched.
 for extension in npm:pi-web-access@0.27.0 npm:pi-ollama-cloud@0.10.0; do
-  if [ -f "$settings" ] && jq -e --arg extension "$extension" \
-    '.packages | index($extension) != null' "$settings" >/dev/null 2>&1; then
-    log_skip "Pi extension already configured: $extension"
+  package_name="${extension%@*}"
+  if [ -f "$settings" ] && jq -e --arg name "$package_name" \
+    '.packages | any(.[]; (if type == "string" then . else .source end) as $s | $s == $name or ($s | startswith($name + "@")))' \
+    "$settings" >/dev/null 2>&1; then
+    log_skip "Pi extension already configured: $package_name"
     continue
   fi
 
