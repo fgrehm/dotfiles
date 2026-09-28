@@ -9,6 +9,7 @@ Git configuration, global gitignore, shell aliases, and TUI tooling.
 - Installs Worktrunk (`wt`) and Hunk through Omarchy's mise wrapper
 - Deploys `~/.config/git/config` (XDG location, templated for user identity and SSH signing)
 - Deploys `~/.config/git/ignore` (global ignores for editor swap files, OS cruft, AI tooling)
+- Deploys `~/.config/hunk/config.toml` (Hunk diff review TUI settings)
 - Adds shell aliases and Bash/Zsh completions via `~/.shellrc.d/git.sh` and the Git utility completion script
 
 ## Config highlights
