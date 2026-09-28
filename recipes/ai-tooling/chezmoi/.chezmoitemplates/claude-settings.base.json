@@ -9,7 +9,7 @@
     "pr": ""
   },
   "permissions": {
-    "defaultMode": "default",
+    "defaultMode": "auto",
     "allow": [
       "WebFetch(domain:github.com)"
     ],
