@@ -36,13 +36,13 @@ A `run_onchange_after_link-skills.sh.tmpl` script creates these symlinks for eve
 
 ### Project continuity context
 
-Pi and Claude Code can load an explicitly approved `<git-root>/.agents/context/main.md` as project-state context. The file is limited to 8 KiB, must be a regular UTF-8 file inside the Git root, and each SHA-256 version requires approval. Approvals are shared at `~/.agents/project-context-trust.json`, so approving a version in either client authorizes the same version in the other. Claude Code prints the approval command when it encounters an unapproved file:
+Pi and Claude Code load a valid `<git-root>/.agents/context/main.md` as project-state context. It is limited to 8 KiB and must be a regular UTF-8 file inside the Git root. By default, both loaders **warn but still load** an unapproved or changed file, including in non-interactive sessions. Set `PROJECT_CONTEXT_STRICT=1` to require approval of each SHA-256 version before loading. Approvals are shared at `~/.agents/project-context-trust.json`. To review and approve the file for both clients from the project root, run:
 
 ```sh
 ~/.agents/bin/project-context-hook --approve
 ```
 
-Pi prompts to review the file in interactive mode, or use `/project-context`. Neither client loads new or changed context in non-interactive mode. Keep `main.md` as a short index that links detailed work in `.agents/scratchpad/`.
+In strict mode, Pi can prompt for approval in its interactive TUI; Claude Code prints the approval command. `/project-context` refreshes Pi's loaded context and offers review in strict interactive mode. Only `main.md` is auto-loaded. Keep it as a short project-wide index, not a session log. `.agents/context/resume.md` holds the current task handoff in this checkout and must be opened explicitly; use `.agents/scratchpad/` for supporting plans, research, and concurrent-task handoffs. The [flush skill](chezmoi/private_dot_agents/skills/flush/SKILL.md) contains a resume template and guidance for trimming completed work.
 
 To vendor a third-party skill from GitHub, use the helper under this recipe:
 

@@ -25,10 +25,11 @@ When uncertain, pick the path that lets the human resume the work at their own p
 
 When working in a repository, use its `.agents/` directory as the shared workspace for local context and scratch work:
 
-- `.agents/context/` contains local context that should survive across sessions.
-- `.agents/scratchpad/` contains transient notes, plans, and handoffs.
+- `.agents/context/main.md` is a short project-wide index of current state and pointers. It is the only context file the Pi and Claude project-context loaders read automatically.
+- `.agents/context/resume.md` is the handoff for the current task in this checkout. Read it when resuming work and check that its named task matches the current request; keep its next step up to date. Before switching tasks, preserve unfinished handoffs in `.agents/scratchpad/` rather than overwriting them.
+- `.agents/scratchpad/` holds supporting plans, investigations, and other detailed working notes. Create separate task handoffs there only when concurrent work needs them.
 - Both directories are local and ignored by the user's global Git excludes. Do not commit their contents unless the repository explicitly says otherwise.
-- Prefer clear Markdown files that another agent can discover and continue from. Promote anything that needs to be shared with the project into the repository's documented source files.
+- Keep context limited to what cannot be recovered easily from the repository. Link to `AGENTS.md`, `README.md`, code, or Git history rather than copying them. Promote durable project decisions to repository docs and trim context and scratchpad pointers when work is complete. Ask before deleting untracked files.
 
 ## Git
 

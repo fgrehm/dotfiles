@@ -7,17 +7,20 @@ description: "Persist session state at a pause or handoff. Use when the user say
 
 Persist only state that lets the next session resume safely. Use the repository's `.agents/` workspace:
 
-- `.agents/context/main.md`: short, durable project-state index. It is auto-loaded by approved Pi and Claude Code sessions.
-- `.agents/scratchpad/`: detailed reviews, plans, investigations, and handoffs. These files are local and ignored.
-- Canonical repository docs: project decisions that belong with the codebase and should be shared.
+- `.agents/context/main.md`: short project-wide index. Pi and Claude Code load this file automatically when valid (and warn if unapproved by default; `PROJECT_CONTEXT_STRICT=1` requires approval).
+- `.agents/context/resume.md`: current task handoff in this checkout. It is not auto-loaded; agents read it when resuming work.
+- `.agents/scratchpad/`: supporting plans, research, and separate handoffs when concurrent work needs them. These files are local and ignored.
+- Canonical repository docs: durable decisions and facts that belong with the codebase.
+
+Use [the resume template](references/resume-template.md) when starting a handoff. Create only files the work needs.
 
 ## Rules
 
-1. Read existing `.agents/context/main.md` before changing it. Keep its current confirmed state and update it in place.
-2. Keep `main.md` under 8 KiB. Record active state, durable decisions, and links to detailed artifacts. Put detail in `scratchpad/`.
-3. When `main.md` changes, tell the user it requires renewed SHA-256 approval before Pi or Claude Code loads the new version.
-4. Keep scratchpad files resumable: goal, confirmed facts, current status, and exact next step.
-5. Never delete untracked `.agents/` files. Ask before removing or replacing uncertain local state.
+1. Read existing `.agents/context/main.md` and `.agents/context/resume.md` before changing either. Update confirmed state in place; preserve unfinished handoffs in `.agents/scratchpad/` before switching tasks.
+2. Keep `main.md` under 8 KiB. Put only project-wide state and pointers there, not session history. Do not duplicate instructions from `AGENTS.md`, facts in `README.md`, code, or Git history; link to the source when useful.
+3. When `main.md` changes, report that its SHA-256 changed. The loaders warn but auto-load unapproved versions by default; with `PROJECT_CONTEXT_STRICT=1` they require renewed approval.
+4. Keep `resume.md` current-state-first: task, status, exact next step, blockers, and links to detail, followed by at most 10 dated, one-paragraph entries for meaningful sessions. Do not record every conversation.
+5. Keep scratchpad files resumable: goal, confirmed facts, current status, and exact next step. Ask before deleting untracked `.agents/` files or replacing uncertain local state.
 6. Ask before committing. Stage files explicitly by name.
 
 ## Process
@@ -36,34 +39,26 @@ Ask whether to commit any uncommitted work.
 
 Review the session for state worth preserving.
 
-Update `.agents/context/main.md` for:
+Update `.agents/context/resume.md` for the current task's status, exact next step, blocker or pending human decision, and links to supporting files. Add a dated session paragraph only when the session meaningfully changed the state or direction; keep the newest 10. When switching tasks, preserve the unfinished handoff in `.agents/scratchpad/` and replace `resume.md` only after checking existing state.
 
-- Active work that the next session needs immediately.
-- Confirmed decisions, constraints, or cross-client workflow preferences.
-- Links to the relevant scratchpad artifact.
+Update `.agents/context/main.md` only when project-wide state or a pointer to active work changes. Keep it an index, not a transcript. Do not copy information already available from repository docs, code, or Git history.
 
-Create or update `.agents/scratchpad/<topic>.md` for:
+Create or update `.agents/scratchpad/<topic>.md` for detailed analysis, plans, research, or concurrent-task handoffs that would otherwise require rediscovery. Link relevant detail from `resume.md` or `main.md`.
 
-- Detailed analysis, plans, incomplete implementation, or a handoff.
-- Facts established during the session that would otherwise require rediscovery.
-- The exact next step and any pending human decision.
+### 3. Trim completed work and update canonical documentation
 
-Do not add derivable code facts, stale task narration, or detailed logs to `main.md`.
-
-### 3. Update canonical documentation
-
-Update project docs only when the session established a durable project fact that belongs in version control. For ambiguous promotions from local context to repository docs, ask the user.
+When work is complete, remove its active pointer from `main.md` and review the finished `resume.md` for cleanup. Ask before deleting untracked files, including a finished resume or stale scratchpad plans and handoffs. Promote durable project facts to repository docs instead of duplicating them in local context; ask the user about ambiguous promotions. Keep completed work discoverable through the repository and Git history, not a growing context log.
 
 ### 4. Surface dangling work
 
-Identify unresolved agent annotations, skipped tests, incomplete implementation, and pending decisions. Record a concrete next step in the relevant scratchpad file, then ask the user how to proceed if judgment is required.
+Identify unresolved agent annotations, skipped tests, incomplete implementation, and pending decisions. Record the next step in `resume.md` (or the relevant concurrent-task handoff) and ask the user how to proceed if judgment is required.
 
 ## Report
 
 Summarize:
 
 - Git state, commits, and unpushed work.
-- `main.md` changes and whether renewed Pi/Claude approval is needed.
-- Scratchpad artifacts created or updated.
+- `main.md` changes and approval status under the current loader policy.
+- `resume.md` and scratchpad artifacts created or updated, and any cleanup needing permission.
 - Canonical docs changed.
 - Dangling work and the next step.
