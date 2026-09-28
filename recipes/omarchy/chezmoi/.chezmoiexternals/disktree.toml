@@ -1,0 +1,19 @@
+{{- $version := "0.10.1" -}}
+{{- $archive := printf "disktree-%s-x86_64-linux.tar.gz" $version -}}
+{{- $dir := printf "disktree-%s-x86_64-linux" $version -}}
+{{- $url := printf "https://github.com/tobi/disktree/releases/download/v%s/%s" $version $archive -}}
+# Binary. The icon entry below points at the same URL and checksum, so the
+# archive is downloaded once per target.
+[".local/bin/disktree"]
+  type = "archive-file"
+  url = "{{ $url }}"
+  path = "{{ $dir }}/disktree"
+  executable = true
+  checksum.sha256 = "838a5b7085dfd5532070cadade68ca5cfa4e61809188211a5c890412e201a113"
+# Icon for the launcher entry in private_dot_local/share/applications.
+[".local/share/icons/hicolor/scalable/apps/disktree.svg"]
+  type = "archive-file"
+  url = "{{ $url }}"
+  path = "{{ $dir }}/disktree.svg"
+  checksum.sha256 = "838a5b7085dfd5532070cadade68ca5cfa4e61809188211a5c890412e201a113"
+# vim: ft=toml.gotmpl
