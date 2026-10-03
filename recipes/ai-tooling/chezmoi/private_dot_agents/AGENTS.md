@@ -57,7 +57,7 @@ Include a URL when referencing any tool, library, article, or documentation. Whe
 
 ## Defer to existing sources of truth
 
-Before adding instructions, docs, helpers, or abstractions, ask: "does the existing system already provide this information?" Use existing declarations (such as the Go version in `go.mod`) as the single source of truth. Defer formatting and lint rules to the tools that enforce them (Prettier, ESLint, shfmt, etc.), rather than duplicating those rules in prose.
+Before adding instructions, docs, helpers, or abstractions, check whether the system already provides them. Defer versions, formatting, and lint rules to existing declarations and tooling instead of duplicating them.
 
 ## Inline annotations
 
@@ -74,27 +74,15 @@ Ignore annotations addressed to specific people (e.g., `TODO(@fabio)`). Treat ba
 
 These rules apply everywhere: prose, documentation, commit messages, code comments.
 
+- Use English by default for responses, explanations, documentation, and code comments. Use Portuguese when explicitly requested. Keep this preference when working with source material in other languages, while preserving original commands, identifiers, paths, and source quotations.
 - Use commas, periods, or parentheses instead of em dashes for mid-sentence breaks.
-- Use ASCII quotation marks (`"` and `'`) in code and comments. Some language formatters restore Unicode from the AST, causing staged changes to revert at commit time.
+- Use ASCII quotation marks (`"` and `'`) in code and comments.
 - Write directly and concisely, avoiding marketing fluff such as "comprehensive", "robust", "seamless", and "cutting-edge".
-- Write one line per Markdown paragraph and let editors soft-wrap, unless project guidance requires hard wrapping. Fixed-column line breaks produce noisy diffs and fragile edits.
+- Write one line per Markdown paragraph and let editors soft-wrap, unless project guidance requires hard wrapping.
 
 ## Commit format
 
-Conventional commits, examples:
-
-```
-feat(auth): add OAuth login support
-```
-
-```
-fix: resolve memory leak in background tasks
-
-Moved timer cleanup into the finally block to prevent accumulation
-during long-running sessions.
-```
-
-Use scopes when they clarify the component; use an unscoped message for broad changes.
+Use Conventional Commits, e.g. `feat(auth): add OAuth login support`. Include a scope when it clarifies the component; omit it for broad changes.
 
 ## When rules are ignored
 
