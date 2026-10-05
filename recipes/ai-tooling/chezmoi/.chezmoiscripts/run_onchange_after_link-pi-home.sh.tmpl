@@ -91,9 +91,10 @@ done
 
 # {{ if .isOmarchy }}
 # Vendored Pi subagent example (see
-# $AGENTS_DIR/pi/extensions/subagent/VENDOR.md for the upstream commit). Bare
-# metal only: the subagent tool spawns child pi processes, which the container
-# and VM paths do not need.
+# $AGENTS_DIR/pi/extensions/subagent/VENDOR.md for the upstream commit). Omarchy
+# only for now: containers and VMs normally run agents through bb
+# (https://getbb.app), which brings its own agent tooling. Once bb detection
+# exists as template data, gate on that instead and drop this condition.
 SUBAGENT_SRC="$AGENTS_DIR/pi/extensions/subagent"
 if [ -d "$SUBAGENT_SRC" ]; then
   # pi requires index.ts inside a subdirectory to load an extension, and

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# vim: ft=bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 if ! command -v pi &>/dev/null; then
@@ -19,6 +20,13 @@ settings="$HOME/.pi/agent/settings.json"
 declare -A floor=(
   ["pi-web-access"]=0.36.0
   ["pi-ollama-cloud"]=0.12.2
+  # {{ if .isOmarchy }}
+  # Omarchy only for now. Containers and VMs normally run agents through bb
+  # (https://getbb.app), which brings its own tooling, so installing these here
+  # would duplicate it. Once bb detection exists as template data, gate on that
+  # instead and drop this condition.
+  ["@juicesharp/rpiv-ask-user-question"]=2.12.0
+  # {{ end }}
 )
 
 newer_than() { # <candidate> <installed> -> 0 when candidate > installed
@@ -71,7 +79,9 @@ done < <(
       name = $1
       sub(/@[0-9][^@]*$/, "", name)
       sub(/^[a-z]+:/, "", name)
-      sub(/^@/, "", name)
+      # The leading "@" of a scoped package is kept: floor keys are spelled the
+      # way `pi install npm:<key>` is, and the only use of these keys is looking
+      # a package up here.
       next
     }
     name != "" && $1 ~ /^\// { print name "\t" $1; name = "" }

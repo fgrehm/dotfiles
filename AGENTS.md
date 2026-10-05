@@ -4,7 +4,7 @@ Project context for AI assistants working on this repo.
 
 ## What This Is
 
-A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). The bare-metal/laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian-based containers and VMs are supported for devcontainers, Codespaces, CI, and other non-Omarchy environments. Omarchy is the only bare-metal target -- the `apt` branches in install scripts exist for Debian-based container and VM paths.
+A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). The bare-metal/laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian-based containers and VMs are supported for devcontainers, Codespaces, CI, and other non-Omarchy environments. Omarchy is the only bare-metal target -- the `apt` branches in install scripts exist for Debian-based container and VM paths. Agents in containers and VMs normally run through [bb](https://getbb.app), which supplies its own agent tooling, so Pi extensions managed here (the vendored subagent example, `rpiv-ask-user-question`) are gated on `.isOmarchy` until bb detection exists as template data.
 
 > **Config philosophy:** only track a config in the repo when there's a need to customize it; otherwise let omarchy manage it (e.g. ghostty config is omarchy's default -- we only handle install + default terminal).
 
