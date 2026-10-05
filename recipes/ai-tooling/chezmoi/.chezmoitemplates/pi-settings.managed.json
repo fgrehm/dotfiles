@@ -1,0 +1,8 @@
+{
+  "theme": "dark",
+  "tuiMode": "fullscreen",
+  "fullscreenExitOutput": "resume-hint",
+  "fullscreenScrollbar": "auto",
+  "hideThinkingBlock": true,
+  "doubleEscapeAction": "tree"
+}
