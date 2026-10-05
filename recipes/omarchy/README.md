@@ -18,11 +18,10 @@ Shared across Omarchy 4:
   - `run_once_install-rust.sh.tmpl` — installs the Rust toolchain (`rustc` and `cargo`) through Omarchy mise.
   - `run_once_install-bun.sh.tmpl` — installs Bun through Omarchy mise.
   - `run_once_after_update-desktop-database.sh` — refreshes `~/.local/share/applications` via `update-desktop-database` so newly deployed launcher entries are indexed. Non-fatal by design.
-  - `run_once_install-fast-cli-tools.sh` — installs the AUR packages `zapfast-bin` and `spotifast-bin` through `omarchy pkg aur add` (a guarded `yay -S --noconfirm --needed` wrapper). Skips packages already registered with pacman.
+  - `run_once_install-fast-cli-tools.sh` — installs the AUR packages `zapfast-bin`, `spotifast-bin` and `disktree` through `omarchy pkg aur add` (a guarded `yay -S --noconfirm --needed` wrapper). Skips packages already registered with pacman.
   - `run_once_install-nvidia-vulkan.sh.tmpl` — on NVIDIA machines, installs the proprietary DKMS driver and Vulkan tooling, then rebuilds DKMS modules. A reboot is required afterward.
 - `~/.config/environment.d/ssh-agent.conf` — points `SSH_AUTH_SOCK` at the stock OpenSSH agent socket and configures Seahorse's graphical SSH askpass prompt. Takes effect after re-login.
 - `~/.local/bin/crib` (via `.chezmoiexternals/crib.toml`) + `~/.config/crib/config.toml` — the [crib](https://github.com/fgrehm/crib) CLI ("Just Enough Devcontainers"). Bare-metal-only; lives here because Omarchy is the only bare-metal target.
-- `~/.local/bin/disktree` (via `.chezmoiexternals/disktree.toml`) + `~/.local/share/icons/hicolor/scalable/apps/disktree.svg` + `~/.local/share/applications/disktree.desktop` — the [disktree](https://github.com/tobi/disktree) TUI disk usage analyzer, pinned to v0.10.1 (the version is declared once, in `disktree.toml`). The desktop entry mirrors upstream's `disktree.desktop.in` with `Exec` pointed at `~/.local/bin`; it registers an `inode/directory` handler (does not become the default) plus a right-click "Scan the whole disk" action. Upstream's `install.sh` is deliberately not used, so chezmoi owns the three files.
 - `run_once_install-omasnap.sh` + `.chezmoiexternals/omasnap.toml` — install Omasnap's runtime dependencies and pinned screenshot binary/desktop entry.
 
 ## Hyprland configuration
