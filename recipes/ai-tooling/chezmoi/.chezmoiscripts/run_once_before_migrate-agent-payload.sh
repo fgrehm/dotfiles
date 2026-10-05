@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # Preserve payload files from the old managed Claude/Pi layout before chezmoi
 # removes those source entries. Never touch session, transcript, credential, or
 # other user data.

@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # vim: ft=bash
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 

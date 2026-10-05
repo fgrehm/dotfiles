@@ -1,4 +1,4 @@
-#!/bin/env bash
+#!/usr/bin/env bash
 # vim: ft=bash
 # Only x86_64/amd64 is supported. Checksums are pinned for this arch only.
 arch="$(uname -m)"
