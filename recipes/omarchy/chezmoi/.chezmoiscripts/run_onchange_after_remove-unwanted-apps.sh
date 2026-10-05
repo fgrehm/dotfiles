@@ -5,6 +5,9 @@ source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 set -eo pipefail
 
 # Remove unwanted omarchy webapps (they share the main browser profile).
+# One call per app on purpose: omarchy-webapp-remove takes a single name and
+# joins all arguments with "$*", so passing several apps in one call builds one
+# bogus name and removes nothing. Each call restarts the app launcher.
 for app in "Basecamp" "Discord" "Fizzy" "Google Contacts" "Zoom" "HEY" "Google Messages" "Google Photos" "WhatsApp"; do
   if [ -f "$HOME/.local/share/applications/$app.desktop" ]; then
     log_info "Removing webapp: $app"
