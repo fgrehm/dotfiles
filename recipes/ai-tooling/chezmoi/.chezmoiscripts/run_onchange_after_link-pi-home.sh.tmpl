@@ -88,3 +88,32 @@ for extension in "$AGENTS_DIR"/pi/extensions/*.ts; do
   [ -e "$extension" ] || continue
   link_into_pi "$extension" "$PI_DIR/extensions/$(basename "$extension")"
 done
+
+# {{ if .isOmarchy }}
+# Vendored Pi subagent example (see
+# $AGENTS_DIR/pi/extensions/subagent/VENDOR.md for the upstream commit). Bare
+# metal only: the subagent tool spawns child pi processes, which the container
+# and VM paths do not need.
+SUBAGENT_SRC="$AGENTS_DIR/pi/extensions/subagent"
+if [ -d "$SUBAGENT_SRC" ]; then
+  # pi requires index.ts inside a subdirectory to load an extension, and
+  # index.ts imports ./agents.ts relatively, so both files must sit side by side.
+  mkdir -p "$PI_DIR/extensions/subagent"
+  link_into_pi "$SUBAGENT_SRC/index.ts" "$PI_DIR/extensions/subagent/index.ts"
+  link_into_pi "$SUBAGENT_SRC/agents.ts" "$PI_DIR/extensions/subagent/agents.ts"
+else
+  log_skip "vendored pi subagent example not found in $AGENTS_DIR, no links"
+fi
+
+# Subagent definitions are discovered from ~/.pi/agent/agents/*.md at tool call
+# time, so individual links are enough. One generic agent ships today.
+if [ -d "$AGENTS_DIR/pi/agents" ]; then
+  mkdir -p "$PI_DIR/agents"
+  for agent in "$AGENTS_DIR"/pi/agents/*.md; do
+    [ -e "$agent" ] || continue
+    link_into_pi "$agent" "$PI_DIR/agents/$(basename "$agent")"
+  done
+fi
+# {{ else }}
+log_skip "not an Omarchy host, skipping vendored pi subagent links"
+# {{ end }}

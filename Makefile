@@ -1,5 +1,8 @@
 SHELL_FILES := $(shell find recipes home \( -name "*.sh" -o -name "*.sh.tmpl" -o -name "*.bash" \) -not -path "*/private_dot_ai/agent-skills/*" 2>/dev/null | sort)
-TS_FILES := $(shell find recipes home -name "*.ts" 2>/dev/null | sort)
+# Vendored upstream TypeScript is excluded: it keeps upstream formatting
+# (tab-indented) and Prettier would reformat it, so a re-vendor would produce an
+# unreviewable diff. Vendored paths are third-party code, not ours to format.
+TS_FILES := $(shell find recipes home -name "*.ts" -not -path "*/extensions/subagent/*" 2>/dev/null | sort)
 
 .DEFAULT_GOAL := help
 
