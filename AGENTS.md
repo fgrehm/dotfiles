@@ -102,6 +102,12 @@ Use `.recipeignore` to exclude entire recipes (e.g. bare-metal-only tools) rathe
 - Run `make check` to lint (shfmt + shellcheck).
 - Vim modelines: `# vim: ft=bash.gotmpl` on `.sh.tmpl` files (line 2, after shebang); `# vim: ft=toml.gotmpl` on `.chezmoiexternals/*.toml` files (last line -- putting it first breaks Go template trimming).
 
+## Script Shebangs and Idempotency
+
+Executable scripts use `#!/usr/bin/env bash`, never `#!/bin/env bash` (`/bin/env` exists only where `/usr` is merged into `/bin`, so it breaks elsewhere). Sourced fragments under `dot_shellrc.d/` carry no shebang, just `# shellcheck shell=bash`.
+
+Scripts must be idempotent: guard every side effect (`command -v` before using a tool, existence checks before writing, `log_skip` when already in the desired state) and batch commands that restart something per call.
+
 ## Documenting Overridden Source Files
 
 When a tracked file overrides an omarchy default (or copies an omarchy script), add a comment at the top of the file pointing to the original source path, so future us can diff against upstream and spot drift. Use the omarchy source path, not the deployed target path.
@@ -269,5 +275,5 @@ These are dotfiles-repo-specific facts the `omarchy` skill does not cover.
 - **lazygit and gh are preinstalled/managed by Omarchy.** Skip their `.chezmoiexternals` and completion scripts on Omarchy (`{{ if not .isOmarchy }}`) to avoid two copies.
 - **Ghostty `config-file` ordering:** entries are processed *after* the file that declares them, in order, so the **last** `config-file` wins. To override omarchy's read-only shipped config (`~/.local/share/omarchy/config/ghostty/config`), track `~/.config/ghostty/config` that includes it first, then load override files (`padding.conf`, etc.) last. Verify with a value `+show-config` does print (e.g. `font-size`); it does not print `window-padding-*`.
 - **`environment.d`** (`~/.config/environment.d/*.conf`) vars are read at systemd user manager startup, so they need a re-login to take effect.
-- **`omarchy-webapp-remove` takes multiple names** and restarts the app launcher once -- pass all apps in one call to avoid the systemd start-limit on rapid restarts. Webapps share the main browser profile.
+- **`omarchy-webapp-remove` takes a single name** (it joins all arguments with `$*`, so never pass several in one call) and restarts the app launcher on every call. Webapps share the main browser profile.
 - **Stock `ssh-agent.service`/`.socket`** user unit is enabled by the `omarchy` recipe; `SSH_AUTH_SOCK` points at `$XDG_RUNTIME_DIR/ssh-agent.socket`. `gpg-agent-ssh.socket` (GnuPG SSH emulation) is active by default and can hijack `SSH_AUTH_SOCK` via `ExecStartPost` -- mask it if it does.

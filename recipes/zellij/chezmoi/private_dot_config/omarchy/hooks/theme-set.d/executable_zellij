@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Sync Zellij's theme with Omarchy's active theme.
 
 set -euo pipefail
