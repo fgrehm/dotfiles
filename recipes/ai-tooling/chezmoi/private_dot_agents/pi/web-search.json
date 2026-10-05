@@ -1,4 +1,7 @@
 {
   "searchProvider": "anysearch",
-  "workflow": "none"
+  "workflow": "none",
+  "webSearch": {
+    "allowedProviders": ["anysearch", "brave"]
+  }
 }
