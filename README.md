@@ -56,6 +56,12 @@ make check      # lint shell scripts (shfmt + shellcheck)
 
 `.chezmoi.toml.tmpl` auto-detects the environment via `/.dockerenv`, env vars, `omarchy` on PATH, etc. Template data available: `.name`, `.email`, `.isContainer`, `.isOmarchy`, `.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
 
+## Contributions
+
+This is open source **personal software**: I build it primarily for myself and share the source in case it's useful to others. [Discussions](https://github.com/fgrehm/dotfiles/discussions) are open for questions, ideas, feedback, and sharing what you've built with it.
+
+Issues and pull requests are reserved for my own tracking and development workflow. Feel free to fork and modify the project under its license, or bring ideas and fixes to Discussions. Depending on interest, I'm very open to evolving it into a more traditional open source project with broader contributions.
+
 ## License
 
 MIT
