@@ -1,12 +1,8 @@
 SHELL_FILES := $(shell find recipes home \( -name "*.sh" -o -name "*.sh.tmpl" -o -name "*.bash" \) -not -path "*/private_dot_ai/agent-skills/*" 2>/dev/null | sort)
-# Vendored upstream TypeScript is excluded: it keeps upstream formatting
-# (tab-indented) and Prettier would reformat it, so a re-vendor would produce an
-# unreviewable diff. Vendored paths are third-party code, not ours to format.
-TS_FILES := $(shell find recipes home -name "*.ts" -not -path "*/extensions/subagent/*" 2>/dev/null | sort)
 
 .DEFAULT_GOAL := help
 
-.PHONY: help shell-fmt shell-fmt-check shell-lint ts-fmt-check check prek prek-install check-versions init apply diff doctor
+.PHONY: help shell-fmt shell-fmt-check shell-lint check prek prek-install check-versions init apply diff doctor
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
@@ -33,10 +29,7 @@ shell-fmt-check: ## Check shell formatting without modifying (shfmt -d)
 shell-lint: ## Lint shell scripts (shellcheck)
 	shellcheck --severity=warning $(SHELL_FILES)
 
-ts-fmt-check: ## Check TypeScript formatting (Prettier)
-	bunx --bun prettier@3.6.2 --check $(TS_FILES)
-
-check: shell-fmt-check shell-lint ts-fmt-check ## Run shell and TypeScript checks
+check: shell-fmt-check shell-lint ## Run shell checks
 
 prek: ## Run all pre-commit hooks
 	prek run --all-files

@@ -21,6 +21,8 @@ cd ~/.local/share/chezmoi
 
 Dotfiles are organized into modular **recipes** under `recipes/`. Each recipe groups related chezmoi files (configs, install scripts, shell fragments) for a single tool. chezmoi-recipes overlays them into a generated `compiled-home/` directory, then chezmoi applies as normal.
 
+Agent configuration is maintained separately in [`dotagents`](https://github.com/fgrehm/dotagents), a plain-files repo with its own Bash installer; it is not part of this chezmoi overlay. After the first successful `chezmoi apply`, the `dotagents` recipe clones it and delegates to that installer. It prefers `/data/projects/oss/dotagents`, then `~/Projects/oss/dotagents`, then `~/.local/share/dotagents`; SSH clone failure falls back to HTTPS.
+
 ```
 home/                         shared chezmoi source files
 recipes/

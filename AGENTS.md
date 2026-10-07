@@ -4,7 +4,7 @@ Project context for AI assistants working on this repo.
 
 ## What This Is
 
-A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). The bare-metal/laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian-based containers and VMs are supported for devcontainers, Codespaces, CI, and other non-Omarchy environments. Omarchy is the only bare-metal target -- the `apt` branches in install scripts exist for Debian-based container and VM paths. Agents in containers and VMs normally run through [bb](https://getbb.app), which supplies its own agent tooling, so Pi extensions managed here (the vendored subagent example, `rpiv-ask-user-question`) are gated on `.isOmarchy` until bb detection exists as template data.
+A chezmoi dotfiles repo organized with [chezmoi-recipes](https://github.com/fgrehm/chezmoi-recipes). The bare-metal/laptop target is [Omarchy](https://omarchy.org/) (Arch-based, Hyprland); Debian-based containers and VMs are supported for devcontainers, Codespaces, CI, and other non-Omarchy environments. Omarchy is the only bare-metal target -- the `apt` branches in install scripts exist for Debian-based container and VM paths. Agent configuration is managed separately in [`dotagents`](https://github.com/fgrehm/dotagents), a plain-files repo with a Bash installer. Agents in containers and VMs normally run through [bb](https://getbb.app), which supplies its own agent tooling; dotagents gates its Omarchy-only Pi extensions (the vendored subagent example and `rpiv-ask-user-question`) on runtime Omarchy detection until bb detection is available there.
 
 > **Config philosophy:** only track a config in the repo when there's a need to customize it; otherwise let omarchy manage it (e.g. ghostty config is omarchy's default -- we only handle install + default terminal).
 
@@ -31,14 +31,9 @@ A recipe is a directory under `recipes/` with a `README.md` and a `chezmoi/` sub
 
 ## Agent Config Home (`~/.agents/`)
 
-`~/.agents/` is the canonical cross-client home for agent config (the ecosystem convention). The `ai-tooling` recipe manages it:
+Agent config is managed by the separate [`dotagents`](https://github.com/fgrehm/dotagents) repo. After the first successful `chezmoi apply`, the `dotagents` recipe clones it and delegates installation to its own installer. The checkout path priority is `/data/projects/oss/dotagents`, `~/Projects/oss/dotagents`, then `~/.local/share/dotagents`; SSH clone failure falls back to HTTPS. Existing checkouts are reused without pulling. The installer deploys shared agent instructions, skills, and Pi config under `~/.agents/`, then links them into `~/.pi/agent/` and `~/.claude/`. See `recipes/dotagents/README.md` and dotagents' README/AGENTS.md for details.
 
-- `~/.agents/AGENTS.md` — global agent instructions (canonical). `~/.pi/agent/AGENTS.md` and `~/.claude/CLAUDE.md` are symlinks to it, so both tools read the same rules.
-- `~/.agents/skills/<name>/` — canonical skills home. A `run_onchange_after_link-skills.sh.tmpl` script creates individual per-agent symlinks (`~/.claude/skills/<name>`, `~/.pi/agent/skills/<name>`) and re-runs when the skill set changes (embedded hash). It only creates missing symlinks, so non-chezmoi entries coexist (e.g. the omarchy skill).
-- `~/.agents/pi/` — canonical home for Pi-specific config. The Pi linking script creates individual symlinks in `~/.pi/agent/` for each managed file, including `sandbox.json`.
-- `~/.agents/pi/extensions/subagent/` — vendored copy of Pi's subagent extension example (`earendil-works/pi`, pinned by commit in the sibling `VENDOR.md`). Linked into `~/.pi/agent/extensions/subagent/` on Omarchy only. Subagent definitions live in `~/.agents/pi/agents/` and are linked the same way; the recipe ships one generic `delegate`. Re-vendor with `recipes/ai-tooling/scripts/vendor-pi-subagent.sh`, never by hand. Vendored TypeScript is excluded from the Makefile's Prettier check so it keeps upstream formatting.
-
-When adding agent configuration, place the source under `private_dot_agents/` and link it into tool-specific homes with the appropriate linking script. Do not deploy directly under `private_dot_pi/` or `private_dot_claude/`, and do not use whole-directory symlinks. Individual links preserve non-chezmoi files and tool-specific additions.
+When adding agent configuration, put it in dotagents under `agents/` and expose it to tool-specific homes through dotagents' installer. Do not use whole-directory symlinks. Individual links preserve user files and tool-specific additions.
 
 ## Directory Privacy Must Be Consistent Across Recipes
 
@@ -48,9 +43,9 @@ chezmoi maps `dot_<dir>` and `private_dot_<dir>` to the same target directory (`
 chezmoi: .config: inconsistent state (...dot_config, ...private_dot_config)
 ```
 
-This bites at any nesting level, not just the top. Agent configuration is an exception to direct deployment: managed files belong in the canonical `private_dot_agents/` tree and are linked into `~/.pi/agent` or `~/.claude` by the ai-tooling scripts.
+This bites at any nesting level, not just the top. Agent configuration is managed separately by dotagents; its plain `agents/` payload is linked into `~/.agents/`, `~/.pi/agent/`, and `~/.claude/` by its installer.
 
-**Rule: before adding a file under a `dot_`/`private_dot_` directory, check what prefix every other recipe already uses for that same target directory and match it.** Concretely: all recipes writing under `.config` use `private_dot_config` (the `.config` directory holds user application state and is private by convention). For agent config, use `private_dot_agents/...` as the canonical source and update the relevant individual-link script rather than adding a direct `private_dot_pi/...` or `private_dot_claude/...` deployment. Mixing privacy prefixes for the same directly managed target directory is always a bug.
+**Rule: before adding a file under a `dot_`/`private_dot_` directory, check what prefix every other recipe already uses for that same target directory and match it.** Concretely, all recipes writing under `.config` use `private_dot_config` (the `.config` directory holds user application state and is private by convention). Mixing privacy prefixes for the same directly managed target directory is always a bug.
 
 ## Environment Detection
 
