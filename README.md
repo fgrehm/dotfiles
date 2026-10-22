@@ -21,7 +21,7 @@ cd ~/.local/share/chezmoi
 
 Dotfiles are organized into modular **recipes** under `recipes/`. Each recipe groups related chezmoi files (configs, install scripts, shell fragments) for a single tool. chezmoi-recipes overlays them into a generated `compiled-home/` directory, then chezmoi applies as normal.
 
-Agent configuration is maintained separately in [`dotagents`](https://github.com/fgrehm/dotagents), a plain-files repo with its own Bash installer; it is not part of this chezmoi overlay. After the first successful `chezmoi apply`, the `dotagents` recipe clones it and delegates to that installer. It prefers `/data/projects/oss/dotagents`, then `~/Projects/oss/dotagents`, then `~/.local/share/dotagents`; SSH clone failure falls back to HTTPS.
+Agent configuration is maintained separately in [`dotagents`](https://github.com/fgrehm/dotagents), a plain-files repo with its own Bash installer; it is not part of this chezmoi overlay. After the first successful `chezmoi apply`, the `dotagents` recipe clones it and delegates to that installer. It uses `/data/projects/dotagents` when `/data/projects` is a mount point, otherwise `~/Projects/oss/dotagents` when `~/Projects` exists, otherwise `~/.local/share/dotagents`; SSH clone failure falls back to HTTPS.
 
 ```
 home/                         shared chezmoi source files
@@ -56,7 +56,7 @@ make check      # lint shell scripts (shfmt + shellcheck)
 
 ### Environment Detection
 
-`.chezmoi.toml.tmpl` auto-detects the environment via `/.dockerenv`, env vars, `omarchy` on PATH, etc. Template data available: `.name`, `.email`, `.isContainer`, `.isOmarchy`, `.hasNvidiaGPU`, `.onepasswordSshVault`, `.onepasswordSshItem`.
+`.chezmoi.toml.tmpl` auto-detects the environment via `/.dockerenv`, env vars, `omarchy` on PATH, etc. Template data available: `.name`, `.email`, `.isContainer`, `.isOmarchy`, `.hasNvidiaGPU`, `.hasToolchain`, `.hydratesHome`, `.onepasswordSshVault`, `.onepasswordSshItem`.
 
 ## Contributions
 

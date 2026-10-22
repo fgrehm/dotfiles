@@ -12,6 +12,46 @@
 {{-   $hasNvidiaGPU = output "lspci" | lower | contains "nvidia" -}}
 {{- end -}}
 
+{{- /*
+Platform-provided environment.
+
+Two independent facts, deliberately separate, because they gate different
+recipes and are owned by different parties:
+
+  hasToolchain   The global mise configuration belongs to the platform, not
+                 to this user. A provisioned guest bakes mise and its toolset
+                 into the image, points MISE_GLOBAL_CONFIG_FILE at a path
+                 outside $HOME, and expects the user not to write to it.
+                 Dotfiles must not install tools through `mise use -g` here:
+                 it would write the platform's config, unpin the versions the
+                 platform deliberately pinned, and lose the change when the
+                 container is replaced.
+
+  hydratesHome   The platform writes managed blocks into ~/.bashrc and
+                 ~/.zshrc. Dotfiles must merge into those files instead of
+                 replacing them, or it silently drops the platform's setup.
+
+Both are detected from the environment rather than from a product name, so
+they stay meaningful if the platform changes.
+*/ -}}
+{{- $miseGlobalConfig := env "MISE_GLOBAL_CONFIG_FILE" | default "" | trim -}}
+{{- $hasToolchain := false -}}
+{{- if $miseGlobalConfig -}}
+{{- /* An explicitly redirected global config outside home signals platform ownership. */ -}}
+{{-   $homePrefix := joinPath .chezmoi.homeDir "/" -}}
+{{-   $hasToolchain = and (ne $miseGlobalConfig .chezmoi.homeDir) (not (hasPrefix $homePrefix $miseGlobalConfig)) -}}
+{{- end -}}
+{{- $hydratesHome := false -}}
+{{- if stat "/usr/local/share/bb/managed.tsv" -}}
+{{-   $hydratesHome = true -}}
+{{- else -}}
+{{- /* Fall back to a managed-block marker in an existing rc file. */ -}}
+{{- /* The dotfiles block carries a marker of its own, so exclude it. */ -}}
+{{-   $rcProbe := printf "awk '/managed >>>/ && !/^# dotfiles managed >>>/ { found = 1 } END { exit !found }' %q 2>/dev/null" (joinPath .chezmoi.homeDir ".bashrc") -}}
+{{-   $marker := output "sh" "-c" (printf "%s && echo yes || echo no" $rcProbe) -}}
+{{-   $hydratesHome = eq ($marker | trim) "yes" -}}
+{{- end -}}
+
 sourceDir = "{{ .chezmoi.workingTree }}"
 
 [hooks.read-source-state.pre]
@@ -76,3 +116,5 @@ sourceDir = "{{ .chezmoi.workingTree }}"
     omarchyVersion = {{ $omarchyVersion | quote }}
     isOmarchy4 = {{ $isOmarchy4 }}
     hasNvidiaGPU = {{ $hasNvidiaGPU }}
+    hasToolchain = {{ $hasToolchain }}
+    hydratesHome = {{ $hydratesHome }}

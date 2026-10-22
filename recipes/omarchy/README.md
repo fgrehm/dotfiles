@@ -21,7 +21,6 @@ Shared across Omarchy 4:
   - `run_once_install-fast-cli-tools.sh` — installs the AUR packages `zapfast-bin`, `spotifast-bin` and `disktree` through `omarchy pkg aur add` (a guarded `yay -S --noconfirm --needed` wrapper). Skips packages already registered with pacman.
   - `run_once_install-nvidia-vulkan.sh.tmpl` — on NVIDIA machines, installs the proprietary DKMS driver and Vulkan tooling, then rebuilds DKMS modules. A reboot is required afterward.
 - `~/.config/environment.d/ssh-agent.conf` — points `SSH_AUTH_SOCK` at the stock OpenSSH agent socket and configures Seahorse's graphical SSH askpass prompt. Takes effect after re-login.
-- `~/.local/bin/crib` (via `.chezmoiexternals/crib.toml`) + `~/.config/crib/config.toml` — the [crib](https://github.com/fgrehm/crib) CLI ("Just Enough Devcontainers"). Bare-metal-only; lives here because Omarchy is the only bare-metal target.
 - `run_once_install-omasnap.sh` + `.chezmoiexternals/omasnap.toml` — install Omasnap's runtime dependencies and pinned screenshot binary/desktop entry.
 
 ## Hyprland configuration

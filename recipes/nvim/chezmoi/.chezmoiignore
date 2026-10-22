@@ -1,3 +1,6 @@
 {{- if not .isOmarchy }}
 .chezmoiscripts/link-omarchy-theme.sh
 {{- end }}
+{{- if .hydratesHome }}
+.chezmoiscripts/setup-neovim.sh
+{{- end }}

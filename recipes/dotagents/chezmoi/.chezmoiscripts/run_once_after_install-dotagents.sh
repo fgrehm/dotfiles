@@ -5,8 +5,27 @@ set -eo pipefail
 SSH_URL="git@github.com:fgrehm/dotagents.git"
 HTTPS_URL="https://github.com/fgrehm/dotagents.git"
 
-if [ -d /data/projects ]; then
-  PARENT="/data/projects/oss"
+# Where the project tree lives.
+#
+# On the laptop the tree is ~/Projects/oss. Everywhere else it is mounted at
+# /data/projects, and the mount point is the tree root, so a checkout belongs
+# directly in /data/projects rather than in a nested "oss" directory.
+#
+# The distinction has to be made on the mount, not on the directory: inside a
+# guest /data/projects exists as a mount of the host tree, and treating it as
+# an ordinary directory produced a stray ~/Projects/oss/oss/dotagents.
+is_mount_point() {
+  local path="$1"
+  [ -d "$path" ] || return 1
+  if command -v mountpoint &>/dev/null; then
+    mountpoint -q "$path"
+    return
+  fi
+  awk -v p="$path" '$2 == p { found = 1 } END { exit !found }' /proc/mounts
+}
+
+if is_mount_point /data/projects; then
+  PARENT="/data/projects"
 elif [ -d "$HOME/Projects" ]; then
   PARENT="$HOME/Projects/oss"
 else

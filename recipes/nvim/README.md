@@ -6,7 +6,9 @@ Neovim installation and LazyVim plugin setup.
 
 - Installs Neovim from GitHub releases tarball to `/opt`, symlinks to `/usr/local/bin/nvim` (skips if nvim already installed, e.g. on Omarchy)
 - Creates `~/.config/nvim` as a symlink to `config/nvim/` in the repo (edits to live config edit the repo copy directly)
-- Installs LazyVim plugins headlessly after file deployment
+- Installs LazyVim plugins headlessly after file deployment, except on platform-hydrated guests where automatic sync is skipped
+
+On platform-hydrated guests, `lazy-lock.json` is copied to Neovim's user state directory and updated there. This keeps interactive plugin syncs from writing through the `~/.config/nvim` symlink into the host-mounted checkout.
 
 ## Config
 

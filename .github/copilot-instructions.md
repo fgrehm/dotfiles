@@ -86,7 +86,7 @@ as wrong just because the source filename has a prefix. Examples:
 |---|---|
 | `run_once_install-ollama.sh` | `.chezmoiscripts/install-ollama.sh` |
 | `run_once_after_install-pi-agent.sh` | `.chezmoiscripts/install-pi-agent.sh` |
-| `run_onchange_after_enable-cartage.sh` | `.chezmoiscripts/enable-cartage.sh` |
+| `run_once_install-neovim.sh.tmpl` | `.chezmoiscripts/install-neovim.sh` |
 | `run_onchange_after_install-mise-tools.sh` | `.chezmoiscripts/install-mise-tools.sh` |
 
 The pattern `.chezmoiscripts/install-ollama.sh` correctly skips

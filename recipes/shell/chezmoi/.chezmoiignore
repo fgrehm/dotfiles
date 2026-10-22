@@ -3,3 +3,15 @@
 {{ if .isContainer }}
 .chezmoiscripts/set-default-shell.sh
 {{ end }}
+
+# A platform-hydrated home owns ~/.bashrc and ~/.zshrc: the platform writes
+# managed blocks into them and refreshes them on every boot. Replacing those
+# files wholesale would drop the platform's setup, so chezmoi skips them and
+# run_onchange_after_merge-shell-rc.sh maintains a marked block of our own
+# inside them instead.
+{{ if .hydratesHome }}
+.bashrc
+.zshrc
+{{ else }}
+.chezmoiscripts/merge-shell-rc.sh
+{{ end }}

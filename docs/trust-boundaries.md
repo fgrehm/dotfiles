@@ -15,9 +15,6 @@ including:
   `AddKeysToAgent yes`). A process granted the socket can request signatures
   for anything it holds a public key for. **Do not forward the agent socket
   into untrusted containers.**
-- **Cartage socket** (`$XDG_RUNTIME_DIR/cartage.sock`, user daemon, 0600).
-  Grants clipboard reading (exfiltration), desktop notifications, and
-  `xdg-open` (host UI abuse). **Keep out of untrusted containers.**
 - **Screen-time history** (`~/.config/omarchy/screen-time/history.json`).
   Retains full window titles (including private/incognito browsing) for ~95
   days. Any process running as the user can read it. Retention policy is a

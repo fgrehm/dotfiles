@@ -14,7 +14,7 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup({
+local options = {
   spec = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
@@ -50,4 +50,24 @@ require("lazy").setup({
       },
     },
   },
-})
+}
+
+-- A provisioned guest's nvim config may be a symlink into a host-mounted
+-- dotfiles checkout. Keep plugin lock updates in the guest home so they never
+-- rewrite the host's shared lazy-lock.json.
+local global_mise_config = vim.env.MISE_GLOBAL_CONFIG_FILE
+local home = vim.env.HOME
+if global_mise_config and home then
+  local home_prefix = home .. "/"
+  local config_is_external = global_mise_config ~= home and global_mise_config:sub(1, #home_prefix) ~= home_prefix
+  if config_is_external then
+    options.lockfile = vim.fn.stdpath("state") .. "/lazy-lock.json"
+    local shared_lockfile = vim.fn.stdpath("config") .. "/lazy-lock.json"
+    if vim.fn.filereadable(options.lockfile) == 0 and vim.fn.filereadable(shared_lockfile) == 1 then
+      vim.fn.mkdir(vim.fn.fnamemodify(options.lockfile, ":h"), "p")
+      vim.fn.writefile(vim.fn.readfile(shared_lockfile, "b"), options.lockfile, "b")
+    end
+  end
+end
+
+require("lazy").setup(options)

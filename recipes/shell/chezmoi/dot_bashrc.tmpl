@@ -65,7 +65,4 @@ fi
 
 {{ end }}
 
-# Source shared shell configuration (env vars, aliases, PATH)
-if [ -f ~/.shellrc ]; then
-  . ~/.shellrc
-fi
+{{ include ".chezmoitemplates/shellrc-block.sh" }}

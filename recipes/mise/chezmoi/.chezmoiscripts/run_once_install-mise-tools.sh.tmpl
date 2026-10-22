@@ -10,6 +10,24 @@ fi
 
 set -eo pipefail
 
+# {{ if .hasToolchain }}
+# The platform owns the toolchain: it bakes mise and its toolset into the
+# image and points MISE_GLOBAL_CONFIG_FILE at a config outside $HOME. Writing
+# to that config with `mise use -g` would rewrite the platform's deliberate
+# version pins and lose the change when the container is replaced, so dotfiles
+# installs nothing here. A tool the guest needs belongs in the platform image.
+log_skip "toolchain is provided by the platform, not installing tools"
+missing=""
+for tool in jq nvim shfmt bunx shellcheck prek wt hunk gitleaks gh bat; do
+  command -v "$tool" &>/dev/null || missing="$missing $tool"
+done
+if [ -n "$missing" ]; then
+  log_info "not provided by the platform:$missing"
+  log_info "add them to the platform image to make them available in this guest"
+fi
+exit 0
+# {{ else }}
+
 install_tool() {
   local package="$1" command="$2"
   if command -v "$command" &>/dev/null; then
@@ -39,3 +57,4 @@ install_tool aqua:modem-dev/hunk hunk
 install_tool aqua:gitleaks/gitleaks gitleaks
 install_tool gh gh
 install_tool bat bat
+# {{ end }}

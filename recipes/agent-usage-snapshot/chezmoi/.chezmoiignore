@@ -1,0 +1,2 @@
+# Python bytecode is generated locally and must not be deployed from the overlay.
+.local/bin/__pycache__

@@ -21,3 +21,7 @@
 In devcontainers and VMs where mise is already installed, the install script skips installation. The shell activation fragment still runs, so `mise` works normally in the shell.
 
 Container and VM environments can manage their own mise tool versions; this recipe only installs mise when it is absent and enables shell activation.
+
+## Provisioned guests
+
+On a machine whose toolchain is provided by a platform (`.hasToolchain`), the global mise configuration belongs to the platform: it is baked into the image and `MISE_GLOBAL_CONFIG_FILE` points at a path outside `$HOME`. Writing to it with `mise use -g` would rewrite the platform's deliberate version pins and the change would be lost when the container is replaced, so the tool install script installs nothing there and reports which tools the platform does not provide. A tool a guest needs belongs in the platform image.

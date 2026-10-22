@@ -31,7 +31,7 @@ A recipe is a directory under `recipes/` with a `README.md` and a `chezmoi/` sub
 
 ## Agent Config Home (`~/.agents/`)
 
-Agent config is managed by the separate [`dotagents`](https://github.com/fgrehm/dotagents) repo. After the first successful `chezmoi apply`, the `dotagents` recipe clones it and delegates installation to its own installer. The checkout path priority is `/data/projects/oss/dotagents`, `~/Projects/oss/dotagents`, then `~/.local/share/dotagents`; SSH clone failure falls back to HTTPS. Existing checkouts are reused without pulling. The installer deploys shared agent instructions, skills, and Pi config under `~/.agents/`, then links them into `~/.pi/agent/` and `~/.claude/`. See `recipes/dotagents/README.md` and dotagents' README/AGENTS.md for details.
+Agent config is managed by the separate [`dotagents`](https://github.com/fgrehm/dotagents) repo. After the first successful `chezmoi apply`, the `dotagents` recipe clones it and delegates installation to its own installer. The checkout goes to `/data/projects/dotagents` when `/data/projects` is a mount point, otherwise to `~/Projects/oss/dotagents` when `~/Projects` exists, otherwise to `~/.local/share/dotagents`; SSH clone failure falls back to HTTPS. Existing checkouts are reused without pulling. The installer deploys shared agent instructions, skills, and Pi config under `~/.agents/`, then links them into `~/.pi/agent/` and `~/.claude/`. See `recipes/dotagents/README.md` and dotagents' README/AGENTS.md for details.
 
 When adding agent configuration, put it in dotagents under `agents/` and expose it to tool-specific homes through dotagents' installer. Do not use whole-directory symlinks. Individual links preserve user files and tool-specific additions.
 
@@ -62,10 +62,20 @@ This bites at any nesting level, not just the top. Agent configuration is manage
 | `.omarchyVersion` | `omarchy version` output (e.g. `4.0.0rc2-1`); empty string on non-Omarchy hosts |
 | `.isOmarchy4` | `omarchyVersion` starts with `4.`; gates the `omarchy3`/`omarchy4` recipe split |
 | `.hasNvidiaGPU` | `lspci` output (skipped in containers); gates the voxtype NVIDIA GPU drop-in |
+| `.hasToolchain` | `MISE_GLOBAL_CONFIG_FILE` explicitly points outside `$HOME`, so the platform owns the global toolchain config |
+| `.hydratesHome` | The platform hydrates the home skeleton (managed blocks in `~/.bashrc`/`~/.zshrc`) |
 
 Use `{{ if .isContainer }}` in templates and `.chezmoiignore` for conditional deployment.
 
-> **Omarchy 3.8 vs 4.0 recipe split.** Omarchy 4.0 changed the Hyprland config system from plain `.conf` files (sourced via `source =`) to a Lua module system (`~/.config/hypr/*.lua` loaded via `require()`), dropped waybar for the Quickshell-based Omarchy shell, and moved its defaults from `~/.local/share/omarchy/` to `/usr/share/omarchy/` (`OMARCHY_PATH`). The omarchy config is therefore split into three recipes: `omarchy` (version-neutral: installs, starship, voxtype, ghostty, crib, the standalone `my-monitor-scaling-cycle`/`obsidian-quick-note` scripts), `omarchy3` (3.8-only Hyprland `.conf` stack + waybar), and `omarchy4` (4.0-only Hyprland `.lua` overrides). `recipes/.recipeignore` skips `omarchy4` on 3.8 and `omarchy3` on 4.0. When a script needs a version-specific command (e.g. `omarchy restart waybar` on 3.8 vs `omarchy restart shell` on 4.0), guard it with `# {{ if .isOmarchy4 }}`. The ghostty `config.tmpl` similarly templates its `config-file` include path by version.
+### Provisioned guests
+
+`.hasToolchain` and `.hydratesHome` describe a machine whose environment is provisioned by something else: a container or VM image that bakes the toolchain and writes managed blocks into shell rc files. They are deliberately separate because they gate different recipes and are owned by different parties. Detection is based on the environment, not a product name, so the flags remain meaningful if the platform changes.
+
+On such a machine dotfiles is the **personal layer**, not the provisioning system. It owns the nvim config, git behavior preferences, shell fragments and agent config; the platform owns the toolchain and shell rc skeleton. Never write to the platform's global mise config (`mise use -g` rewrites the platform's version pins and is lost when the container is replaced), never replace a hydrated rc file, and install guest tools in the platform image rather than a dotfiles script.
+
+The shell rc merge lives in `recipes/shell` and is documented in that recipe's README.
+
+> **Omarchy 3.8 vs 4.0 recipe split.** Omarchy 4.0 changed the Hyprland config system from plain `.conf` files (sourced via `source =`) to a Lua module system (`~/.config/hypr/*.lua` loaded via `require()`), dropped waybar for the Quickshell-based Omarchy shell, and moved its defaults from `~/.local/share/omarchy/` to `/usr/share/omarchy/` (`OMARCHY_PATH`). The omarchy config is therefore split into three recipes: `omarchy` (version-neutral: installs, starship, voxtype, ghostty, the standalone `my-monitor-scaling-cycle`/`obsidian-quick-note` scripts), `omarchy3` (3.8-only Hyprland `.conf` stack + waybar), and `omarchy4` (4.0-only Hyprland `.lua` overrides). `recipes/.recipeignore` skips `omarchy4` on 3.8 and `omarchy3` on 4.0. When a script needs a version-specific command (e.g. `omarchy restart waybar` on 3.8 vs `omarchy restart shell` on 4.0), guard it with `# {{ if .isOmarchy4 }}`. The ghostty `config.tmpl` similarly templates its `config-file` include path by version.
 
 > **GPU detection is split between runtime and template data.** The voxtype install script checks for a discrete GPU via `lspci` at runtime (2+ display controllers) to decide whether to enable the GPU backend. But the NVIDIA-specific systemd drop-in (`VOXTYPE_VULKAN_DEVICE=nvidia`) is gated by the `hasNvidiaGPU` template variable via `.chezmoiignore`, since it only makes sense on machines with an NVIDIA GPU.
 
