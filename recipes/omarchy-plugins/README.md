@@ -1,6 +1,8 @@
 # Omarchy plugins
 
-Bundled Omarchy shell plugins. Plugin source is maintained under `config/omarchy-plugins/` and linked into `~/.config/omarchy/plugins/` rather than installed from an external repository. Vendored forks are marked with a `FORK.md` file and retain their upstream link and source commit.
+This legacy recipe is excluded on Omarchy hosts by `recipes/.recipeignore`; its Pomodoro, Screen Time, and My Agents plugins are not deployed by the fresh-start setup. Their source remains under `config/omarchy-plugins/` for reference and is not deleted. The separately requested `crmne.omastats` plugin is installed by the `omarchy` recipe from its upstream repository.
+
+Bundled plugin source is maintained under `config/omarchy-plugins/` and linked into `~/.config/omarchy/plugins/` rather than installed from an external repository. Vendored forks are marked with a `FORK.md` file and retain their upstream link and source commit.
 
 ## Pomodoro
 

@@ -5,8 +5,6 @@ source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 
 packages=(
   "zapfast-bin"
-  "spotifast-bin"
-  "disktree"
 )
 
 missing=()

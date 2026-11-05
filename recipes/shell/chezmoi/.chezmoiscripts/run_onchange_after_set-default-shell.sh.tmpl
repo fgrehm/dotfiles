@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+source "$CHEZMOI_SOURCE_DIR/scripts/privilege.bash"
+setup_sudo
+
+# {{ if .isOmarchy }}
+SHELL_NAME="bash"
+SHELL_BIN="/bin/bash"
+# {{ else }}
+SHELL_NAME="zsh"
+SHELL_BIN="$(command -v zsh 2>/dev/null || true)"
+# {{ end }}
+if [ -z "$SHELL_BIN" ]; then
+  log_skip "$SHELL_NAME not found, skipping default shell setup"
+  exit 0
+fi
+
+CURRENT_SHELL="$(getent passwd "$(whoami)" | cut -d: -f7)"
+if [ "$CURRENT_SHELL" = "$SHELL_BIN" ]; then
+  log_skip "$SHELL_NAME is already the default shell"
+  exit 0
+fi
+
+set -eo pipefail
+
+log_info "Setting $SHELL_NAME as the default shell..."
+if [ "$(id -u)" -eq 0 ] || [ -n "$SUDO" ]; then
+  run_quiet $SUDO chsh -s "$SHELL_BIN" "$(whoami)"
+else
+  # chsh permits users to change their own login shell without sudo.
+  chsh -s "$SHELL_BIN" "$(whoami)"
+fi

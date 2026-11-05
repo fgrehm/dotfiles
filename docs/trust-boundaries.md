@@ -10,16 +10,13 @@ Anything running as your user (app containers, agent threads, devcontainers
 with the home directory mounted) can read everything your user can read,
 including:
 
-- **SSH agent socket** (`$XDG_RUNTIME_DIR/ssh-agent.socket`). The signing key
-  is auto-added to the agent on shell startup (`dot_shellrc.d/env.sh` +
-  `AddKeysToAgent yes`). A process granted the socket can request signatures
-  for anything it holds a public key for. **Do not forward the agent socket
-  into untrusted containers.**
+- **1Password-provisioned SSH key files** in `~/.ssh`. The 1Password recipe downloads configured attachments after confirming the CLI is authenticated. The Omarchy setup disables previously enabled OpenSSH/GCR agent sockets and does not automatically load these keys.
 - **Screen-time history** (`~/.config/omarchy/screen-time/history.json`).
-  Retains full window titles (including private/incognito browsing) for ~95
-  days. Any process running as the user can read it. Retention policy is a
-  deliberate choice; see the omarchy-plugins recipe for the current state.
-- **1Password SSH agent / vault items** reachable through the desktop.
+  Any process running as the user can read it. The custom tracker is not
+  deployed on the fresh-start setup, but an existing history file is included
+  in the encrypted WIP backup. If browser-title tracking was enabled, treat
+  that backup as sensitive browsing history. Per-app detail ages out after a
+  year; daily totals remain archived in the file.
 
 ## Accepted risks (deliberate, reviewed)
 

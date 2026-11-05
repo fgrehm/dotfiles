@@ -55,4 +55,4 @@ Scheduling is intentionally out of scope (single-shot script): use cron, a syste
 
 ## Deployment
 
-Installed by this recipe as `~/.local/bin/agent-usage-snapshot` on all targets (Omarchy, Debian containers/VMs). Requires `python3` (stdlib only — no `rg`, no third-party modules).
+Installed by this recipe as `~/.local/bin/agent-usage-snapshot` on enabled non-Omarchy targets (Debian containers/VMs); the Omarchy fresh-start profile excludes it. Requires `python3` (stdlib only — no `rg`, no third-party modules).

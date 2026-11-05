@@ -1,0 +1,26 @@
+# Keep only the agent tools I use from Omarchy's lazy mise defaults.
+# The create_ attribute seeds this user-owned file without replacing existing settings.
+[settings]
+disable_tools = [
+  "amp",
+  "antigravity-cli",
+  "basecamp",
+  "codex",
+  "copilot",
+  "crush",
+  "cursor-agent",
+  "grok",
+  "http:devin",
+  "http:kiro-cli",
+  "muse",
+  "npm:@deepseek-ai/dsh",
+  "npm:@kilocode/cli",
+  "npm:@minimax-ai/code",
+  "npm:@moonshot-ai/kimi-code",
+  "npm:command-code",
+  "npm:freebuff",
+  "oh-my-pi",
+  "opencode",
+  "ori",
+  "qwen",
+]

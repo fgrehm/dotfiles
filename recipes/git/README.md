@@ -7,15 +7,13 @@ Git configuration, global gitignore, shell aliases, and TUI tooling.
 - Installs git via apt (Debian) / pacman (Omarchy) (graceful failure, idempotent)
 - Uses Omarchy-managed Git utilities (`gh` and `lazygit`) without installing duplicate copies
 - Installs Worktrunk (`wt`) and Hunk through Omarchy's mise wrapper
-- Deploys `~/.config/git/config` (XDG location, templated for user identity and SSH signing)
+- Deploys `~/.config/git/config` (XDG location, templated for user identity)
 - Deploys `~/.config/git/ignore` (global ignores for editor swap files, OS cruft, AI tooling)
 - Deploys `~/.config/hunk/config.toml` (Hunk diff review TUI settings)
 - Adds shell aliases and Bash/Zsh completions via `~/.shellrc.d/git.sh` and the Git utility completion script
 
 ## Config highlights
 
-- SSH commit signing (auto-detected: only enabled if `~/.ssh/id_ed25519-sign.pub` exists)
-- SSH URLs for GitHub (`git@github.com:` instead of `https://`)
 - Histogram diff algorithm, colorMoved, fetch prune
 - Git LFS filter configured (install `git-lfs` separately before using LFS repositories)
 

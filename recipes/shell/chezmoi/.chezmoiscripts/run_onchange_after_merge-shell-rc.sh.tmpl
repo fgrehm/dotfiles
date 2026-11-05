@@ -82,7 +82,11 @@ merge_block() {
 }
 
 changed=0
-for rc in "$HOME/.bashrc" "$HOME/.zshrc"; do
+rc_files=("$HOME/.bashrc")
+# {{ if not .isOmarchy }}
+rc_files+=("$HOME/.zshrc")
+# {{ end }}
+for rc in "${rc_files[@]}"; do
   before=""
   [ -f "$rc" ] && before="$(cksum <"$rc")"
   merge_block "$rc"

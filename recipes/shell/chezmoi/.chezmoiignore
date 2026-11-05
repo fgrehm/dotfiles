@@ -4,6 +4,12 @@
 .chezmoiscripts/set-default-shell.sh
 {{ end }}
 
+# Omarchy uses Bash; do not install or configure Zsh there.
+{{ if .isOmarchy }}
+.zshrc
+.chezmoiscripts/install-ohmyzsh.sh
+{{ end }}
+
 # A platform-hydrated home owns ~/.bashrc and ~/.zshrc: the platform writes
 # managed blocks into them and refreshes them on every boot. Replacing those
 # files wholesale would drop the platform's setup, so chezmoi skips them and

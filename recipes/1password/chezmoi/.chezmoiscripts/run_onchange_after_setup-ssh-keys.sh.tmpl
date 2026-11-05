@@ -25,11 +25,20 @@ fi
 
 if ! op whoami &>/dev/null; then
   log_info "Signing in to 1Password..."
-  if ! eval "$(op signin)"; then
-    log_error "1Password sign-in failed, skipping SSH key setup"
-    log_info "Run 'chezmoi apply' again after signing in with 'op signin'"
-    exit 0
+  if ! signin_env="$(op signin)"; then
+    log_error "1Password sign-in failed; unlock the desktop app or sign in with 'op signin', then retry chezmoi apply"
+    exit 1
   fi
+  if ! eval "$signin_env"; then
+    log_error "1Password sign-in did not initialize the CLI session"
+    exit 1
+  fi
+  unset signin_env
+fi
+
+if ! op whoami &>/dev/null; then
+  log_error "1Password CLI is not authenticated; refusing to read SSH key attachments"
+  exit 1
 fi
 
 log_info "Downloading SSH keys from 1Password (vault: $OP_VAULT, item: $OP_ITEM)..."

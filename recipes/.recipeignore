@@ -3,6 +3,10 @@ omarchy
 omarchy-plugins
 podman
 vanta-agent
-{{- else if not .installVantaAgent }}
+{{- else }}
+omarchy-plugins
+agent-usage-snapshot
+{{- if not .installVantaAgent }}
 vanta-agent
+{{- end }}
 {{- end }}

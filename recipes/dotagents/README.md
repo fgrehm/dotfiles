@@ -5,7 +5,7 @@ Clones and installs the separate [dotagents](https://github.com/fgrehm/dotagents
 ## Behavior
 
 - Clone to `/data/projects` when it is a mount point (a guest whose project tree is mounted there), otherwise to `~/Projects/oss` when `~/Projects` exists, otherwise to `~/.local/share`.
-- Try `git@github.com:fgrehm/dotagents.git` with SSH batch mode first; if that fails, retry with `https://github.com/fgrehm/dotagents.git`.
+- Clone with `https://github.com/fgrehm/dotagents.git` only. An existing GitHub SSH-origin checkout is switched to the HTTPS remote without pulling.
 - Reuse an existing dotagents checkout without pulling. Refuse to overwrite a non-repository or a checkout with a different origin.
 - Delegate installation to the clone's `install.sh`.
 

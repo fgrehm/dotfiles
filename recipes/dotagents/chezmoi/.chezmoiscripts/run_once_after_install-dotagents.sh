@@ -2,7 +2,7 @@
 source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
 set -eo pipefail
 
-SSH_URL="git@github.com:fgrehm/dotagents.git"
+LEGACY_SSH_URL="git@github.com:fgrehm/dotagents.git"
 HTTPS_URL="https://github.com/fgrehm/dotagents.git"
 
 # Where the project tree lives.
@@ -40,7 +40,12 @@ is_dotagents_checkout() {
   git -C "$TARGET" rev-parse --is-inside-work-tree >/dev/null 2>&1 || return 1
   origin="$(git -C "$TARGET" remote get-url origin 2>/dev/null || true)"
   case "$origin" in
-  "$SSH_URL" | "$HTTPS_URL" | "ssh://git@github.com/fgrehm/dotagents.git") return 0 ;;
+  "$HTTPS_URL") return 0 ;;
+  "$LEGACY_SSH_URL" | "ssh://git@github.com/fgrehm/dotagents.git")
+    git -C "$TARGET" remote set-url origin "$HTTPS_URL" || return 1
+    log_info "Updated existing dotagents remote to HTTPS"
+    return 0
+    ;;
   *) return 1 ;;
   esac
 }
@@ -56,17 +61,12 @@ else
   trap 'rm -rf -- "$tmpdir"' EXIT
   clone_dir=""
 
-  log_info "Cloning dotagents over SSH"
-  if GIT_SSH_COMMAND="ssh -o BatchMode=yes" git clone --quiet "$SSH_URL" "$tmpdir/ssh-checkout"; then
-    clone_dir="$tmpdir/ssh-checkout"
-  else
-    log_skip "SSH clone failed; retrying dotagents clone over HTTPS"
-    git clone --quiet "$HTTPS_URL" "$tmpdir/https-checkout" || {
-      log_error "Could not clone dotagents over SSH or HTTPS"
-      exit 1
-    }
-    clone_dir="$tmpdir/https-checkout"
-  fi
+  log_info "Cloning dotagents over HTTPS"
+  git clone --quiet "$HTTPS_URL" "$tmpdir/https-checkout" || {
+    log_error "Could not clone dotagents over HTTPS"
+    exit 1
+  }
+  clone_dir="$tmpdir/https-checkout"
 
   if [ ! -x "$clone_dir/install.sh" ]; then
     log_error "Cloned dotagents repo has no executable install.sh"

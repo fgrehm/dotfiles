@@ -1,17 +1,16 @@
 # shell
 
-Core shell infrastructure: bash, zsh (via Oh My Zsh), and the modular
-`~/.shellrc.d/` loader that other recipes use for shell fragments.
+Core shell infrastructure for Omarchy Bash and non-Omarchy Bash/Zsh setups, plus the modular `~/.shellrc.d/` loader that other recipes use for shell fragments.
 
 ## What it does
 
 - Deploys `~/.bashrc` (on Omarchy: omarchy's `default/bash/rc` + shellrc loader; on containers: standard Debian skeleton + shellrc loader)
-- Deploys `~/.zshrc` (Oh My Zsh + git prompt extensions + shellrc loader)
+- Deploys `~/.zshrc` on non-Omarchy hosts (Oh My Zsh + git prompt extensions + shellrc loader)
 - Deploys `~/.shellrc` (sources `~/.shellrc.d/*.sh` alphabetically, then `~/.shellrc.local`)
 - Deploys `~/.shellrc.d/env.sh` (PATH, editor, history)
 - Deploys `~/.shellrc.d/aliases.sh` (ls, grep color aliases; `cdp`/`cdpo` project shortcuts with tab-completion of subdirectories, skipped in containers)
 - Creates `~/.shellrc.local` for machine-local overrides (not managed by chezmoi)
-- Installs Oh My Zsh (unattended, preserves existing `.zshrc`)
+- Installs Oh My Zsh on non-Omarchy hosts (unattended, preserves existing `.zshrc`)
 
 ## Provisioned guests
 
@@ -32,16 +31,16 @@ fi
 
 The block is refreshed in place, so re-running is a no-op and anything the user added outside the markers is preserved. The block content lives in `.chezmoitemplates/shellrc-block.sh` and is shared by the whole-file deploy and the merge, so the two cannot drift.
 
-The shared block is deliberately the only thing dotfiles contributes to a guest's rc files. The Debian skeleton and the Oh My Zsh setup are baselines for a machine dotfiles owns outright; on a guest the platform provides the baseline and the guest's shell is not the login shell anyway.
+The shared block is deliberately the only thing dotfiles contributes to a guest's rc files. On non-Omarchy machines owned by dotfiles, the Debian skeleton and Oh My Zsh setup provide shell baselines; on a guest, the platform provides the baseline and the guest's shell is not the login shell anyway.
 
 ## Requirements
 
 - Containers: Debian 13 (Trixie); `wget` (for Oh My Zsh install, available by default)
-- Omarchy: zsh is installed and selected as the default shell
+- Omarchy: Bash is selected as the default shell; Zsh and Oh My Zsh are not installed or configured by this recipe
 
 ## Omarchy
 
-On Omarchy, zsh and Oh My Zsh are installed through `omarchy pkg add` and the default shell is switched to zsh. Bash remains supported: `~/.bashrc` sources Omarchy's `default/bash/rc` followed by the shared shellrc loader.
+On Omarchy, the recipe selects Bash as the default shell, skips Zsh and Oh My Zsh, and manages `~/.bashrc` to source Omarchy's `default/bash/rc` followed by the shared shellrc loader. On existing hosts, it does not uninstall a Zsh package or delete an existing `~/.oh-my-zsh` directory or `.zshrc`; those files are simply no longer managed by this recipe.
 
 ## Template variables
 
@@ -50,6 +49,7 @@ On Omarchy, zsh and Oh My Zsh are installed through `omarchy pkg add` and the de
 | `.name` | User's full name | `chezmoi init` prompt |
 | `.email` | User's email address | `chezmoi init` prompt |
 | `.isContainer` | true in Docker containers | auto-detected |
+| `.isOmarchy` | true on Omarchy hosts | auto-detected |
 
 In containers, chezmoi never changes the account's login shell; that remains
 owned by the image or container runtime. Shell configuration and missing tools

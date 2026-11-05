@@ -20,6 +20,4 @@ SSH keys must be stored as file attachments on a Secure Note in 1Password:
 
 ## Auth
 
-If the 1Password desktop app is running and unlocked, the CLI uses it automatically.
-Otherwise, the SSH key setup script will call `eval "$(op signin)"` to prompt for
-interactive authentication.
+The SSH key setup script checks `op whoami` before reading any attachments. If the 1Password desktop app is running and unlocked, the CLI uses it automatically. Otherwise the script runs `op signin`, evaluates the returned environment, verifies authentication again, and fails the chezmoi apply if sign-in did not succeed, so the setup can be retried after logging in.
