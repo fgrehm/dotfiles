@@ -5,8 +5,9 @@ Omarchy 4.x customizations for bare-metal hosts. The recipe is selected by `reci
 ## Kept customizations
 
 - `input.lua` keeps Caps Lock as Ctrl, US/US-international layouts, Alt+Shift layout switching, and natural touchpad scrolling. Omarchy's stock 4.5 Hyprland entry point loads this personal module, so the repo does not carry a fork of that entry point.
-- `bindings.lua` removes the stock WhatsApp launcher shortcut.
+- `bindings.lua` removes the stock WhatsApp and Herdr launcher shortcuts, plus the Herdr keybindings menu.
 - `run_after_disable-whatsapp-extension.sh` removes Omarchy's WhatsApp-only Chromium extension from any installed Chromium-family flags files, while preserving the other stock extensions and flags. It is safe to run repeatedly.
+- `run_once_after_remove-herdr.sh` removes the `herdr` package and stops its server if present.
 - `run_onchange_after_remove-unwanted-apps.sh` removes unwanted stock webapps, including Basecamp and WhatsApp, one at a time. Omarchy's removal command accepts one app name per invocation.
 - `run_once_after_enable-gcr-ssh-agent.sh` uses Omarchy's supported setup command to enable the GCR SSH agent and configure `SSH_AUTH_SOCK` for host and container use.
 - `create_private_dot_config_mise_config.toml` seeds `~/.config/mise/config.toml` only when it does not already exist. It disables Omarchy's unused agent and Basecamp CLI defaults while leaving Claude and Pi available. The file is user-owned after seeding, so existing mise settings are not overwritten.
