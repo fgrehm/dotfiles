@@ -35,6 +35,7 @@ shell-lint: ## Lint shell scripts (shellcheck)
 test: ## Run focused tests
 	bash tests/whatsapp-extension.sh
 	bash tests/chezmoi-target-paths.sh
+	bash tests/keyboard-config.sh
 	bash tests/omastats-install.sh
 	bash tests/onepassword-ssh-keys.sh
 	bash tests/preflight-1password.sh

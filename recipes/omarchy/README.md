@@ -4,7 +4,8 @@ Omarchy 4.x customizations for bare-metal hosts. The recipe is selected by `reci
 
 ## Kept customizations
 
-- `input.lua` keeps Caps Lock as Ctrl, US/US-international layouts, Alt+Shift layout switching, and natural touchpad scrolling. Omarchy's stock 4.5 Hyprland entry point loads this personal module, so the repo does not carry a fork of that entry point.
+- `input.lua` keeps Caps Lock as Ctrl, US/US-international layouts, and natural touchpad scrolling. Layout switching uses Omarchy 4.5's stock Super+I (forward) and Super+Shift+I (backward), without a custom Alt+Shift toggle. Omarchy's stock Hyprland entry point loads this personal module, so the repo does not carry a fork of that entry point.
+- `private_dot_XCompose` deploys `~/.XCompose`, includes Omarchy's standard Compose definitions, and maps US-international acute+c/C to ç/Ç. `run_onchange_after_reload-xcompose.sh.tmpl` reloads Omarchy's input service after the Compose file changes. The old `private_XCompose` filename incorrectly targeted `~/XCompose`; an existing stray file can be removed manually.
 - `bindings.lua` removes the stock WhatsApp and Herdr launcher shortcuts, plus the Herdr keybindings menu.
 - `run_after_disable-whatsapp-extension.sh` removes Omarchy's WhatsApp-only Chromium extension from any installed Chromium-family flags files, while preserving the other stock extensions and flags. It is safe to run repeatedly.
 - `run_once_after_remove-herdr.sh` removes the `herdr` package and stops its server if present.

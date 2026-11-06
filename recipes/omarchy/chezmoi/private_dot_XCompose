@@ -1,0 +1,8 @@
+# Overrides Omarchy's default: /usr/share/omarchy/install/user/xcompose.sh
+# Keep Omarchy's Compose sequences and the locale's dead-key definitions.
+include "/usr/share/omarchy/default/xcompose"
+
+# US International: acute+c produces cedilla rather than c-acute.
+
+<dead_acute> <c> : "ç" U00E7
+<dead_acute> <C> : "Ç" U00C7

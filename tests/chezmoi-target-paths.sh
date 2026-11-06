@@ -24,6 +24,9 @@ assert_target_path() {
 assert_target_path \
   "$source_dir/private_dot_config/mise/create_config.toml" \
   "$HOME/.config/mise/config.toml"
+assert_target_path \
+  "$source_dir/private_dot_XCompose" \
+  "$HOME/.XCompose"
 
 omarchy_ignore="$tmp/omarchy-ignore"
 chezmoi --config "$config" --source "$root" execute-template \

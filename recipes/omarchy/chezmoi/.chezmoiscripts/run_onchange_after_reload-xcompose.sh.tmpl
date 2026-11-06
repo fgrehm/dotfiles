@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# vim: ft=bash.gotmpl
+# chezmoi:template:left-delimiter="# {{" right-delimiter="}}"
+# Compose hash: # {{ include "private_dot_XCompose" | sha256sum }}
+source "$CHEZMOI_SOURCE_DIR/scripts/ui.bash"
+
+set -eo pipefail
+
+log_info "Reloading Omarchy's input service for updated Compose rules..."
+omarchy restart xcompose
