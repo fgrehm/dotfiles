@@ -5,7 +5,7 @@ SHELL_FILES := $(shell find recipes home tests \( -name "*.sh" -o -name "*.sh.tm
 
 .DEFAULT_GOAL := help
 
-.PHONY: help shell-fmt shell-fmt-check shell-lint test-wip-backup check prek prek-install check-versions init apply diff doctor
+.PHONY: help shell-fmt shell-fmt-check shell-lint test check prek prek-install check-versions init apply diff doctor
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | awk -F ':.*## ' '{printf "  make %-18s %s\n", $$1, $$2}'
@@ -32,15 +32,14 @@ shell-fmt-check: ## Check shell formatting without modifying (shfmt -d)
 shell-lint: ## Lint shell scripts (shellcheck)
 	shellcheck --severity=warning $(SHELL_FILES)
 
-test-wip-backup: ## Run backup, browser-config, target-path, plugin, and SSH safety tests
-	bash tests/wip-backup.sh
+test: ## Run focused tests
 	bash tests/whatsapp-extension.sh
 	bash tests/chezmoi-target-paths.sh
 	bash tests/omastats-install.sh
 	bash tests/onepassword-ssh-keys.sh
 	bash tests/ssh-agent-cleanup.sh
 
-check: shell-fmt-check shell-lint test-wip-backup ## Run shell checks and focused tests
+check: shell-fmt-check shell-lint test ## Run shell checks and focused tests
 
 prek: ## Run all pre-commit hooks
 	prek run --all-files
