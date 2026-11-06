@@ -19,25 +19,15 @@ if [ -f "$SSH_DIR/id_ed25519" ] && [ -f "$SSH_DIR/id_ed25519.pub" ]; then
 fi
 
 if ! command -v op &>/dev/null; then
-  log_skip "1Password CLI not found, skipping SSH key setup"
-  exit 0
+  log_error "1Password CLI not found; install the Omarchy 1Password service and rerun the preflight before chezmoi apply"
+  exit 1
 fi
 
-if ! op whoami &>/dev/null; then
-  log_info "Signing in to 1Password..."
-  if ! signin_env="$(op signin)"; then
-    log_error "1Password sign-in failed; unlock the desktop app or sign in with 'op signin', then retry chezmoi apply"
-    exit 1
-  fi
-  if ! eval "$signin_env"; then
-    log_error "1Password sign-in did not initialize the CLI session"
-    exit 1
-  fi
-  unset signin_env
-fi
-
-if ! op whoami &>/dev/null; then
-  log_error "1Password CLI is not authenticated; refusing to read SSH key attachments"
+# Desktop-app integration authorizes CLI commands without creating a CLI sign-in
+# session, so `op whoami` is not a reliable auth check here. Listing vaults
+# verifies that the CLI can access the signed-in account before reading files.
+if ! op vault list --format=json >/dev/null; then
+  log_error "1Password CLI cannot access an account; unlock the desktop app, enable CLI integration, and retry"
   exit 1
 fi
 

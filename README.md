@@ -41,10 +41,15 @@ See [`recipes/`](recipes/) for the full list. Each recipe has its own README.
 
 ## Fresh Machine Setup
 
-On a new laptop, `chezmoi apply` needs to run twice:
+On a fresh Omarchy laptop, install and sign in to 1Password before running `install.sh`:
 
-1. **First apply** -- downloads SSH keys from your 1Password vault (on Omarchy, 1Password is preinstalled so only the key download runs). Other recipes that need SSH (e.g. private repos) will skip gracefully on this run.
-2. **Second apply** -- SSH keys are now on disk; any recipe that skipped will retry and complete normally.
+1. In the Omarchy menu, choose **Install > Service > 1Password**. This installs the desktop app and CLI (`op`).
+2. Open 1Password and sign in to your account.
+3. In 1Password, enable **Settings > Developer > Integrate with 1Password CLI**.
+4. From a new terminal, confirm `op vault list` works. `op whoami` may report that the account is not signed in even when desktop integration is working.
+5. Run `./install.sh`. On Omarchy, it runs `scripts/preflight-1password.sh` before bootstrapping chezmoi and stops if `op` is missing or cannot access vaults.
+
+The first `chezmoi apply` retrieves configured SSH keys from your 1Password vault. If other recipes need those keys (for example, to access private repositories), run `chezmoi apply` again after the keys are present.
 
 ## Development
 

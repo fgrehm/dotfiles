@@ -9,6 +9,7 @@
 set -eu
 
 BIN_DIR="${BIN_DIR:-$HOME/.local/bin}"
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
 
 _log() { printf '\033[1;34m==> %s\033[0m\n' "$*"; }
 _die() {
@@ -32,6 +33,12 @@ if ! command -v git >/dev/null 2>&1; then
   else
     _die "git is required but not installed (apt-get install git)"
   fi
+fi
+
+# The Omarchy target retrieves SSH keys from 1Password during apply. Fail before
+# bootstrap or chezmoi init if its CLI cannot access the signed-in account.
+if command -v omarchy >/dev/null 2>&1; then
+  "$SCRIPT_DIR/scripts/preflight-1password.sh" || _die "1Password preflight failed; resolve it before continuing"
 fi
 
 case "$(uname -m)" in
@@ -93,7 +100,6 @@ REPO_URL='https://github.com/fgrehm/dotfiles.git'
 SOURCE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/chezmoi"
 
 # If run from within the repo, use it directly instead of cloning
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 if [ -f "$SCRIPT_DIR/.chezmoiroot" ]; then
   _log "Running from local repo at $SCRIPT_DIR"
   SOURCE_DIR="$SCRIPT_DIR"

@@ -7,7 +7,7 @@ Skipped in containers (they use SSH agent forwarding) and on VMs (the SSH-key
 setup requires the `op` CLI and interactive sign-in; the `chezmoi init` vault
 prompts are likewise scoped to Omarchy).
 
-On Omarchy, 1Password is preinstalled, so only the SSH-key setup runs (no install step). The apt install script that used to run on the Debian laptop was removed when Debian-as-bare-metal was dropped.
+On Omarchy, 1Password is not installed by default. Install it from Omarchy's **Install > Service > 1Password** menu before applying dotfiles.
 
 ## 1Password setup
 
@@ -18,6 +18,8 @@ SSH keys must be stored as file attachments on a Secure Note in 1Password:
 - Attachments: `id_ed25519`, `id_ed25519.pub`, and optionally
   `id_ed25519-sign`, `id_ed25519-sign.pub`
 
-## Auth
+## Preflight and auth
 
-The SSH key setup script checks `op whoami` before reading any attachments. If the 1Password desktop app is running and unlocked, the CLI uses it automatically. Otherwise the script runs `op signin`, evaluates the returned environment, verifies authentication again, and fails the chezmoi apply if sign-in did not succeed, so the setup can be retried after logging in.
+Before `chezmoi apply`, run `scripts/preflight-1password.sh`. It fails early if `op` is missing or cannot access vaults. On Omarchy, install the service from **Install > Service > 1Password** first. Then sign in to the desktop app, enable **Settings > Developer > Integrate with 1Password CLI**, and rerun the preflight. It checks `op vault list --format=json`; `op whoami` is not suitable for this desktop-integrated session because the CLI may report that the account is not signed in even while vault access works.
+
+During apply, SSH-key setup repeats the vault-access check before reading the configured attachments. It fails apply if `op` is missing or vault access is unavailable, rather than silently skipping key setup.
