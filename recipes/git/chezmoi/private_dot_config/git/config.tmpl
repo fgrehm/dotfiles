@@ -7,6 +7,13 @@
 {{- if ne .name "TODO: Your Name" }}
 	name = {{ .name }}
 {{- end }}
+{{- if stat (joinPath .chezmoi.homeDir ".ssh/id_ed25519-sign.pub") }}
+	signingKey = ~/.ssh/id_ed25519-sign.pub
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
+{{- end }}
 {{ end -}}
 [color]
 	branch = auto
