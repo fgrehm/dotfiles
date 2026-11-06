@@ -1,0 +1,37 @@
+# Restic patterns, not shell globs. $HOME is expanded by Restic; ~ is not.
+# SSH keys are recoverable from 1Password; exclude local copies anywhere.
+**/.ssh
+
+# Rebuildable caches and generated dependencies.
+**/.cache
+**/.dropbox.cache
+**/node_modules
+**/.venv
+**/venv
+**/target
+
+# Package stores and build caches. Keep installed tools and project lockfiles.
+$HOME/.local/share/pnpm/store
+**/.pnpm-store
+$HOME/.npm/_cacache
+$HOME/.npm/_logs
+$HOME/.gradle/caches
+$HOME/.gradle/daemon
+**/.gradle
+$HOME/.m2/repository
+$HOME/go/pkg/mod
+$HOME/.cargo/registry
+$HOME/.cargo/git
+
+# VM disks and container storage, including volumes and writable container data.
+# Export databases and other irreplaceable guest data separately before relying
+# on these exclusions for recovery.
+$HOME/.local/share/containers/storage
+$HOME/.local/share/docker
+$HOME/.docker/desktop
+$HOME/.local/share/libvirt/images
+$HOME/.local/share/gnome-boxes/images
+$HOME/VirtualBox VMs
+
+# User trash.
+**/.local/share/Trash

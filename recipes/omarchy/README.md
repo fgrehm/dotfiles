@@ -22,6 +22,12 @@ The `omarchy-plugins` recipe is excluded on Omarchy hosts. Its Pomodoro, custom 
 
 Quick Note, Typora-specific bindings, the copied Hyprland entry point, Omasnap's duplicate install, and custom window rules are not managed here. Omarchy 4.5 supplies Omasnap and its screenshot behavior.
 
+## Backup exclusions
+
+`~/.config/omarchy-time-machine/excludes.txt` links to [`config/restic/excludes.txt`](../../config/restic/excludes.txt) in this checkout. Omarchy Time Machine uses that default exclude file unless its configuration explicitly selects another path. The plugin, backup sources, repository, password, and schedule remain manually configured; dotfiles does not start backups.
+
+The rules exclude SSH directories, dependency/build caches, pnpm stores, and common VM/container storage locations. Container volumes and VM disks can contain irreplaceable data; export that data separately or remove the relevant exclusion if it must be backed up. Git repositories, uncommitted work, and BB session data are not broadly excluded. New rules affect future snapshots, not existing ones.
+
 ## Notes
 
 - Omarchy commands manage privilege escalation internally; do not prefix them with `sudo`.
