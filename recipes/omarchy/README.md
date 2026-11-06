@@ -18,7 +18,7 @@ Omarchy 4.x customizations for bare-metal hosts. The recipe is selected by `reci
 
 ## Intentionally not deployed
 
-The `omarchy-plugins` recipe is excluded on Omarchy hosts. Its Pomodoro, custom Screen Time, and My Agents plugin sources remain in the repository but are not enabled on the fresh-start system. Existing Screen Time history is not removed.
+The vendored Pomodoro, Screen Time, and My Agents plugins and their legacy recipe have been removed. Existing installed plugin links and bar settings are not migrated or cleaned up. Screen Time usage data remains at `~/.config/omarchy/screen-time/history.json`; add its parent directory to backup sources to preserve it.
 
 Quick Note, Typora-specific bindings, the copied Hyprland entry point, Omasnap's duplicate install, and custom window rules are not managed here. Omarchy 4.5 supplies Omasnap and its screenshot behavior.
 
