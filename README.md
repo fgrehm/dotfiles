@@ -49,7 +49,7 @@ On a fresh Omarchy laptop, install and sign in to 1Password before running `inst
 4. From a new terminal, confirm `op vault list` works. `op whoami` may report that the account is not signed in even when desktop integration is working.
 5. Run `./install.sh`. On Omarchy, it runs `scripts/preflight-1password.sh` before bootstrapping chezmoi and stops if `op` is missing or cannot access vaults.
 
-The first `chezmoi apply` retrieves configured SSH keys from your 1Password vault. If other recipes need those keys (for example, to access private repositories), run `chezmoi apply` again after the keys are present.
+The first `chezmoi apply` retrieves configured SSH keys from your 1Password vault and enables Omarchy's GCR SSH agent. Log out and back in for `SSH_AUTH_SOCK` to reach the session. Git enables SSH commit signing when `~/.ssh/id_ed25519-sign.pub` is present. The same agent socket can be forwarded into containers; processes with access to it can request signatures as well as SSH authentication. If other recipes need the downloaded keys (for example, to access private repositories), run `chezmoi apply` again after the keys are present.
 
 ## Development
 

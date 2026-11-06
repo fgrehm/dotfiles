@@ -13,7 +13,7 @@ Omarchy 4.x customizations for bare-metal hosts. The recipe is selected by `reci
 - `run_once_install-fast-cli-tools.sh` installs ZapFast (`zapfast-bin`).
 - Install scripts also set up Brave, Slack, Dropbox, Bun, Rust, lmk, and NVIDIA Vulkan support where applicable.
 - `run_once_after_enable-omastats.sh` installs and enables the upstream `crmne.omastats` bar plugin in the right section.
-- On Omarchy, the 1Password recipe remains responsible for retrieving configured SSH key attachments. It verifies `op whoami` and signs in before reading the vault; it does not configure an SSH agent.
+- On Omarchy, the 1Password recipe retrieves configured SSH key attachments after `op vault list --format=json` confirms desktop-integrated vault access. The GCR SSH agent is enabled separately by the Omarchy setup script; Git uses the optional `id_ed25519-sign.pub` key for SSH commit signing when present.
 
 ## Intentionally not deployed
 

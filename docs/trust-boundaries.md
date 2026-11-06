@@ -10,13 +10,9 @@ Anything running as your user (app containers, agent threads, devcontainers
 with the home directory mounted) can read everything your user can read,
 including:
 
-- **1Password-provisioned SSH key files** in `~/.ssh`. The 1Password recipe downloads configured attachments after confirming the CLI is authenticated. The Omarchy setup disables previously enabled OpenSSH/GCR agent sockets and does not automatically load these keys.
-- **Screen-time history** (`~/.config/omarchy/screen-time/history.json`).
-  Any process running as the user can read it. The custom tracker is not
-  deployed on the fresh-start setup, but an existing history file is included
-  in the encrypted WIP backup. If browser-title tracking was enabled, treat
-  that backup as sensitive browsing history. Per-app detail ages out after a
-  year; daily totals remain archived in the file.
+- **1Password-provisioned SSH key files** in `~/.ssh`. The 1Password recipe downloads configured attachments after confirming desktop-integrated CLI vault access.
+- **GCR SSH agent socket** (`$SSH_AUTH_SOCK`). Omarchy enables GCR for SSH authentication and Git commit signing. Processes and containers granted this socket can request authentication and signing operations from keys available to the agent, though they cannot extract private key material from the agent.
+- **Screen-time history** (`~/.config/omarchy/screen-time/history.json`). Any process running as the user can read it. The custom tracker is not deployed on the fresh-start setup, but an existing history file is retained.
 
 ## Accepted risks (deliberate, reviewed)
 
