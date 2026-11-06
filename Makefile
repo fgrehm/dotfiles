@@ -38,7 +38,7 @@ test: ## Run focused tests
 	bash tests/omastats-install.sh
 	bash tests/onepassword-ssh-keys.sh
 	bash tests/preflight-1password.sh
-	bash tests/ssh-agent-cleanup.sh
+	bash tests/ssh-agent-setup.sh
 
 check: shell-fmt-check shell-lint test ## Run shell checks and focused tests
 

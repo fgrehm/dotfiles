@@ -8,7 +8,7 @@ Omarchy 4.x customizations for bare-metal hosts. The recipe is selected by `reci
 - `bindings.lua` removes the stock WhatsApp launcher shortcut.
 - `run_after_disable-whatsapp-extension.sh` removes Omarchy's WhatsApp-only Chromium extension from any installed Chromium-family flags files, while preserving the other stock extensions and flags. It is safe to run repeatedly.
 - `run_onchange_after_remove-unwanted-apps.sh` removes unwanted stock webapps, including Basecamp and WhatsApp, one at a time. Omarchy's removal command accepts one app name per invocation.
-- `run_once_after_000-disable-openssh-agent.sh` removes Omarchy's managed GCR agent environment file and disables its socket, while preserving the OpenSSH agent socket and `SSH_AUTH_SOCK` used by containers. It clears the systemd user manager variable only when it points at the stale GCR socket.
+- `run_once_after_enable-gcr-ssh-agent.sh` uses Omarchy's supported setup command to enable the GCR SSH agent and configure `SSH_AUTH_SOCK` for host and container use.
 - `create_private_dot_config_mise_config.toml` seeds `~/.config/mise/config.toml` only when it does not already exist. It disables Omarchy's unused agent and Basecamp CLI defaults while leaving Claude and Pi available. The file is user-owned after seeding, so existing mise settings are not overwritten.
 - `run_once_install-fast-cli-tools.sh` installs ZapFast (`zapfast-bin`).
 - Install scripts also set up Brave, Slack, Dropbox, Bun, Rust, lmk, and NVIDIA Vulkan support where applicable.
